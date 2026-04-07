@@ -1,0 +1,50 @@
+fail: commit
+
+pre-commit:
+  parallel: true
+  commands:
+    branch-name:
+      run: node scripts/validate-branch-name.js --strict
+
+    prettier:
+      glob: 'src/**/*.{tsx,ts,jsx,js,css,json,md}'
+      run: pnpm format
+      stage_fixed: true
+
+    eslint:
+      glob: 'src/**/*.{tsx,ts,jsx,js}'
+      run: pnpm lint --fix
+      stage_fixed: true
+
+    tests:
+      glob: 'src/**/*.{test,spec}.{tsx,ts}'
+      run: pnpm test:check
+      skip: merge
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: node scripts/validate-commit-msg.js $1
+
+post-checkout:
+  commands:
+    branch-name:
+      run: node scripts/validate-branch-name.js
+
+pre-push:
+  parallel: true
+  commands:
+    branch-name:
+      run: node scripts/validate-branch-name.js --strict
+
+    prettier:
+      glob: 'src/**/*.{tsx,ts,jsx,js,css,json,md}'
+      run: pnpm format:check
+
+    eslint:
+      glob: 'src/**/*.{tsx,ts,jsx,js}'
+      run: pnpm lint
+
+    tests:
+      glob: 'src/**/*.{test,spec}.{tsx,ts}'
+      run: pnpm test:check

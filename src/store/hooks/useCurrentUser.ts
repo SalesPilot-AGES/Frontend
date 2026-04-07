@@ -14,7 +14,7 @@ export const useCurrentUser = (): User | null => {
 
 export const useRequireUser = (): User => {
   const user = useAuthStore(selectUser);
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/' });
   if (!user) {
     navigate({ to: '/login' });
     throw new Error('User not authenticated');

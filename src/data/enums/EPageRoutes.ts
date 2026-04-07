@@ -16,4 +16,4 @@ export const EPageRoutes = {
   // Salesman Routes
   SALESMAN_DASHBOARD: '/vendedores',
   SALESMAN_MEETINGS: '/vendedores/reuniões',
-};
+} as const;

@@ -6,7 +6,7 @@ import { Layout } from './Layout';
 
 // Root route - renders Layout for app routes, or direct component for login
 export const RootComponent = (): JSX.Element => {
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/' });
   const user = useCurrentUser();
   const location = useLocation();
 

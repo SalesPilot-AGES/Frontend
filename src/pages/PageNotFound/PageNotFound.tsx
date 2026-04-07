@@ -4,7 +4,7 @@ import { useNavigate } from '@tanstack/react-router';
 import type { JSX } from 'react';
 
 export const PageNotFound = (): JSX.Element => {
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/' });
 
   return (
     <Box

@@ -49,7 +49,6 @@ try {
 
   // Allow release/* and hotfix/* patterns
   if (PROTECTED_PATTERNS.some((pattern) => branchName.startsWith(pattern))) {
-    console.log(`✅ Branch "${branchName}" matches protected pattern`);
     process.exit(0);
   }
 
@@ -69,14 +68,6 @@ try {
 
     errorOutput('\n❌ Invalid branch name format\n');
     errorOutput('Expected format: <type>/<issue-number>/<short-description>');
-    errorOutput('Use "no-ref" for issue-number if no issue is applicable\n');
-    errorOutput(`Valid types: ${VALID_TYPES.join(', ')}\n`);
-    errorOutput('Examples:');
-    errorOutput('  feat/1234/add-user-authentication');
-    errorOutput('  fix/5678/sidebar-alignment-issue');
-    errorOutput('  hotfix/3456/critical-bug-fix');
-    errorOutput('  refactor/no-ref/simplify-form-logic\n');
-    errorOutput(`Your branch: "${branchName}"\n`);
 
     if (shouldFail) {
       errorOutput(
@@ -93,15 +84,6 @@ try {
       process.exit(0);
     }
   }
-
-  const typeMatch = branchName.match(/^([^/]+)\//);
-  const type = typeMatch ? typeMatch[1] : 'no-ref';
-  console.log(`✅ Branch name is valid`);
-  console.log(`   Type: ${type}`);
-  const issueMatch = branchName.match(/^[^/]+\/([^/]+)\//);
-  const issueNumber = issueMatch ? issueMatch[1] : 'no-ref';
-  console.log(`   Issue: ${issueNumber}`);
-  console.log(`   Name: ${branchName}`);
   process.exit(0);
 } catch (error) {
   console.error('❌ Error validating branch name:', error.message);

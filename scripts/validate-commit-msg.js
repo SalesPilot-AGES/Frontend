@@ -43,9 +43,6 @@ try {
   if (!typeRegex.test(firstLine)) {
     console.error('❌ Invalid commit message format\n');
     console.error('Expected format: <type>: <description>');
-    console.error(`Valid types: ${VALID_TYPES.join(', ')}\n`);
-    console.error(`Example: "feat: add user authentication modal"\n`);
-    console.error(`Your message: "${firstLine}"\n`);
     process.exit(1);
   }
 
@@ -58,9 +55,6 @@ try {
     process.exit(1);
   }
 
-  console.log(`✅ Commit message is valid`);
-  console.log(`   Type: ${type}`);
-  console.log(`   Desc: ${description}`);
   process.exit(0);
 } catch (error) {
   console.error('❌ Error reading commit message:', error.message);

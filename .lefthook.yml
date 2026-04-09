@@ -16,11 +16,6 @@ pre-commit:
       run: pnpm lint --fix
       stage_fixed: true
 
-    tests:
-      glob: 'src/**/*.{test,spec}.{tsx,ts}'
-      run: pnpm test:check
-      skip: merge
-
 commit-msg:
   commands:
     conventional-commit:

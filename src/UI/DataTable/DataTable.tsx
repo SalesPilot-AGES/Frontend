@@ -1,7 +1,7 @@
 import { Paper, Table, TableContainer, useTheme } from '@mui/material';
 import type { JSX } from 'react';
 
-import type { DataTableProps } from './DataTable';
+import type { DataTableProps } from '../../types/ui';
 import { getDataTableSurfaceColors } from './DataTable';
 import { DataTableBody } from './DataTableBody/DataTableBody';
 import { DataTableHead } from './DataTableHead/DataTableHead';
@@ -19,12 +19,12 @@ export const DataTable = <T,>({
   toolbarTitle,
   searchValue,
   onSearchChange,
-  searchPlaceholder = 'Buscar...',
+  searchPlaceholder = 'Buscar',
   searchAriaLabel = 'Buscar',
   filterValue,
   onFilterChange,
   filterOptions = [],
-  filterPlaceholder = 'Filtrar...',
+  filterPlaceholder = 'Filtrar',
   filterAriaLabel = 'Filtro',
 }: DataTableProps<T>): JSX.Element => {
   const { palette } = useTheme();
@@ -38,7 +38,7 @@ export const DataTable = <T,>({
     <Paper
       elevation={0}
       sx={{
-        backgroundColor: palette.neutrals.baseWhite,
+        backgroundColor: palette.common.white,
         border: `1px solid ${surface.paperBorder}`,
         borderRadius: '0.75rem',
         boxShadow: 'none',
@@ -98,14 +98,3 @@ export const DataTable = <T,>({
 };
 
 export default DataTable;
-
-export type {
-  BadgeLook,
-  DataTableAccessor,
-  DataTableBadgeColor,
-  DataTableColumn,
-  DataTableFilterOption,
-  DataTableIconColorTuple,
-  DataTableProps,
-  DataTableSurfaceColors,
-} from './DataTable';

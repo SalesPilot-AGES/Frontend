@@ -9,7 +9,8 @@ import {
 import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
 
-import type { DataTableColumn, DataTableSurfaceColors } from '../DataTable';
+import type { DataTableColumn } from '../../../types/ui';
+import type { DataTableSurfaceColors } from '../../../UI/DataTable/DataTable';
 import { formatHeaderMultiline, iconTupleToCss } from '../DataTable';
 
 export interface DataTableHeadProps<T> {

@@ -9,7 +9,8 @@ import {
 import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
 
-import type { DataTableColumn, DataTableSurfaceColors } from '../DataTable';
+import type { DataTableColumn } from '../../../types/ui';
+import type { DataTableSurfaceColors } from '../../../UI/DataTable/DataTable';
 import { buildSkeletonWidths, ROWS_PER_PAGE } from '../DataTable';
 import { DataTableBodyCell } from '../DataTableBodyCell/DataTableBodyCell';
 import { DataTableEmptyState } from '../DataTableEmptyState/DataTableEmptyState';

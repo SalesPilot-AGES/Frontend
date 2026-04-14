@@ -2,7 +2,7 @@ import { Box, Chip, Stack, Typography } from '@mui/material';
 import type { Palette } from '@mui/material/styles';
 import type { JSX, ReactNode } from 'react';
 
-import type { DataTableColumn } from '../DataTable';
+import type { DataTableColumn } from '../../../types/ui';
 import {
   chipLookFromValue,
   resolveBadgeColor,

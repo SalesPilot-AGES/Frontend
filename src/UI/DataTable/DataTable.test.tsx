@@ -5,7 +5,7 @@ import { fireEvent, render, screen } from '@tests/testUtils';
 import type { JSX } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DataTable } from './DataTableView';
+import { DataTable } from './DataTable.tsx';
 
 interface CompanyRow {
   id: string;

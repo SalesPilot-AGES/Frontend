@@ -1,59 +1,16 @@
-import type { ChipProps, SxProps, Theme } from '@mui/material';
+import { EDataTableBgShade } from '@data/enums/EDataTableBgShade';
+import { EDataTableFgShade } from '@data/enums/EDataTableFgShade';
+import { EDataTableScaleBgFg } from '@data/enums/EDataTableScaleBgFg';
+import type {
+  BadgeLook,
+  DataTableAccessor,
+  DataTableBadgeColor,
+  DataTableColumn,
+  DataTableIconColorTuple,
+} from '@declarations/ui';
 import type { Palette } from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
 import type { ReactNode } from 'react';
-
-export type DataTableIconColorTuple = readonly [
-  r: number,
-  g: number,
-  b: number,
-];
-
-export type DataTableBadgeColor = ChipProps['color'];
-
-export type DataTableAccessor<T> = keyof T | ((row: T) => ReactNode);
-
-export interface DataTableFilterOption {
-  value: string;
-  label: string;
-}
-
-export interface DataTableColumn<T> {
-  header: string;
-  accessor: DataTableAccessor<T>;
-  icon?: ReactNode;
-  iconColor?: DataTableIconColorTuple;
-  variant?: 'text' | 'badge';
-  badgeColor?:
-    | DataTableBadgeColor
-    | ((value: ReactNode, row: T) => DataTableBadgeColor);
-  width?: number | string;
-  align?: 'left' | 'center' | 'right';
-  render?: (value: ReactNode, row: T) => ReactNode;
-}
-
-export interface DataTableProps<T> {
-  columns: DataTableColumn<T>[];
-  data: T[];
-  getRowId: (row: T) => string | number;
-  onDetailsClick: (id: string | number) => void;
-  loading?: boolean;
-  emptyTitle?: string;
-  emptyDescription?: string;
-  sx?: SxProps<Theme>;
-  toolbarTitle?: string;
-  searchValue?: string;
-  onSearchChange?: (value: string) => void;
-  searchPlaceholder?: string;
-  searchAriaLabel?: string;
-  filterValue?: string;
-  onFilterChange?: (value: string) => void;
-  filterOptions?: DataTableFilterOption[];
-  filterPlaceholder?: string;
-  filterAriaLabel?: string;
-}
-
-export type BadgeLook = { backgroundColor: string; color: string };
 
 export const ROWS_PER_PAGE = 5;
 
@@ -137,11 +94,13 @@ export const resolveBadgeColor = <T>(
 
 const scaleBgFg = (
   palette: Palette,
-  key: 'success' | 'warning' | 'error' | 'info',
-  bgShade: 100 | 200,
-  fgShade: 400 | 500
+  key: (typeof EDataTableScaleBgFg)[keyof typeof EDataTableScaleBgFg],
+  bgShade: (typeof EDataTableBgShade)[keyof typeof EDataTableBgShade],
+  fgShade: (typeof EDataTableFgShade)[keyof typeof EDataTableFgShade]
 ): BadgeLook => {
-  const tone = palette[key] as Record<string, string> | undefined;
+  const tone = palette[key as keyof Palette] as unknown as
+    | Record<string, string>
+    | undefined;
   return {
     backgroundColor: tone?.[String(bgShade)] ?? palette.neutrals[100],
     color: tone?.[String(fgShade)] ?? palette.neutrals[700],
@@ -160,7 +119,12 @@ export const chipLookFromValue = (
     .replace(/[\u0300-\u036f]/g, '');
 
   if (/^ativo|active|enabled/.test(normalized)) {
-    return scaleBgFg(palette, 'success', 100, 500);
+    return scaleBgFg(
+      palette,
+      EDataTableScaleBgFg.SUCCESS,
+      EDataTableBgShade.LIGHT,
+      EDataTableFgShade.DARK
+    );
   }
   if (/^inativo|inactive|disabled/.test(normalized)) {
     return {
@@ -169,7 +133,7 @@ export const chipLookFromValue = (
     };
   }
   if (/pendente|pending/.test(normalized)) {
-    return scaleBgFg(palette, 'warning', 100, 500);
+    return scaleBgFg(palette, EDataTableScaleBgFg.WARNING, 100, 500);
   }
   if (normalized.includes('enterprise')) {
     return {
@@ -192,11 +156,26 @@ export const chipLookFromValue = (
 
   switch (badgeColor) {
     case 'success':
-      return scaleBgFg(palette, 'success', 100, 500);
+      return scaleBgFg(
+        palette,
+        EDataTableScaleBgFg.SUCCESS,
+        EDataTableBgShade.LIGHT,
+        EDataTableFgShade.DARK
+      );
     case 'warning':
-      return scaleBgFg(palette, 'warning', 100, 500);
+      return scaleBgFg(
+        palette,
+        EDataTableScaleBgFg.WARNING,
+        EDataTableBgShade.LIGHT,
+        EDataTableFgShade.DARK
+      );
     case 'error':
-      return scaleBgFg(palette, 'error', 100, 400);
+      return scaleBgFg(
+        palette,
+        EDataTableScaleBgFg.ERROR,
+        EDataTableBgShade.LIGHT,
+        EDataTableFgShade.LIGHT
+      );
     case 'default':
       return {
         backgroundColor: palette.neutrals[100],

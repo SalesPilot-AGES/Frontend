@@ -12,10 +12,8 @@ import {
 import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
 
-import type {
-  DataTableFilterOption,
-  DataTableSurfaceColors,
-} from '../DataTable';
+import type { DataTableFilterOption } from '../../../types/ui';
+import type { DataTableSurfaceColors } from '../../../UI/DataTable/DataTable';
 
 export interface DataTableToolbarProps {
   toolbarTitle?: string;

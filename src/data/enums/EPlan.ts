@@ -1,5 +1,5 @@
 export const EPlan = {
-  BASIC: 'basic',
-  PRO: 'pro',
-  ENTERPRISE: 'enterprise',
+  BASIC: 'Básico',
+  PRO: 'Pro',
+  ENTERPRISE: 'Enterprise',
 } as const;

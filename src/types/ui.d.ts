@@ -60,7 +60,7 @@ export type TStatus = (typeof EStatus)[keyof typeof EStatus];
 export type TPlan = (typeof EPlan)[keyof typeof EPlan];
 
 export interface IStatusBadgeProps {
-  status: TStatus;
+  active: boolean;
   sx?: SxProps;
 }
 

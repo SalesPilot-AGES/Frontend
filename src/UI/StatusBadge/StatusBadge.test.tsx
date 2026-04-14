@@ -1,23 +1,22 @@
-import { EStatus } from '@data/enums/EStatus';
 import { render, screen } from '@tests/testUtils';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import { describe, expect, it } from 'vitest';
 
 describe('StatusBadge Component', () => {
   it('renders active status badge', () => {
-    render(<StatusBadge status={EStatus.ACTIVE} />);
+    render(<StatusBadge active />);
 
     expect(screen.getByText('Ativo')).toBeInTheDocument();
   });
 
   it('renders inactive status badge', () => {
-    render(<StatusBadge status={EStatus.INACTIVE} />);
+    render(<StatusBadge active={false} />);
 
     expect(screen.getByText('Inativo')).toBeInTheDocument();
   });
 
   it('renders a chip component', () => {
-    const { container } = render(<StatusBadge status={EStatus.ACTIVE} />);
+    const { container } = render(<StatusBadge active />);
 
     const chip = container.querySelector('[class*="MuiChip"]');
     expect(chip).toBeInTheDocument();
@@ -25,7 +24,7 @@ describe('StatusBadge Component', () => {
 
   it('applies custom sx styles', () => {
     const { container } = render(
-      <StatusBadge status={EStatus.ACTIVE} sx={{ borderRadius: '1rem' }} />
+      <StatusBadge active sx={{ borderRadius: '1rem' }} />
     );
 
     const chip = container.querySelector('[class*="MuiChip"]') as HTMLElement;
@@ -36,7 +35,7 @@ describe('StatusBadge Component', () => {
   });
 
   it('applies active status styles', () => {
-    const { container } = render(<StatusBadge status={EStatus.ACTIVE} />);
+    const { container } = render(<StatusBadge active />);
 
     const chip = container.querySelector('[class*="MuiChip"]') as HTMLElement;
 

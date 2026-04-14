@@ -1,4 +1,4 @@
 export const EStatus = {
-  ACTIVE: 'active',
-  INACTIVE: 'inactive',
+  ACTIVE: 'Ativo',
+  INACTIVE: 'Inativo',
 } as const;

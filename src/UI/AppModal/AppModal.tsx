@@ -1,11 +1,11 @@
 import type { IBasicModalProps } from '@declarations/ui';
 import { Stack } from '@mui/material';
 import Modal from '@mui/material/Modal';
-import ModalFooter from '@UI/ModalFooter/ModalFooter';
-import ModalHeader from '@UI/ModalHeader/ModalHeader';
+import ModalFooter from '@UI/AppModal/ModalFooter/ModalFooter';
+import ModalHeader from '@UI/AppModal/ModalHeader/ModalHeader';
 import type { JSX } from 'react';
 
-export default function BasicModal({
+export default function AppModal({
   modalName,
   open,
   children,

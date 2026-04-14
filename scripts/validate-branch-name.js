@@ -28,7 +28,7 @@ const VALID_TYPES = [
   'ci',
   'revert',
   'hotfix',
-  'chore'
+  'chore',
 ];
 const SPECIAL_BRANCHES = ['main', 'development', 'staging'];
 const PROTECTED_PATTERNS = ['release/', 'hotfix/'];

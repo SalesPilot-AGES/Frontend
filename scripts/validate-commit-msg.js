@@ -20,7 +20,7 @@ const VALID_TYPES = [
   'perf',
   'ci',
   'revert',
-  'chore'
+  'chore',
 ];
 
 try {

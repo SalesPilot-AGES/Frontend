@@ -1,7 +1,7 @@
 import type { IIconBoxProps } from '@declarations';
 import { useColorTheme } from '@hooks/useColorTheme';
 import { Box } from '@mui/material';
-import { getAppIcon } from '@UI/AppIcon/AppIcon';
+import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
 export const IconBox = ({
@@ -26,7 +26,7 @@ export const IconBox = ({
         ...sx,
       }}
     >
-      {getAppIcon(iconName)}
+      {GetAppIcon(iconName)}
     </Box>
   );
 };

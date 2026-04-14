@@ -11,7 +11,9 @@ export type TIconName =
   | 'salesman'
   | 'meeting'
   | 'login'
-  | 'logout';
+  | 'logout'
+  | 'close'
+  | 'save';
 
 export interface IHeaderProps {
   title: string;
@@ -43,4 +45,11 @@ export interface MenuItem {
   label: string;
   path: string;
   icon: JSX.Element;
+}
+
+export interface IBasicModalProps {
+  modalName: string;
+  handleClose?: () => void;
+  open: boolean;
+  children: JSX.Element;
 }

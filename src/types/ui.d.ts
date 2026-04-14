@@ -1,3 +1,4 @@
+import type { ECardLabel } from '@data/enums/ECardLabel';
 import type { SxProps } from '@mui/material';
 import type { JSX, ReactNode } from 'react';
 
@@ -32,6 +33,14 @@ export interface IPageContainerProps {
 export interface IIconBoxProps {
   iconName: TIconName;
   theme?: TColorThemeOptions;
+  sx?: SxProps;
+}
+
+export interface IStatCardProps {
+  iconName: TIconName;
+  theme?: TColorThemeOptions;
+  value: number | string;
+  label: ECardLabel;
   sx?: SxProps;
 }
 

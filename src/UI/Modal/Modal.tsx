@@ -7,9 +7,9 @@ import type { JSX } from 'react';
 
 export default function BasicModal({
   modalName,
-  handleClose,
   open,
   children,
+  handleClose,
 }: IBasicModalProps): JSX.Element {
   return (
     <Modal open={open} onClose={handleClose}>

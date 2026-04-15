@@ -1,82 +1,23 @@
+import { ECardLabel } from '@data/enums/ECardLabel';
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { ArrowBack } from '@mui/icons-material';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
-import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import {
-  Box,
   IconButton,
   Link as MuiLink,
-  Paper,
   Stack,
   Typography,
   useTheme,
 } from '@mui/material';
 import { getRouteApi, Link } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
-import type { JSX, ReactNode } from 'react';
+import { StatCard } from '@UI/StatCard/StatCard';
+import type { JSX } from 'react';
 
+import { getMockCompanyDetail } from '../../../../data/mocks/CompanyDetail';
 import { CompanyInformation } from './CompanyInformation/CompanyInformation';
-import { getMockCompanyDetail } from './mockCompanyDetailData';
 
 const companyDetailRouteApi = getRouteApi(EPageRoutes.ADMIN_COMPANY_DETAIL);
-
-/** Placeholder até o componente Card compartilhado ficar pronto. */
-const MockSummaryCard = ({
-  icon,
-  iconBg,
-  iconColor,
-  value,
-  label,
-}: {
-  icon: ReactNode;
-  iconBg: string;
-  iconColor: string;
-  value: string;
-  label: string;
-}): JSX.Element => {
-  const { palette } = useTheme();
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        flex: '1 1 0',
-        minWidth: { xs: '100%', sm: 160 },
-        p: 2.5,
-        border: `1px solid ${palette.neutrals[200]}`,
-      }}
-    >
-      <Stack spacing={2}>
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: '0.75rem',
-            bgcolor: iconBg,
-            color: iconColor,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {icon}
-        </Box>
-        <Typography variant="h2" sx={{ lineHeight: 1.1 }}>
-          {value}
-        </Typography>
-        <Typography
-          variant="body2"
-          color={palette.neutrals[600]}
-          fontWeight={500}
-        >
-          {label}
-        </Typography>
-      </Stack>
-    </Paper>
-  );
-};
 
 export const CompanyDetail = (): JSX.Element => {
   const { palette } = useTheme();
@@ -144,33 +85,33 @@ export const CompanyDetail = (): JSX.Element => {
           useFlexGap
           sx={{ width: '100%' }}
         >
-          <MockSummaryCard
-            icon={<ManageAccountsOutlinedIcon />}
-            iconBg="#EDE7F6"
-            iconColor="#5E35B1"
+          <StatCard
+            iconName="manager"
+            theme="managers"
             value={mock.summary.managers}
-            label="Gestores"
+            label={ECardLabel.MANAGERS}
+            sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
           />
-          <MockSummaryCard
-            icon={<PersonOutlineOutlinedIcon />}
-            iconBg="#FCE4EC"
-            iconColor="#C2185B"
+          <StatCard
+            iconName="salesman"
+            theme="salesmen"
             value={mock.summary.salesmen}
-            label="Vendedores"
+            label={ECardLabel.SALESMAN}
+            sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
           />
-          <MockSummaryCard
-            icon={<CalendarMonthOutlinedIcon />}
-            iconBg="#FFF3E0"
-            iconColor="#E65100"
+          <StatCard
+            iconName="meeting"
+            theme="meetings"
             value={mock.summary.totalMeetings}
-            label="Total de reuniões"
+            label={ECardLabel.TOTAL_MEETINGS}
+            sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
           />
-          <MockSummaryCard
-            icon={<ScheduleOutlinedIcon />}
-            iconBg={palette.neutrals[200]}
-            iconColor={palette.neutrals[700]}
+          <StatCard
+            iconName="meeting"
+            theme="meetings"
             value={mock.summary.avgMeetingDuration}
-            label="Duração média das reuniões"
+            label={ECardLabel.AVERAGE_MEETINGS_DURATION}
+            sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
           />
         </Stack>
 

@@ -1,4 +1,6 @@
-import type { CompanyInformationProps } from './CompanyInformation/CompanyInformation';
+import { EPlan } from '@data/enums/EPlan';
+
+import type { CompanyInformationProps } from '../../pages/admin/CompaniesManagement/CompanyDetail/CompanyInformation/CompanyInformation';
 
 export interface MockCompanySummaryStats {
   managers: string;
@@ -8,7 +10,6 @@ export interface MockCompanySummaryStats {
 }
 
 export interface MockCompanyDetail {
-  /** Corresponde ao parâmetro de rota `companyId`. */
   companyId: string;
   name: string;
   summary: MockCompanySummaryStats;
@@ -30,8 +31,8 @@ const digitalSales: MockCompanyDetail = {
     cnpj: '12.345.678/0001-90',
     phone: '(11) 98765-4321',
     address: 'Av. Paulista, 1000, São Paulo, SP',
-    planLabel: 'Pro',
-    statusLabel: 'Ativo',
+    plan: EPlan.PRO,
+    active: true,
   },
 };
 
@@ -50,8 +51,8 @@ const acme: MockCompanyDetail = {
     cnpj: '98.765.432/0001-10',
     phone: '(21) 4002-8922',
     address: 'Rua do Ouvidor, 50, Rio de Janeiro, RJ',
-    planLabel: 'Básico',
-    statusLabel: 'Em trial',
+    plan: EPlan.BASIC,
+    active: false,
   },
 };
 

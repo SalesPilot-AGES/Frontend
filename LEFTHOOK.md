@@ -128,6 +128,7 @@ Validates commit message format according to Conventional Commits standard.
 - `perf` - Performance improvement
 - `ci` - CI/CD configuration
 - `revert` - Revert a previous commit
+- `chore` - Merge
 
 **Examples:**
 

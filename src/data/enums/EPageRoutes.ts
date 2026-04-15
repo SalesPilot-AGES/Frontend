@@ -5,6 +5,7 @@ export const EPageRoutes = {
   ADMIN_DASHBOARD: '/admin',
   ADMIN_COMPANIES: '/admin/empresas',
   ADMIN_MANAGERS: '/admin/gerentes',
+  ADMIN_MANAGERS_DETAILS: '/admin/gerentes/$id',
   ADMIN_SALESMEN: '/admin/vendedores',
   ADMIN_MEETINGS: '/admin/reuniões',
 

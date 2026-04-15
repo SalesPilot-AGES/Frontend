@@ -9,8 +9,9 @@ import type {
   DataTableIconColorTuple,
 } from '@declarations/ui';
 import type { Palette } from '@mui/material/styles';
-import { alpha } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 
 export const ROWS_PER_PAGE = 5;
 
@@ -222,3 +223,18 @@ export const getDataTableSurfaceColors = (
   emptyStateIconBg: alpha(palette.primary[100], 0.7),
   emptyStateIconFg: palette.primary[500],
 });
+
+export interface UseDataTableResult {
+  palette: Palette;
+  surfaceColors: DataTableSurfaceColors;
+}
+
+export const useDataTable = (): UseDataTableResult => {
+  const { palette } = useTheme();
+  const surfaceColors = useMemo(
+    () => getDataTableSurfaceColors(palette),
+    [palette]
+  );
+
+  return { palette, surfaceColors };
+};

@@ -1,4 +1,9 @@
 import {
+  type DataTableSurfaceColors,
+  formatHeaderMultiline,
+  iconTupleToCss,
+} from '@hooks/useDataTable';
+import {
   Box,
   Stack,
   TableCell,
@@ -10,8 +15,6 @@ import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
 
 import type { DataTableColumn } from '../../../types/ui';
-import type { DataTableSurfaceColors } from '../../../UI/DataTable/DataTable';
-import { formatHeaderMultiline, iconTupleToCss } from '../DataTable';
 
 export interface DataTableHeadProps<T> {
   columns: DataTableColumn<T>[];
@@ -38,7 +41,6 @@ export const DataTableHead = <T,>({
     textTransform: 'uppercase' as const,
     whiteSpace: 'normal' as const,
     verticalAlign: 'middle' as const,
-    '& .MuiStack-root > .MuiBox-root': { display: 'none' },
   };
 
   return (

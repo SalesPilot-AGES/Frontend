@@ -1,8 +1,8 @@
-import { Paper, Table, TableContainer, useTheme } from '@mui/material';
+import { useDataTable } from '@hooks/useDataTable';
+import { Paper, Table, TableContainer } from '@mui/material';
 import type { JSX } from 'react';
 
 import type { DataTableProps } from '../../types/ui';
-import { getDataTableSurfaceColors } from './DataTable';
 import { DataTableBody } from './DataTableBody/DataTableBody';
 import { DataTableHead } from './DataTableHead/DataTableHead';
 import { DataTableToolbar } from './DataTableToolbar/DataTableToolbar';
@@ -27,8 +27,7 @@ export const DataTable = <T,>({
   filterPlaceholder = 'Filtrar',
   filterAriaLabel = 'Filtro',
 }: DataTableProps<T>): JSX.Element => {
-  const { palette } = useTheme();
-  const surface = getDataTableSurfaceColors(palette);
+  const { palette, surfaceColors } = useDataTable();
 
   const showSearch = onSearchChange != null;
   const showFilter = onFilterChange != null && filterOptions.length > 0;
@@ -39,7 +38,7 @@ export const DataTable = <T,>({
       elevation={0}
       sx={{
         backgroundColor: palette.common.white,
-        border: `1px solid ${surface.paperBorder}`,
+        border: `1px solid ${surfaceColors.paperBorder}`,
         borderRadius: '0.75rem',
         boxShadow: 'none',
         overflow: 'hidden',
@@ -60,7 +59,7 @@ export const DataTable = <T,>({
           filterOptions={filterOptions}
           filterPlaceholder={filterPlaceholder}
           filterAriaLabel={filterAriaLabel}
-          surface={surface}
+          surface={surfaceColors}
           palette={palette}
         />
       ) : null}
@@ -72,12 +71,14 @@ export const DataTable = <T,>({
             minWidth: 760,
             tableLayout: 'fixed',
             borderCollapse: 'collapse',
-            '& .MuiTableCell-root': { borderColor: surface.tableCellBorder },
+            '& .MuiTableCell-root': {
+              borderColor: surfaceColors.tableCellBorder,
+            },
           }}
         >
           <DataTableHead
             columns={columns}
-            surface={surface}
+            surface={surfaceColors}
             palette={palette}
           />
           <DataTableBody
@@ -88,7 +89,7 @@ export const DataTable = <T,>({
             onDetailsClick={onDetailsClick}
             emptyTitle={emptyTitle}
             emptyDescription={emptyDescription}
-            surface={surface}
+            surface={surfaceColors}
             palette={palette}
           />
         </Table>

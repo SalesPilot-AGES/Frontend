@@ -14,7 +14,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { getRouteApi,Link } from '@tanstack/react-router';
+import { getRouteApi, Link } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import type { JSX, ReactNode } from 'react';
 

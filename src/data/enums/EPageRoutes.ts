@@ -4,6 +4,8 @@ export const EPageRoutes = {
   // Admin Routes
   ADMIN_DASHBOARD: '/admin',
   ADMIN_COMPANIES: '/admin/empresas',
+  /** Detalhe de empresa; use com parâmetro `companyId` nas rotas. */
+  ADMIN_COMPANY_DETAIL: '/admin/empresas/$companyId',
   ADMIN_MANAGERS: '/admin/gerentes',
   ADMIN_SALESMEN: '/admin/vendedores',
   ADMIN_MEETINGS: '/admin/reuniões',

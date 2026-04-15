@@ -27,11 +27,11 @@ export default function AppModal({
           borderColor: 'divider',
         }}
       >
-        <ModalHeader modalName={modalName} />
+        <ModalHeader modalName={modalName} handleClose={handleClose} />
 
         {children}
 
-        <ModalFooter />
+        <ModalFooter handleClose={handleClose} />
       </Stack>
     </Modal>
   );

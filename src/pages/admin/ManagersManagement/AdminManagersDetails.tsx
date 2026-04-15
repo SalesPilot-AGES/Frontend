@@ -2,10 +2,9 @@ import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import { mockManagers } from '@data/mocks/Managers';
 import { ArrowBack, Business, Email } from '@mui/icons-material';
-import { Box, Button } from '@mui/material';
+import { Box, Button, useTheme } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { theme } from '@theme/Theme';
 import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import { IconBox } from '@UI/IconBox/IconBox';
 import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
@@ -16,6 +15,7 @@ import type { JSX } from 'react';
 
 export const AdminManagersDetails = (): JSX.Element => {
   const navigate = useNavigate();
+  const { palette } = useTheme();
   const { id } = useParams({ from: EPageRoutes.ADMIN_MANAGERS_DETAILS });
 
   const manager = mockManagers.find((managerItem) => managerItem.id === id);
@@ -47,7 +47,7 @@ export const AdminManagersDetails = (): JSX.Element => {
           onClick={handleGoBack}
           sx={{
             textTransform: 'none',
-            color: theme.palette.neutrals[600],
+            color: palette.neutrals[600],
           }}
         >
           Voltar para gestores

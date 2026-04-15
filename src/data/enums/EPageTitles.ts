@@ -5,6 +5,7 @@ export const EPageTitles = {
   SALESMAN_DASHBOARD: 'Painel do Vendedor',
   COMPANIES: 'Empresas',
   MANAGERS: 'Gestores',
+  MANAGER_INFORMATION: 'Informações do gestor',
   SALESMEN: 'Vendedores',
   MEETINGS: 'Reuniões',
 };

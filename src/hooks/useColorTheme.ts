@@ -8,28 +8,28 @@ export const useColorTheme = (
   switch (theme) {
     case 'primary':
       return {
-        color: palette.primary[200],
-        backgroundColor: palette.primary[500],
+        color: palette.primary[500],
+        backgroundColor: palette.primary[200],
       };
     case 'companies':
       return {
-        color: palette.companies[200],
-        backgroundColor: palette.companies[500],
+        color: palette.companies[500],
+        backgroundColor: palette.companies[200],
       };
     case 'managers':
       return {
-        color: palette.managers[200],
-        backgroundColor: palette.managers[500],
+        color: palette.managers[500],
+        backgroundColor: palette.managers[200],
       };
     case 'salesmen':
       return {
-        color: palette.salesmen[200],
-        backgroundColor: palette.salesmen[500],
+        color: palette.salesmen[500],
+        backgroundColor: palette.salesmen[200],
       };
     case 'meetings':
       return {
-        color: palette.meetings[200],
-        backgroundColor: palette.meetings[500],
+        color: palette.meetings[500],
+        backgroundColor: palette.meetings[200],
       };
     default:
       return {

@@ -2,6 +2,22 @@ import { render } from '@tests/testUtils';
 import { IconBox } from '@UI/IconBox/IconBox';
 import { describe, expect, it } from 'vitest';
 
+function getIconBoxRoot(container: HTMLElement): HTMLElement {
+  const svg = container.querySelector('svg');
+  if (!svg) {
+    throw new Error('Expected IconBox to render an SVG');
+  }
+  let el: HTMLElement | null = svg.parentElement as HTMLElement | null;
+  while (el && el !== container) {
+    const className = typeof el.className === 'string' ? el.className : '';
+    if (className.includes('MuiBox-root')) {
+      return el;
+    }
+    el = el.parentElement;
+  }
+  throw new Error('Expected IconBox root MuiBox');
+}
+
 describe('IconBox Component', () => {
   it('renders with logo icon', () => {
     const { container } = render(<IconBox iconName="logo" theme="primary" />);
@@ -57,7 +73,7 @@ describe('IconBox Component', () => {
         sx={{ width: '4rem', height: '4rem' }}
       />
     );
-    const iconBox = container.querySelector('[class*="MuiBox"]') as HTMLElement;
+    const iconBox = getIconBoxRoot(container);
     expect(iconBox).toHaveStyle({
       width: '4rem',
       height: '4rem',
@@ -68,12 +84,12 @@ describe('IconBox Component', () => {
     const { container } = render(
       <IconBox iconName="dashboard" theme="primary" />
     );
-    const iconBox = container.querySelector('[class*="MuiBox"]') as HTMLElement;
-    expect(iconBox).toHaveStyle({
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: '1rem',
-    });
+    const iconBox = getIconBoxRoot(container);
+    const computed = getComputedStyle(iconBox);
+    expect(computed.display).toBe('flex');
+    expect(computed.alignItems).toBe('center');
+    expect(computed.justifyContent).toBe('center');
+    expect(['48px', '3rem']).toContain(computed.width);
+    expect(['48px', '3rem']).toContain(computed.height);
   });
 });

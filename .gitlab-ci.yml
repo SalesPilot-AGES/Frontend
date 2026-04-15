@@ -44,7 +44,7 @@ secret-detection:
   stage: security
   image:
     name: zricethezav/gitleaks:latest
-    entrypoint: [""]
+    entrypoint: ['']
   script:
     - gitleaks detect --source . --exit-code 1
   rules:

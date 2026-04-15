@@ -5,7 +5,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { getAppIcon } from '@UI/AppIcon/AppIcon';
+import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
 import { DemoAccountsInfo } from './DemoAccountsInfo/DemoAccountsInfo';
@@ -55,7 +55,7 @@ export const LoginForm = (): JSX.Element => {
           />
 
           <Button type="submit" variant="gradient" sx={{ width: '100%' }}>
-            {getAppIcon('login')}
+            {GetAppIcon('login')}
             Login
           </Button>
         </form>

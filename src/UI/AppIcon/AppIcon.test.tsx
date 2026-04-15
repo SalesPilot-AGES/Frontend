@@ -1,10 +1,10 @@
 import { render } from '@tests/testUtils';
-import { getAppIcon } from '@UI/AppIcon/AppIcon';
+import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import { describe, expect, it } from 'vitest';
 
 describe('AppIcon Component', () => {
   it('returns ElectricBoltIcon for logo', () => {
-    const icon = getAppIcon('logo');
+    const icon = GetAppIcon('logo');
     const { container } = render(icon);
     expect(
       container.querySelector('[data-testid="ElectricBoltIcon"]')
@@ -12,7 +12,7 @@ describe('AppIcon Component', () => {
   });
 
   it('returns DashboardIcon for dashboard', () => {
-    const icon = getAppIcon('dashboard');
+    const icon = GetAppIcon('dashboard');
     const { container } = render(icon);
     expect(
       container.querySelector('[data-testid="DashboardIcon"]')
@@ -20,7 +20,7 @@ describe('AppIcon Component', () => {
   });
 
   it('returns ApartmentIcon for company', () => {
-    const icon = getAppIcon('company');
+    const icon = GetAppIcon('company');
     const { container } = render(icon);
     expect(
       container.querySelector('[data-testid="ApartmentIcon"]')
@@ -28,7 +28,7 @@ describe('AppIcon Component', () => {
   });
 
   it('returns ManageAccountsIcon for manager', () => {
-    const icon = getAppIcon('manager');
+    const icon = GetAppIcon('manager');
     const { container } = render(icon);
     expect(
       container.querySelector('[data-testid="ManageAccountsIcon"]')
@@ -36,7 +36,7 @@ describe('AppIcon Component', () => {
   });
 
   it('returns PersonIcon for salesman', () => {
-    const icon = getAppIcon('salesman');
+    const icon = GetAppIcon('salesman');
     const { container } = render(icon);
     expect(
       container.querySelector('[data-testid="PersonIcon"]')
@@ -44,7 +44,7 @@ describe('AppIcon Component', () => {
   });
 
   it('returns EventNoteIcon for meeting', () => {
-    const icon = getAppIcon('meeting');
+    const icon = GetAppIcon('meeting');
     const { container } = render(icon);
     expect(
       container.querySelector('[data-testid="EventNoteIcon"]')
@@ -52,7 +52,7 @@ describe('AppIcon Component', () => {
   });
 
   it('returns LoginIcon for login', () => {
-    const icon = getAppIcon('login');
+    const icon = GetAppIcon('login');
     const { container } = render(icon);
     expect(
       container.querySelector('[data-testid="LoginIcon"]')
@@ -60,7 +60,7 @@ describe('AppIcon Component', () => {
   });
 
   it('returns LogoutIcon for logout', () => {
-    const icon = getAppIcon('logout');
+    const icon = GetAppIcon('logout');
     const { container } = render(icon);
     expect(
       container.querySelector('[data-testid="LogoutIcon"]')

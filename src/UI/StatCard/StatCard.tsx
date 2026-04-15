@@ -1,5 +1,5 @@
 import type { IStatCardProps } from '@declarations/ui';
-import { Paper, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { IconBox } from '@UI/IconBox/IconBox';
 import type { JSX } from 'react';
 
@@ -10,27 +10,43 @@ export const StatCard = ({
   label,
   sx,
 }: IStatCardProps): JSX.Element => {
+  const { palette } = useTheme();
+
   return (
-    <Paper
-      elevation={0}
+    <Box
+      gap="0.75rem"
+      width="100%"
+      height="fit-content"
       sx={{
-        p: 3,
-        borderRadius: 4,
-        gap: 3,
+        padding: '1.5rem',
+        border: '1px solid',
+        borderRadius: '0.75rem',
+        borderColor: palette.neutrals[200],
+        backgroundColor: palette.neutrals.baseWhite,
         ...sx,
       }}
     >
-      <IconBox iconName={iconName} theme={theme} />
+      <Stack gap="0.75rem" alignItems="left">
+        <IconBox iconName={iconName} theme={theme} />
 
-      <Stack>
-        <Typography fontSize={24} fontWeight={600} lineHeight="32px">
+        <Typography
+          fontSize="1.5rem"
+          fontWeight="600"
+          lineHeight="2rem"
+          color={palette.neutrals[900]}
+        >
           {value}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary">
+        <Typography
+          fontSize="1rem"
+          fontWeight="400"
+          lineHeight="1.5rem"
+          color={palette.neutrals[600]}
+        >
           {label}
         </Typography>
       </Stack>
-    </Paper>
+    </Box>
   );
 };

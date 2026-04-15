@@ -126,3 +126,17 @@ export interface IBasicModalProps {
   open: boolean;
   children: JSX.Element;
 }
+
+export interface IEntityDetailsCardProps {
+  title: string;
+  children: React.ReactNode;
+  onEdit?: () => void;
+}
+
+export interface IItemDetailProps {
+  label: string;
+  value?: string;
+  icon?: JSX.Element;
+  children?: ReactNode;
+  sx?: SxProps;
+}

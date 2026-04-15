@@ -5,7 +5,11 @@ import Typography from '@mui/material/Typography';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
-export default function ModalFooter(): JSX.Element {
+export default function ModalFooter({
+  handleClose,
+}: {
+  handleClose?: () => void;
+}): JSX.Element {
   return (
     <Box
       display="flex"
@@ -17,7 +21,12 @@ export default function ModalFooter(): JSX.Element {
         borderColor: 'divider',
       }}
     >
-      <FooterButton icon="close" content="Cancelar" variant="outlined" />
+      <FooterButton
+        icon="close"
+        content="Cancelar"
+        variant="outlined"
+        onClick={handleClose}
+      />
       <FooterButton icon="save" content="Salvar" variant="contained" />
     </Box>
   );
@@ -27,14 +36,17 @@ function FooterButton({
   icon,
   content,
   variant,
+  onClick,
 }: {
   icon: TIconName;
   content: string;
   variant: 'outlined' | 'contained';
+  onClick?: () => void;
 }): JSX.Element {
   return (
     <Button
       variant={variant}
+      onClick={onClick}
       sx={{
         borderRadius: '0.75rem',
         gap: '0.5rem',

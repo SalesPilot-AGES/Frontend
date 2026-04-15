@@ -7,8 +7,10 @@ import type { JSX } from 'react';
 
 export default function ModalHeader({
   modalName,
+  handleClose,
 }: {
   modalName: string;
+  handleClose?: () => void;
 }): JSX.Element {
   return (
     <Box
@@ -24,14 +26,21 @@ export default function ModalHeader({
       <Typography id="modal-modal-title" variant="h5">
         {modalName}
       </Typography>
-      <HeaderButton icon="close" />
+      <HeaderButton icon="close" onClick={handleClose} />
     </Box>
   );
 }
 
-function HeaderButton({ icon }: { icon: TIconName }): JSX.Element {
+function HeaderButton({
+  icon,
+  onClick,
+}: {
+  icon: TIconName;
+  onClick?: () => void;
+}): JSX.Element {
   return (
     <Button
+      onClick={onClick}
       sx={{
         minWidth: '2.25rem',
         width: '2.25rem',

@@ -56,6 +56,19 @@ export interface MenuItem {
   icon: JSX.Element;
 }
 
+export type TStatus = (typeof EStatus)[keyof typeof EStatus];
+export type TPlan = (typeof EPlan)[keyof typeof EPlan];
+
+export interface IStatusBadgeProps {
+  active: boolean;
+  sx?: SxProps;
+}
+
+export interface IPlanBadgeProps {
+  plan: TPlan;
+  sx?: SxProps;
+}
+
 export type DataTableIconColorTuple = readonly [
   r: number,
   g: number,

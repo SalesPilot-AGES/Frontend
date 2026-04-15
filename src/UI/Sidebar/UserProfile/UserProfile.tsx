@@ -1,6 +1,6 @@
 import { Avatar, Box, IconButton, Typography, useTheme } from '@mui/material';
 import { useRequireUser } from '@store/hooks/useCurrentUser';
-import { getAppIcon } from '@UI/AppIcon/AppIcon';
+import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
 import { useUserProfile } from './UseUserProfile';
@@ -61,7 +61,7 @@ export const UserProfile = (): JSX.Element => {
           height: '2.5rem',
         }}
       >
-        {getAppIcon('logout')}
+        {GetAppIcon('logout')}
       </IconButton>
     </Box>
   );

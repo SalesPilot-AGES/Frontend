@@ -11,7 +11,9 @@ export type TIconName =
   | 'salesman'
   | 'meeting'
   | 'login'
-  | 'logout';
+  | 'logout'
+  | 'close'
+  | 'save';
 
 export interface IHeaderProps {
   title: string;
@@ -96,3 +98,9 @@ export interface DataTableProps<T> {
 }
 
 export type BadgeLook = { backgroundColor: string; color: string };
+export interface IBasicModalProps {
+  modalName: string;
+  handleClose?: () => void;
+  open: boolean;
+  children: JSX.Element;
+}

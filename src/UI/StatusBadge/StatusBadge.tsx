@@ -10,7 +10,7 @@ export const StatusBadge = ({ active, sx }: IStatusBadgeProps): JSX.Element => {
       active={active}
       label={active ? EStatus.ACTIVE : EStatus.INACTIVE}
       size="medium"
-      sx={sx}
+      sx={{ width: 'fit-content', ...sx }}
     />
   );
 };

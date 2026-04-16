@@ -8,22 +8,18 @@ import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import type { JSX, ReactNode } from 'react';
 
 export interface CompanyInformationProps {
-  displayId: string;
+  id: string;
   name: string;
   cnpj: string;
-  phone: string;
-  address: string;
   plan: TPlan;
   active: boolean;
   onEdit?: () => void;
 }
 
 export const CompanyInformation = ({
-  displayId,
+  id,
   name,
   cnpj,
-  phone,
-  address,
   plan,
   active,
   onEdit,
@@ -75,10 +71,7 @@ export const CompanyInformation = ({
         alignItems={{ xs: 'stretch', md: 'flex-start' }}
       >
         <Stack spacing={2.5} sx={{ flex: { md: '1 1 58%' } }}>
-          {row(
-            'ID da empresa',
-            <Typography fontWeight={600}>{displayId}</Typography>
-          )}
+          {row('ID da empresa', <Typography fontWeight={600}>{id}</Typography>)}
           {row(
             'Nome da empresa',
             <Typography fontWeight={600}>{name}</Typography>
@@ -90,7 +83,7 @@ export const CompanyInformation = ({
               <PhoneOutlinedIcon
                 sx={{ fontSize: '1.125rem', color: palette.neutrals[500] }}
               />
-              <Typography fontWeight={600}>{phone}</Typography>
+              <Typography fontWeight={600}>{'(11) 99999-9999'}</Typography>
             </Stack>
           )}
           {row(
@@ -103,7 +96,7 @@ export const CompanyInformation = ({
                   mt: 0.125,
                 }}
               />
-              <Typography fontWeight={600}>{address}</Typography>
+              <Typography fontWeight={600}>{'Rua Exemplo, 123'}</Typography>
             </Stack>
           )}
         </Stack>

@@ -1,6 +1,7 @@
 import type {
   TCreateManager,
   TManager,
+  TManagerAdminDetailsEditFields,
   TManagerWithCompany,
   TUpdateManager,
 } from '@services/models/ManagerSchema';
@@ -62,6 +63,17 @@ const parseManagerResponse = (data: unknown): TManagerWithCompany => {
   const row = ManagerListItemApiSchema.parse(data);
   return mapManagerListItemApiToTManagerWithCompany(row);
 };
+
+export const buildAdminManagerDetailsUpdatePayload = (
+  manager: TManagerWithCompany,
+  fields: TManagerAdminDetailsEditFields
+): TUpdateManager => ({
+  name: fields.name,
+  email: fields.email,
+  active: fields.active,
+  companyId: fields.companyId,
+  preferences: manager.preferences,
+});
 
 export const managerApi = {
   getManagerById: async (id: string): Promise<TManagerWithCompany> => {

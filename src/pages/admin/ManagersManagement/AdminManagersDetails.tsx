@@ -131,7 +131,6 @@ export const AdminManagersDetails = (): JSX.Element => {
               isCompanyValid={isCompanyValid}
               companyOptions={companyOptions}
               onFieldChange={handleFieldChange}
-              isCompanyLocked
               onStatusChange={handleStatusChange}
             />
           ) : (

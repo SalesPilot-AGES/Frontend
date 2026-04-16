@@ -84,3 +84,9 @@ export const UpdateManagerSchema = CreateManagerSchema.partial();
 export type TManager = z.infer<typeof ManagerSchema>;
 export type TCreateManager = z.infer<typeof CreateManagerSchema>;
 export type TUpdateManager = z.infer<typeof UpdateManagerSchema>;
+
+/** Campos editáveis no PUT do detalhe admin (inclui troca de empresa). */
+export type TManagerAdminDetailsEditFields = Pick<
+  TManager,
+  'name' | 'email' | 'active' | 'companyId'
+>;

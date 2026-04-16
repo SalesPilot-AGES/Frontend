@@ -9,17 +9,23 @@ import {
 import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
 import { type JSX } from 'react';
 
-type TManagerEditForm = {
+export type TManagerEditForm = {
   name: string;
-  companyName: string;
+  companyId: string;
   email: string;
   active: boolean;
 };
 
+export type TManagerCompanyOption = {
+  id: string;
+  name: string;
+};
+
 type ManagerEditFormProps = {
+  managerId: string;
   editForm: TManagerEditForm;
   isCompanyValid: boolean;
-  companyOptions: string[];
+  companyOptions: TManagerCompanyOption[];
   onFieldChange: (
     field: keyof Omit<TManagerEditForm, 'active'>,
     value: string
@@ -28,6 +34,7 @@ type ManagerEditFormProps = {
 };
 
 export const ManagerEditFormComponent = ({
+  managerId,
   editForm,
   isCompanyValid,
   companyOptions,
@@ -44,7 +51,7 @@ export const ManagerEditFormComponent = ({
         gap: '1.5rem',
       }}
     >
-      <ItemDetail label="ID do usuário" value={editForm.name} />
+      <ItemDetail label="ID do usuário" value={managerId} />
 
       <Box
         sx={{
@@ -84,22 +91,22 @@ export const ManagerEditFormComponent = ({
           </Typography>
           <TextField
             select
-            value={editForm.companyName}
+            value={editForm.companyId}
             onChange={(event) => {
-              onFieldChange('companyName', event.target.value);
+              onFieldChange('companyId', event.target.value);
             }}
             fullWidth
-            error={!isCompanyValid && editForm.companyName === ''}
+            error={!isCompanyValid && editForm.companyId === ''}
             helperText={
-              !isCompanyValid && editForm.companyName === ''
+              !isCompanyValid && editForm.companyId === ''
                 ? 'Selecione uma empresa da lista.'
                 : ''
             }
           >
             <MenuItem value="">Selecione uma empresa</MenuItem>
             {companyOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
               </MenuItem>
             ))}
           </TextField>

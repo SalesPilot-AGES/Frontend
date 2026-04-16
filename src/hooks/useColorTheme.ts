@@ -31,6 +31,11 @@ export const useColorTheme = (
         color: palette.meetings[500],
         backgroundColor: palette.meetings[200],
       };
+    case 'neutrals':
+      return {
+        color: palette.neutrals[400],
+        backgroundColor: palette.neutrals[200],
+      };
     default:
       return {
         color: palette.neutrals[100],

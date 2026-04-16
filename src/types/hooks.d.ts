@@ -14,7 +14,8 @@ export type TColorThemeOptions =
   | 'success'
   | 'info'
   | 'warning'
-  | 'error';
+  | 'error'
+  | 'neutrals';
 
 export type TColorThemeResult = {
   color: string;

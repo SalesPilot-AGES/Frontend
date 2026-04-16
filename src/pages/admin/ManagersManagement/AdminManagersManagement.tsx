@@ -9,7 +9,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import type { TManager } from '@services/models/ManagerSchema';
+import type { TManagerWithCompany } from '@services/models/ManagerSchema';
 import { useGetManagers } from '@services/queries/useManagers';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
@@ -21,31 +21,16 @@ import { useState } from 'react';
 
 import { AddManagerModal } from './AddManagerModal/AddManagerModal';
 
-type ManagerWithCompany = TManager & {
-  company: {
-    id: string;
-    name: string;
-  };
-};
-
 export const AdminManagersManagement = (): JSX.Element => {
   const { palette } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: managersData = [], isLoading } = useGetManagers();
+  const { data: managers = [], isLoading } = useGetManagers();
 
-  const managers: ManagerWithCompany[] = managersData.map((manager) => ({
-    ...manager,
-    company: {
-      id: manager.companyId,
-      name: manager.companyId,
-    },
-  }));
-
-  const columns: DataTableProps<ManagerWithCompany>['columns'] = [
+  const columns: DataTableProps<TManagerWithCompany>['columns'] = [
     {
       header: 'Nome do gestor',
-      accessor: (row: ManagerWithCompany) => row.name,
+      accessor: (row: TManagerWithCompany) => row.name,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ManageAccountsIcon
@@ -59,7 +44,7 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: 'E-mail',
-      accessor: (row: ManagerWithCompany) => row.email,
+      accessor: (row: TManagerWithCompany) => row.email,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <MailIcon sx={{ color: palette.neutrals[300], fontSize: '1.5rem' }} />
@@ -71,7 +56,7 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: ECardLabel.COMPANY_NAME,
-      accessor: (row: ManagerWithCompany) => row.company.name,
+      accessor: (row: TManagerWithCompany) => row.company.name,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ApartmentIcon
@@ -85,8 +70,8 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: 'Status',
-      accessor: (row: ManagerWithCompany) => row.active,
-      render: (_value: ReactNode, row: ManagerWithCompany) => (
+      accessor: (row: TManagerWithCompany) => row.active,
+      render: (_value: ReactNode, row: TManagerWithCompany) => (
         <StatusBadge active={row.active} />
       ),
     },
@@ -136,7 +121,7 @@ export const AdminManagersManagement = (): JSX.Element => {
         <DataTable
           data={managers}
           columns={columns}
-          getRowId={(row: ManagerWithCompany) => row.id}
+          getRowId={(row: TManagerWithCompany) => row.id}
           loading={isLoading}
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {

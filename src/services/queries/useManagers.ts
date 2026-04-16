@@ -2,6 +2,7 @@ import { managerApi } from '@services/api/manager';
 import type {
   TCreateManager,
   TManager,
+  TManagerWithCompany,
   TUpdateManager,
 } from '@services/models/ManagerSchema';
 import {
@@ -24,9 +25,9 @@ export const managersQueryKeys = {
 
 // GET queries
 export const useGetManagers = (
-  options?: UseQueryOptions<TManager[]>
-): ReturnType<typeof useQuery<TManager[], Error>> => {
-  return useQuery<TManager[], Error>({
+  options?: UseQueryOptions<TManagerWithCompany[]>
+): ReturnType<typeof useQuery<TManagerWithCompany[], Error>> => {
+  return useQuery<TManagerWithCompany[], Error>({
     queryKey: managersQueryKeys.lists(),
     queryFn: () => managerApi.getManagers(),
     staleTime: 1000 * 60 * 5,

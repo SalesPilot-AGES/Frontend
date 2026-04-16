@@ -1,10 +1,14 @@
 import type {
   TCreateManager,
   TManager,
+  TManagerWithCompany,
   TUpdateManager,
 } from '@services/models/ManagerSchema';
-import { ManagerSchema } from '@services/models/ManagerSchema';
-import { z } from 'zod';
+import {
+  ManagerSchema,
+  ManagersPagedResponseSchema,
+  mapManagerListItemApiToTManagerWithCompany,
+} from '@services/models/ManagerSchema';
 
 import apiClient from './apiClient';
 
@@ -16,11 +20,12 @@ export const managerApi = {
     return ManagerSchema.parse(response.data);
   },
 
-  getManagers: async (): Promise<TManager[]> => {
-    const response = await apiClient.get<TManager[]>(
+  getManagers: async (): Promise<TManagerWithCompany[]> => {
+    const response = await apiClient.get<unknown>(
       '/api/collaborators/managers'
     );
-    return z.array(ManagerSchema).parse(response.data);
+    const page = ManagersPagedResponseSchema.parse(response.data);
+    return page.content.map(mapManagerListItemApiToTManagerWithCompany);
   },
 
   createManager: async (data: TCreateManager): Promise<TManager> => {

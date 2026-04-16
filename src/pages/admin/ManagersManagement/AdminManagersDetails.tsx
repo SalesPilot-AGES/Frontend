@@ -3,15 +3,7 @@ import { EPageTitles } from '@data/enums/EPageTitles';
 import type { ManagerMock } from '@data/mocks/Managers';
 import { mockManagers } from '@data/mocks/Managers';
 import { ArrowBack, Business, Close, Email, Save } from '@mui/icons-material';
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Switch,
-  TextField,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { Box, Button, useTheme } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
@@ -20,7 +12,9 @@ import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
-import { useState, type JSX } from 'react';
+import { type JSX, useState } from 'react';
+
+import { ManagerEditFormComponent } from './ManagerEditForm';
 
 type TManagerEditForm = {
   name: string;
@@ -196,132 +190,13 @@ export const AdminManagersDetails = (): JSX.Element => {
           }
         >
           {isEditing && editForm ? (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1.5rem',
-              }}
-            >
-              <ItemDetail label="ID do usuário" value={managerData.id} />
-
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                  gap: '1.5rem 2rem',
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Nome do usuario
-                  </Typography>
-                  <TextField
-                    value={editForm.name}
-                    onChange={(event) => {
-                      handleFieldChange('name', event.target.value);
-                    }}
-                    fullWidth
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Empresa
-                  </Typography>
-                  <Autocomplete
-                    options={companyOptions}
-                    value={editForm.companyName}
-                    onChange={(_, value) => {
-                      handleFieldChange('companyName', value ?? '');
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        fullWidth
-                        error={!isCompanyValid}
-                        helperText={
-                          isCompanyValid
-                            ? undefined
-                            : 'Selecione uma empresa da lista.'
-                        }
-                      />
-                    )}
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Email de acesso
-                  </Typography>
-                  <TextField
-                    value={editForm.email}
-                    onChange={(event) => {
-                      handleFieldChange('email', event.target.value);
-                    }}
-                    fullWidth
-                  />
-                </Box>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Status
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      minHeight: '3rem',
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                      {editForm.active ? 'Ativo' : 'Inativo'}
-                    </Typography>
-                    <Switch
-                      checked={editForm.active}
-                      onChange={(event) => {
-                        handleStatusChange(event.target.checked);
-                      }}
-                      sx={{
-                        '& .MuiSwitch-switchBase.Mui-checked': {
-                          color: palette.success[400],
-                        },
-                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track':
-                          {
-                            backgroundColor: palette.success[200],
-                            opacity: 1,
-                          },
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
+            <ManagerEditFormComponent
+              editForm={editForm}
+              isCompanyValid={isCompanyValid}
+              companyOptions={companyOptions}
+              onFieldChange={handleFieldChange}
+              onStatusChange={handleStatusChange}
+            />
           ) : (
             <Box
               sx={{

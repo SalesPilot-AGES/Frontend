@@ -18,7 +18,7 @@ export const getMenuItems = (userRole: UserRole): MenuItem[] => {
           icon: GetAppIcon('company'),
         },
         {
-          label: 'Gerentes',
+          label: 'Gestores',
           path: EPageRoutes.ADMIN_MANAGERS,
           icon: GetAppIcon('manager'),
         },

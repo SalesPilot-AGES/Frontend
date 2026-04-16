@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { formatCnpjInput } from '@hooks/formatCnpjInput';
 import {
   Box,
   FormControlLabel,
@@ -10,6 +11,10 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  PLAN_API_CODES,
+  planApiToUiLabel,
+} from '@pages/admin/CompaniesManagement/planMapping';
+import {
   type CompanyCreateInput,
   CompanyCreateInputSchema,
 } from '@services/models/CompanySchema';
@@ -19,8 +24,6 @@ import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import type { JSX } from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-
-import { PLAN_EDIT_OPTIONS } from '../CompanyDetail/CompanyInformationEdit/useCompanyInformationEdit';
 
 export interface IAddCompanyModalProps {
   open: boolean;
@@ -110,6 +113,14 @@ export const AddCompanyModal = ({
                 type="text"
                 error={!!errors.tax_id}
                 helperText={errors.tax_id?.message}
+                onChange={(e) =>
+                  field.onChange(formatCnpjInput(e.target.value))
+                }
+                slotProps={{
+                  htmlInput: {
+                    maxLength: 18,
+                  },
+                }}
               />
             )}
           />
@@ -158,21 +169,35 @@ export const AddCompanyModal = ({
           <Typography variant="body2" fontWeight={500}>
             Plano
           </Typography>
-          <RadioGroup aria-label="Plano da empresa">
-            <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
-              {PLAN_EDIT_OPTIONS.map((planOption) => (
-                <FormControlLabel
-                  key={planOption}
-                  value={planOption}
-                  control={<Radio size="small" disableRipple />}
-                  label={
-                    <PlanBadge plan={planOption} sx={{ fontSize: 'small' }} />
-                  }
-                  sx={{ mr: 0, ml: 0 }}
-                />
-              ))}
-            </Stack>
-          </RadioGroup>
+          <Controller
+            name="plan"
+            control={control}
+            render={({ field }) => (
+              <RadioGroup
+                aria-label="Plano da empresa"
+                name="company-plan"
+                value={field.value}
+                onChange={(_, value) => field.onChange(value)}
+              >
+                <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
+                  {PLAN_API_CODES.map((planOption) => (
+                    <FormControlLabel
+                      key={planOption}
+                      value={planOption}
+                      control={<Radio size="small" disableRipple />}
+                      label={
+                        <PlanBadge
+                          plan={planApiToUiLabel[planOption]}
+                          sx={{ fontSize: 'small' }}
+                        />
+                      }
+                      sx={{ mr: 0, ml: 0 }}
+                    />
+                  ))}
+                </Stack>
+              </RadioGroup>
+            )}
+          />
         </Stack>
       </Box>
     </AppModal>

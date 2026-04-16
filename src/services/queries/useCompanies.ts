@@ -23,17 +23,30 @@ export const companiesQueryKeys = {
   detail: (id: string) => [...companiesQueryKeys.details(), id] as const,
 };
 
+/** Opções da query de listagem (dados sempre “stale” para refletir o GET ao entrar na tela). */
+const getCompaniesListQueryOptions = (
+  page: number = 0,
+  size: number = 20,
+  filters?: CompanyFilters
+): Pick<
+  UseQueryOptions<CompaniesResponse, Error>,
+  'queryKey' | 'queryFn' | 'staleTime'
+> => ({
+  queryKey: companiesQueryKeys.list(page, size, filters),
+  queryFn: (): Promise<CompaniesResponse> =>
+    companyApi.getCompanies(page, size, filters),
+  staleTime: 0,
+});
+
 // GET queries
 export const useGetCompanies = (
   page: number = 0,
-  size: number = 10,
+  size: number = 20,
   filters?: CompanyFilters,
   options?: UseQueryOptions<CompaniesResponse>
 ): ReturnType<typeof useQuery<CompaniesResponse, Error>> => {
   return useQuery<CompaniesResponse, Error>({
-    queryKey: companiesQueryKeys.list(page, size, filters),
-    queryFn: () => companyApi.getCompanies(page, size, filters),
-    staleTime: 1000 * 60 * 5,
+    ...getCompaniesListQueryOptions(page, size, filters),
     ...options,
   });
 };

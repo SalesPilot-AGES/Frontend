@@ -1,10 +1,9 @@
 import { ECardLabel } from '@data/enums/ECardLabel';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
+import { EPlan } from '@data/enums/EPlan';
 import { EStatus } from '@data/enums/EStatus';
-import type { MockCompany } from '@data/mocks/Companies';
-import { mockCompanies } from '@data/mocks/Companies';
-import type { DataTableProps } from '@declarations/ui';
+import type { DataTableProps, TPlan } from '@declarations/ui';
 import AddIcon from '@mui/icons-material/Add';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import EventIcon from '@mui/icons-material/Event';
@@ -12,6 +11,8 @@ import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import type { Company } from '@services/models/CompanySchema';
+import { useGetCompanies } from '@services/queries/useCompanies';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
@@ -20,14 +21,37 @@ import { StatCard } from '@UI/StatCard/StatCard';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import type { JSX, ReactNode } from 'react';
 
+const planLabelMap: Record<Company['plan'], TPlan> = {
+  BASIC: EPlan.BASIC,
+  PRO: EPlan.PRO,
+  ENTERPRISE: EPlan.ENTERPRISE,
+};
+
+// TODO: remover quando a API retornar esses campos
+type CompanyWithStats = Company & {
+  managers: number;
+  sellers: number;
+  meetings: number;
+};
+
 export const AdminCompaniesManagement = (): JSX.Element => {
   const { palette } = useTheme();
-  const companies = mockCompanies;
+  const { data, isLoading } = useGetCompanies();
 
-  const columns: DataTableProps<MockCompany>['columns'] = [
+  // TODO: remover mock quando a API retornar managers, sellers e meetings
+  const companies: CompanyWithStats[] = (data?.content ?? []).map(
+    (company, index) => ({
+      ...company,
+      managers: (index % 4) + 1,
+      sellers: (index % 8) + 5,
+      meetings: (index % 10) * 12 + 50,
+    })
+  );
+
+  const columns: DataTableProps<CompanyWithStats>['columns'] = [
     {
       header: ECardLabel.COMPANY_NAME,
-      accessor: (row: MockCompany) => row.company,
+      accessor: (row: CompanyWithStats) => row.name,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ApartmentIcon
@@ -41,7 +65,7 @@ export const AdminCompaniesManagement = (): JSX.Element => {
     },
     {
       header: ECardLabel.MANAGERS,
-      accessor: (row: MockCompany) => row.managers,
+      accessor: (row: CompanyWithStats) => row.managers,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ManageAccountsIcon
@@ -55,7 +79,7 @@ export const AdminCompaniesManagement = (): JSX.Element => {
     },
     {
       header: ECardLabel.SALESMAN,
-      accessor: (row: MockCompany) => row.sellers,
+      accessor: (row: CompanyWithStats) => row.sellers,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <PersonIcon
@@ -69,7 +93,7 @@ export const AdminCompaniesManagement = (): JSX.Element => {
     },
     {
       header: ECardLabel.TOTAL_MEETINGS,
-      accessor: (row: MockCompany) => row.meetings,
+      accessor: (row: CompanyWithStats) => row.meetings,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <EventIcon
@@ -83,28 +107,24 @@ export const AdminCompaniesManagement = (): JSX.Element => {
     },
     {
       header: 'Plano',
-      accessor: (row: MockCompany) => row.plan,
-      render: (_value: ReactNode, row: MockCompany) => (
-        <PlanBadge plan={row.plan} />
+      accessor: (row: CompanyWithStats) => row.plan,
+      render: (_value: ReactNode, row: CompanyWithStats) => (
+        <PlanBadge plan={planLabelMap[row.plan]} />
       ),
     },
     {
       header: 'Status',
-      accessor: (row: MockCompany) => row.status,
-      render: (_value: ReactNode, row: MockCompany) => (
-        <StatusBadge active={row.status === EStatus.ACTIVE} />
+      accessor: (row: CompanyWithStats) => row.active,
+      render: (_value: ReactNode, row: CompanyWithStats) => (
+        <StatusBadge active={row.active} />
       ),
     },
   ];
 
-  const activeCompanies = companies.filter(
-    (company) => company.status === EStatus.ACTIVE
-  ).length;
-
+  const activeCompanies = companies.filter((company) => company.active).length;
   const inactiveCompanies = companies.filter(
-    (company) => company.status === EStatus.INACTIVE
+    (company) => !company.active
   ).length;
-
   const totalMeetings = companies.reduce(
     (acc, company) => acc + company.meetings,
     0
@@ -154,7 +174,8 @@ export const AdminCompaniesManagement = (): JSX.Element => {
         <DataTable
           data={companies}
           columns={columns}
-          getRowId={(row) => row.id}
+          getRowId={(row: CompanyWithStats) => row.id}
+          loading={isLoading}
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {
             console.log(rowId);
@@ -174,8 +195,8 @@ export const AdminCompaniesManagement = (): JSX.Element => {
           filterAriaLabel="Filtrar empresas"
           filterOptions={[
             { label: 'Todos', value: '' },
-            { label: EStatus.ACTIVE, value: EStatus.ACTIVE },
-            { label: EStatus.INACTIVE, value: EStatus.INACTIVE },
+            { label: EStatus.ACTIVE, value: 'true' },
+            { label: EStatus.INACTIVE, value: 'false' },
           ]}
         />
       </Stack>

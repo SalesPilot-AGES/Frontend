@@ -1,142 +1,45 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import { ArrowBack, Business, Close, Email, Save } from '@mui/icons-material';
-import { Box, Button, Typography, useTheme } from '@mui/material';
-import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
-import type { TManagerWithCompany } from '@services/models/ManagerSchema';
-import { useGetCompanies } from '@services/queries/useCompanies';
 import {
-  useGetManagerById,
-  useUpdateManager,
-} from '@services/queries/useManagers';
-import { useNavigate, useParams } from '@tanstack/react-router';
+  Box,
+  Button,
+  Link as MuiLink,
+  Typography,
+  useTheme,
+} from '@mui/material';
+import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
+import { useGetManagerById } from '@services/queries/useManagers';
+import { useAdminManagersDetailsEdit } from '@store/hooks/useAdminManagersDetailsEdit';
+import { Link, useParams } from '@tanstack/react-router';
 import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import { IconBox } from '@UI/IconBox/IconBox';
 import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
-import { type JSX, useMemo, useState } from 'react';
+import { type JSX } from 'react';
 
 import { ManagerEditFormComponent } from './ManagerEditForm';
 
-type TManagerEditForm = {
-  name: string;
-  companyName: string;
-  email: string;
-  active: boolean;
-};
-
-const createEditForm = (manager: TManagerWithCompany): TManagerEditForm => ({
-  name: manager.name,
-  companyName: manager.company.name,
-  email: manager.email,
-  active: manager.active,
-});
-
 export const AdminManagersDetails = (): JSX.Element => {
-  const navigate = useNavigate();
   const { palette } = useTheme();
   const { id } = useParams({ from: EPageRoutes.ADMIN_MANAGERS_DETAILS });
 
   const { data: manager, isLoading, isError } = useGetManagerById(id ?? null);
-  const { data: companiesResponse } = useGetCompanies(0, 200);
-  const updateManagerMutation = useUpdateManager();
-
-  const companyOptions = useMemo(
-    () =>
-      companiesResponse?.content.map((companyItem) => companyItem.name) ?? [],
-    [companiesResponse]
-  );
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState<TManagerEditForm | null>(null);
-
-  const isCompanyValid = editForm
-    ? companyOptions.includes(editForm.companyName)
-    : false;
-  const isEditFormValid = isCompanyValid;
-
-  const handleGoBack = (): void => {
-    navigate({ to: EPageRoutes.ADMIN_MANAGERS });
-  };
-
-  const handleEdit = (): void => {
-    if (!manager) {
-      return;
-    }
-
-    setEditForm(createEditForm(manager));
-    setIsEditing(true);
-  };
-
-  const handleCancelEdit = (): void => {
-    if (!manager) {
-      return;
-    }
-
-    setEditForm(createEditForm(manager));
-    setIsEditing(false);
-  };
-
-  const handleSaveEdit = (): void => {
-    if (!manager || !editForm || !isEditFormValid) {
-      return;
-    }
-
-    const company = companiesResponse?.content.find(
-      (companyItem) => companyItem.name === editForm.companyName
-    );
-    if (!company) {
-      return;
-    }
-
-    updateManagerMutation.mutate(
-      {
-        id: manager.id,
-        data: {
-          name: editForm.name,
-          email: editForm.email,
-          active: editForm.active,
-          companyId: company.id,
-        },
-      },
-      {
-        onSuccess: () => {
-          setIsEditing(false);
-        },
-      }
-    );
-  };
-
-  const handleFieldChange = (
-    field: keyof Omit<TManagerEditForm, 'active'>,
-    value: string
-  ): void => {
-    setEditForm((previous) => {
-      if (!previous) {
-        return previous;
-      }
-
-      return {
-        ...previous,
-        [field]: value,
-      };
-    });
-  };
-
-  const handleStatusChange = (checked: boolean): void => {
-    setEditForm((previous) => {
-      if (!previous) {
-        return previous;
-      }
-
-      return {
-        ...previous,
-        active: checked,
-      };
-    });
-  };
+  const {
+    companyOptions,
+    isCompanyValid,
+    isEditFormValid,
+    isEditing,
+    editForm,
+    updateManagerMutation,
+    handleEdit,
+    handleCancelEdit,
+    handleSaveEdit,
+    handleFieldChange,
+    handleStatusChange,
+  } = useAdminManagersDetailsEdit(manager ?? null);
 
   if (isLoading) {
     return (
@@ -160,16 +63,23 @@ export const AdminManagersDetails = (): JSX.Element => {
           width: '100%',
         }}
       >
-        <Button
-          startIcon={<ArrowBack />}
-          onClick={handleGoBack}
+        <MuiLink
+          component={Link}
+          to={EPageRoutes.ADMIN_MANAGERS}
+          underline="hover"
           sx={{
-            textTransform: 'none',
-            color: palette.neutrals[600],
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.75,
+            color: palette.primary[600],
+            fontWeight: 500,
+            width: 'fit-content',
+            fontSize: '0.875rem',
           }}
         >
+          <ArrowBack sx={{ fontSize: '0.875rem' }} />
           Voltar para gestores
-        </Button>
+        </MuiLink>
 
         <Box
           sx={{
@@ -216,10 +126,12 @@ export const AdminManagersDetails = (): JSX.Element => {
         >
           {isEditing && editForm ? (
             <ManagerEditFormComponent
+              managerId={manager.id}
               editForm={editForm}
               isCompanyValid={isCompanyValid}
               companyOptions={companyOptions}
               onFieldChange={handleFieldChange}
+              isCompanyLocked
               onStatusChange={handleStatusChange}
             />
           ) : (

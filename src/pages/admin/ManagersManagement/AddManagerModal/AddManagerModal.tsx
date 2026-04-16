@@ -16,14 +16,26 @@ const companyOptions: string[] = [
   'Prime Solutions',
 ];
 
-export const AddManagerModal = (): JSX.Element => {
+type AddManagerModalProps = {
+  open: boolean;
+  handleClose: () => void;
+};
+
+export const AddManagerModal = ({
+  open,
+  handleClose,
+}: AddManagerModalProps): JSX.Element => {
   const [managerName, setManagerName] = useState<string>('');
   const [accessEmail, setAccessEmail] = useState<string>('');
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [isActive, setIsActive] = useState<boolean>(true);
 
   return (
-    <AppModal modalName="Adicionar gestor" open>
+    <AppModal
+      modalName="Adicionar gestor"
+      open={open}
+      handleClose={handleClose}
+    >
       <Box
         sx={{
           width: '100%',

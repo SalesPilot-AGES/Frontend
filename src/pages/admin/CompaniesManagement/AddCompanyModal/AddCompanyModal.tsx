@@ -20,7 +20,7 @@ import type { JSX } from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { PLAN_EDIT_OPTIONS } from '../CompanyDetail/CompanyInformationEdit/useCompanyInformationEdit';
+import { PLAN_EDIT_OPTIONS } from '../CompanyDetail/CompanyInformation/CompanyInformationEdit/useCompanyInformationEdit';
 
 export interface IAddCompanyModalProps {
   open: boolean;

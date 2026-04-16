@@ -17,8 +17,8 @@ import { type JSX } from 'react';
 import React from 'react';
 
 import { CompanyInformation } from './CompanyInformation/CompanyInformation';
-import { CompanyInformationEdit } from './CompanyInformationEdit/CompanyInformationEdit';
-import { pickCompanyValues } from './CompanyInformationEdit/useCompanyInformationEdit';
+import { CompanyInformationEdit } from './CompanyInformation/CompanyInformationEdit/CompanyInformationEdit';
+import { pickCompanyValues } from './CompanyInformation/CompanyInformationEdit/useCompanyInformationEdit';
 
 const companyDetailRouteApi = getRouteApi(EPageRoutes.ADMIN_COMPANY_DETAIL);
 

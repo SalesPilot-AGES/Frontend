@@ -26,10 +26,7 @@ export const CompanyDetail = (): JSX.Element => {
 
   return (
     <PageContainter>
-      <Stack
-        spacing={3}
-        sx={{ width: '100%', maxWidth: 1200, alignSelf: 'flex-start' }}
-      >
+      <Stack spacing={3} sx={{ width: '100%', alignSelf: 'flex-start' }}>
         <MuiLink
           component={Link}
           to={EPageRoutes.ADMIN_COMPANIES}

@@ -7,6 +7,7 @@ import {
 import { useCreateCompany } from '@services/queries/useCompanies';
 import AppModal from '@UI/AppModal/AppModal';
 import type { JSX } from 'react';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 export interface IAddCompanyModalProps {
@@ -22,15 +23,22 @@ export const AddCompanyModal = ({
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<CompanyCreateInput>({
     resolver: zodResolver(CompanyCreateInputSchema),
     defaultValues: {
       name: '',
       tax_id: '',
-      plan: 'STARTER',
+      plan: 'BASIC',
       active: true,
     },
   });
+
+  useEffect(() => {
+    if (!open) {
+      reset();
+    }
+  }, [open, reset]);
 
   const { mutate: createCompany } = useCreateCompany();
 

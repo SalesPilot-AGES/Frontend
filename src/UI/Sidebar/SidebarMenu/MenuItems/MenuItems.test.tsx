@@ -11,7 +11,7 @@ describe('MenuItems', () => {
     expect(items[0].path).toBe(EPageRoutes.ADMIN_DASHBOARD);
     expect(items[1].label).toBe('Empresas');
     expect(items[1].path).toBe(EPageRoutes.ADMIN_COMPANIES);
-    expect(items[2].label).toBe('Gerentes');
+    expect(items[2].label).toBe('Gestores');
     expect(items[2].path).toBe(EPageRoutes.ADMIN_MANAGERS);
     expect(items[3].label).toBe('Vendedores');
     expect(items[3].path).toBe(EPageRoutes.ADMIN_SALESMEN);

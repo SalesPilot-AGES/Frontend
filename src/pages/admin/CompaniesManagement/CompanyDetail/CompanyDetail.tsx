@@ -115,7 +115,7 @@ export const CompanyDetail = (): JSX.Element => {
           />
         </Stack>
 
-        <CompanyInformation {...mock.information} />
+        <CompanyInformation key={mock.companyId} {...mock.information} />
       </Stack>
     </PageContainter>
   );

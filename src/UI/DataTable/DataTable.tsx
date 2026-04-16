@@ -41,7 +41,10 @@ export const DataTable = <T,>({
         border: `1px solid ${surfaceColors.paperBorder}`,
         borderRadius: '0.75rem',
         boxShadow: 'none',
-        overflow: 'hidden',
+        // overflow:hidden corta linhas extras dentro de flex/layout com altura limitada.
+        overflow: 'visible',
+        minWidth: 0,
+        width: '100%',
         ...sx,
       }}
     >
@@ -63,7 +66,13 @@ export const DataTable = <T,>({
           palette={palette}
         />
       ) : null}
-      <TableContainer sx={{ overflowX: 'auto' }}>
+      <TableContainer
+        sx={{
+          overflowX: 'auto',
+          overflowY: 'visible',
+          maxWidth: '100%',
+        }}
+      >
         <Table
           stickyHeader
           size="small"

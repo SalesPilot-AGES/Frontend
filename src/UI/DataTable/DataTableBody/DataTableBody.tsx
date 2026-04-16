@@ -41,7 +41,6 @@ export const DataTableBody = <T,>({
   surface,
   palette,
 }: DataTableBodyProps<T>): JSX.Element => {
-  const visibleRows = data.slice(0, ROWS_PER_PAGE);
   const skeletonWidths = buildSkeletonWidths(columns.length);
 
   const bodyCellSx = {
@@ -95,8 +94,8 @@ export const DataTableBody = <T,>({
             </TableCell>
           </TableRow>
         ))
-      ) : visibleRows.length > 0 ? (
-        visibleRows.map((row) => {
+      ) : data.length > 0 ? (
+        data.map((row) => {
           const rowId = getRowId(row);
 
           return (

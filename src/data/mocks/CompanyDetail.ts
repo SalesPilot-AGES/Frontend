@@ -1,6 +1,6 @@
 import { EPlan } from '@data/enums/EPlan';
 
-import type { CompanyInformationProps } from '../../pages/admin/CompaniesManagement/CompanyDetail/CompanyInformation/CompanyInformation';
+import type { CompanyInformationValues } from '../../pages/admin/CompaniesManagement/CompanyDetail/CompanyInformation/types';
 
 export interface MockCompanySummaryStats {
   managers: string;
@@ -13,7 +13,7 @@ export interface MockCompanyDetail {
   companyId: string;
   name: string;
   summary: MockCompanySummaryStats;
-  information: Omit<CompanyInformationProps, 'onEdit'>;
+  information: CompanyInformationValues;
 }
 
 const digitalSales: MockCompanyDetail = {

@@ -1,45 +1,29 @@
-import type { TPlan } from '@declarations/ui';
+import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
-import { Box, Button, Paper, Stack, Typography, useTheme } from '@mui/material';
-import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
-import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
-import type { JSX, ReactNode } from 'react';
+import SaveIcon from '@mui/icons-material/Save';
+import { Button, Paper, Stack, Typography, useTheme } from '@mui/material';
+import type { JSX } from 'react';
 
-export interface CompanyInformationProps {
-  displayId: string;
-  name: string;
-  cnpj: string;
-  phone: string;
-  address: string;
-  plan: TPlan;
-  active: boolean;
-  onEdit?: () => void;
-}
+import { CompanyInformationEdit } from './CompanyInformationEdit';
+import { CompanyInformationView } from './CompanyInformationView';
+import type { CompanyInformationProps } from './types';
+import { useCompanyInformation } from './useCompanyInformation';
 
-export const CompanyInformation = ({
-  displayId,
-  name,
-  cnpj,
-  phone,
-  address,
-  plan,
-  active,
-  onEdit,
-}: CompanyInformationProps): JSX.Element => {
+export type { CompanyInformationProps } from './types';
+
+export const CompanyInformation = (
+  props: CompanyInformationProps
+): JSX.Element => {
   const { palette } = useTheme();
-  const labelColor = palette.neutrals[600];
-  const valueColor = palette.neutrals[800];
-
-  const row = (fieldLabel: string, value: ReactNode): JSX.Element => (
-    <Stack spacing={0.75}>
-      <Typography variant="body2" color={labelColor} fontWeight={500}>
-        {fieldLabel}
-      </Typography>
-      <Box sx={{ color: valueColor }}>{value}</Box>
-    </Stack>
-  );
+  const {
+    isEditing,
+    viewValues,
+    draft,
+    setDraft,
+    startEdit,
+    cancelEdit,
+    saveEdit,
+  } = useCompanyInformation(props);
 
   return (
     <Paper
@@ -59,72 +43,43 @@ export const CompanyInformation = ({
         sx={{ mb: 3 }}
       >
         <Typography variant="h2">Informações da empresa</Typography>
-        <Button
-          variant="contained"
-          startIcon={<EditIcon />}
-          onClick={onEdit}
-          aria-label="Editar informações da empresa"
-        >
-          Editar
-        </Button>
+        {isEditing ? (
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<CloseIcon />}
+              onClick={cancelEdit}
+              aria-label="Cancelar edição das informações da empresa"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<SaveIcon />}
+              onClick={saveEdit}
+              aria-label="Salvar informações da empresa"
+            >
+              Salvar
+            </Button>
+          </Stack>
+        ) : (
+          <Button
+            variant="contained"
+            startIcon={<EditIcon />}
+            onClick={startEdit}
+            aria-label="Editar informações da empresa"
+          >
+            Editar
+          </Button>
+        )}
       </Stack>
 
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={4}
-        alignItems={{ xs: 'stretch', md: 'flex-start' }}
-      >
-        <Stack spacing={2.5} sx={{ flex: { md: '1 1 58%' } }}>
-          {row(
-            'ID da empresa',
-            <Typography fontWeight={600}>{displayId}</Typography>
-          )}
-          {row(
-            'Nome da empresa',
-            <Typography fontWeight={600}>{name}</Typography>
-          )}
-          {row('CNPJ', <Typography fontWeight={600}>{cnpj}</Typography>)}
-          {row(
-            'Telefone',
-            <Stack direction="row" alignItems="center" gap={1}>
-              <PhoneOutlinedIcon
-                sx={{ fontSize: '1.125rem', color: palette.neutrals[500] }}
-              />
-              <Typography fontWeight={600}>{phone}</Typography>
-            </Stack>
-          )}
-          {row(
-            'Endereço',
-            <Stack direction="row" alignItems="flex-start" gap={1}>
-              <LocationOnOutlinedIcon
-                sx={{
-                  fontSize: '1.125rem',
-                  color: palette.neutrals[500],
-                  mt: 0.125,
-                }}
-              />
-              <Typography fontWeight={600}>{address}</Typography>
-            </Stack>
-          )}
-        </Stack>
-        <Stack
-          spacing={2.5}
-          sx={{ flex: { md: '1 1 42%' }, minWidth: { md: 200 } }}
-        >
-          <Stack spacing={0.75}>
-            <Typography variant="body2" color={labelColor} fontWeight={500}>
-              Plano
-            </Typography>
-            <PlanBadge plan={plan} sx={{ fontSize: 'small' }} />
-          </Stack>
-          <Stack spacing={0.75}>
-            <Typography variant="body2" color={labelColor} fontWeight={500}>
-              Status
-            </Typography>
-            <StatusBadge active={active} />
-          </Stack>
-        </Stack>
-      </Stack>
+      {isEditing ? (
+        <CompanyInformationEdit draft={draft} setDraft={setDraft} />
+      ) : (
+        <CompanyInformationView viewValues={viewValues} />
+      )}
     </Paper>
   );
 };

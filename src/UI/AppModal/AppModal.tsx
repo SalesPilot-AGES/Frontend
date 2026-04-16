@@ -1,7 +1,7 @@
 import type { IBasicModalProps } from '@declarations/ui';
-import { Stack } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import Modal from '@mui/material/Modal';
-import ModalFooter from '@UI/AppModal/ModalFooter/ModalFooter';
+import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import ModalHeader from '@UI/AppModal/ModalHeader/ModalHeader';
 import type { JSX } from 'react';
 
@@ -10,6 +10,7 @@ export default function AppModal({
   open,
   children,
   handleClose,
+  handleSubmit,
 }: IBasicModalProps): JSX.Element {
   return (
     <Modal open={open} onClose={handleClose}>
@@ -31,7 +32,33 @@ export default function AppModal({
 
         {children}
 
-        <ModalFooter />
+        <Box
+          display="flex"
+          sx={{
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            padding: '1.5rem',
+            borderTop: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={handleClose}
+            startIcon={GetAppIcon('close')}
+          >
+            <Typography variant="body1">{'Cancelar'}</Typography>
+          </Button>
+          <Button
+            startIcon={GetAppIcon('save')}
+            content="Salvar"
+            variant="contained"
+            onClick={() => {
+              handleSubmit();
+              handleClose();
+            }}
+          />
+        </Box>
       </Stack>
     </Modal>
   );

@@ -120,10 +120,12 @@ export interface DataTableProps<T> {
 }
 
 export type BadgeLook = { backgroundColor: string; color: string };
+
 export interface IBasicModalProps {
   modalName: string;
-  handleClose?: () => void;
+  handleClose: () => void;
   open: boolean;
+  handleSubmit: () => void;
   children: JSX.Element;
 }
 

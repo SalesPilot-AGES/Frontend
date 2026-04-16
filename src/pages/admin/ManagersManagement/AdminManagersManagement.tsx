@@ -19,7 +19,7 @@ import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import type { JSX, ReactNode } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { AddManagerModal } from './AddManagerModal/AddManagerModal';
 
@@ -27,8 +27,29 @@ export const AdminManagersManagement = (): JSX.Element => {
   const { palette } = useTheme();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [filterValue, setFilterValue] = useState('');
 
   const { data: managers = [], isLoading } = useGetManagers();
+
+  const filteredManagers = useMemo(() => {
+    const query = searchValue.trim().toLowerCase();
+    return managers.filter((manager) => {
+      if (filterValue === 'true' && !manager.active) {
+        return false;
+      }
+      if (filterValue === 'false' && manager.active) {
+        return false;
+      }
+      if (query.length === 0) {
+        return true;
+      }
+      const nameMatch = manager.name.toLowerCase().includes(query);
+      const emailMatch = manager.email.toLowerCase().includes(query);
+      const companyMatch = manager.company.name.toLowerCase().includes(query);
+      return nameMatch || emailMatch || companyMatch;
+    });
+  }, [managers, searchValue, filterValue]);
 
   const columns: DataTableProps<TManagerWithCompany>['columns'] = [
     {
@@ -122,7 +143,7 @@ export const AdminManagersManagement = (): JSX.Element => {
         </Box>
 
         <DataTable
-          data={managers}
+          data={filteredManagers}
           columns={columns}
           getRowId={(row: TManagerWithCompany) => row.id}
           loading={isLoading}
@@ -133,14 +154,10 @@ export const AdminManagersManagement = (): JSX.Element => {
               params: { id: String(rowId) },
             });
           }}
-          onSearchChange={(value) => {
-            console.log(value);
-          }}
-          onFilterChange={(value) => {
-            console.log(value);
-          }}
-          searchValue=""
-          filterValue=""
+          onSearchChange={setSearchValue}
+          onFilterChange={setFilterValue}
+          searchValue={searchValue}
+          filterValue={filterValue}
           toolbarTitle="Lista de gestores"
           searchPlaceholder="Buscar gestor..."
           searchAriaLabel="Buscar gestor"

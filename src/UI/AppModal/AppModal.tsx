@@ -51,13 +51,14 @@ export default function AppModal({
           </Button>
           <Button
             startIcon={GetAppIcon('save')}
-            content="Salvar"
             variant="contained"
             onClick={() => {
               handleSubmit();
               handleClose();
             }}
-          />
+          >
+            <Typography variant="body1">{'Salvar'}</Typography>
+          </Button>
         </Box>
       </Stack>
     </Modal>

@@ -1,5 +1,6 @@
 import { ECardLabel } from '@data/enums/ECardLabel';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
+import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import { EPlan } from '@data/enums/EPlan';
 import { EStatus } from '@data/enums/EStatus';
@@ -13,6 +14,7 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { Company } from '@services/models/CompanySchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
+import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
@@ -20,6 +22,9 @@ import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import type { JSX, ReactNode } from 'react';
+import React from 'react';
+
+import { AddCompanyModal } from './AddCompanyModal/AddCompanyModal';
 
 const planLabelMap: Record<Company['plan'], TPlan> = {
   BASIC: EPlan.BASIC,
@@ -37,6 +42,8 @@ type CompanyWithStats = Company & {
 export const AdminCompaniesManagement = (): JSX.Element => {
   const { palette } = useTheme();
   const { data, isLoading } = useGetCompanies();
+  const [openAddModal, setOpenAddModal] = React.useState(false);
+  const navigate = useNavigate();
 
   // TODO: remover mock quando a API retornar managers, sellers e meetings
   const companies: CompanyWithStats[] = (data?.content ?? []).map(
@@ -132,6 +139,10 @@ export const AdminCompaniesManagement = (): JSX.Element => {
 
   return (
     <PageContainter>
+      <AddCompanyModal
+        open={openAddModal}
+        handleClose={() => setOpenAddModal(false)}
+      />
       <Stack spacing="2.5rem">
         <Box
           display="flex"
@@ -143,7 +154,11 @@ export const AdminCompaniesManagement = (): JSX.Element => {
             subtitle={EpageDescriptions.COMPANIES}
           />
 
-          <Button startIcon={<AddIcon />} variant="gradient">
+          <Button
+            startIcon={<AddIcon />}
+            variant="gradient"
+            onClick={() => setOpenAddModal(true)}
+          >
             Adicionar empresa
           </Button>
         </Box>
@@ -178,7 +193,10 @@ export const AdminCompaniesManagement = (): JSX.Element => {
           loading={isLoading}
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {
-            console.log(rowId);
+            navigate({
+              to: EPageRoutes.ADMIN_COMPANY_DETAIL,
+              params: { companyId: String(rowId) },
+            });
           }}
           onSearchChange={(value) => {
             console.log(value);

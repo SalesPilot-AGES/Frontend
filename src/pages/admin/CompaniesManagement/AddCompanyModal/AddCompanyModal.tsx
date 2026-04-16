@@ -158,21 +158,35 @@ export const AddCompanyModal = ({
           <Typography variant="body2" fontWeight={500}>
             Plano
           </Typography>
-          <RadioGroup aria-label="Plano da empresa">
-            <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
-              {PLAN_EDIT_OPTIONS.map((planOption) => (
-                <FormControlLabel
-                  key={planOption}
-                  value={planOption}
-                  control={<Radio size="small" disableRipple />}
-                  label={
-                    <PlanBadge plan={planOption} sx={{ fontSize: 'small' }} />
-                  }
-                  sx={{ mr: 0, ml: 0 }}
-                />
-              ))}
-            </Stack>
-          </RadioGroup>
+          <Controller
+            name="plan"
+            control={control}
+            render={({ field }) => (
+              <RadioGroup
+                aria-label="Plano da empresa"
+                name="company-plan"
+                value={field.value}
+                onChange={(_, value) => field.onChange(value)}
+              >
+                <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
+                  {PLAN_EDIT_OPTIONS.map((planOption) => (
+                    <FormControlLabel
+                      key={planOption}
+                      value={planOption}
+                      control={<Radio size="small" disableRipple />}
+                      label={
+                        <PlanBadge
+                          plan={planOption}
+                          sx={{ fontSize: 'small' }}
+                        />
+                      }
+                      sx={{ mr: 0, ml: 0 }}
+                    />
+                  ))}
+                </Stack>
+              </RadioGroup>
+            )}
+          />
         </Stack>
       </Box>
     </AppModal>

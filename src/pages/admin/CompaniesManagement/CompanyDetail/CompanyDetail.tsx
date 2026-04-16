@@ -27,7 +27,15 @@ export const CompanyDetail = (): JSX.Element => {
   const { companyId } = companyDetailRouteApi.useParams();
   const { data: company, isLoading } = useGetCompanyById(companyId);
   const [editMode, setEditMode] = React.useState(false);
-  const handleSetDraft = React.useCallback(() => {}, []);
+  const [draft, setDraft] = React.useState(
+    company ? pickCompanyValues(company) : undefined
+  );
+
+  React.useEffect(() => {
+    if (company) {
+      setDraft(pickCompanyValues(company));
+    }
+  }, [company]);
 
   return (
     <PageContainter>
@@ -130,8 +138,10 @@ export const CompanyDetail = (): JSX.Element => {
           />
         ) : company ? (
           <CompanyInformationEdit
-            draft={pickCompanyValues(company)}
-            setDraft={handleSetDraft}
+            draft={draft ?? pickCompanyValues(company)}
+            setDraft={setDraft}
+            onSaveSuccess={() => setEditMode(false)}
+            onCancel={() => setEditMode(false)}
           />
         ) : (
           <Typography>Empresa não encontrada</Typography>

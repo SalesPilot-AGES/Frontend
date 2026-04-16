@@ -4,6 +4,7 @@ import type {
   TUpdateManager,
 } from '@services/models/ManagerSchema';
 import { ManagerSchema } from '@services/models/ManagerSchema';
+import { z } from 'zod';
 
 import apiClient from './apiClient';
 
@@ -13,6 +14,13 @@ export const managerApi = {
       `/api/collaborators/managers/${id}`
     );
     return ManagerSchema.parse(response.data);
+  },
+
+  getManagers: async (): Promise<TManager[]> => {
+    const response = await apiClient.get<TManager[]>(
+      '/api/collaborators/managers'
+    );
+    return z.array(ManagerSchema).parse(response.data);
   },
 
   createManager: async (data: TCreateManager): Promise<TManager> => {

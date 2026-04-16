@@ -22,6 +22,18 @@ export const managersQueryKeys = {
   detail: (id: string) => [...managersQueryKeys.details(), id] as const,
 };
 
+// GET queries
+export const useGetManagers = (
+  options?: UseQueryOptions<TManager[]>
+): ReturnType<typeof useQuery<TManager[], Error>> => {
+  return useQuery<TManager[], Error>({
+    queryKey: managersQueryKeys.lists(),
+    queryFn: () => managerApi.getManagers(),
+    staleTime: 1000 * 60 * 5,
+    ...options,
+  });
+};
+
 export const useGetManagerById = (
   id: string | null,
   options?: UseQueryOptions<TManager>

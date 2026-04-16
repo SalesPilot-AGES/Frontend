@@ -2,8 +2,6 @@ import { ECardLabel } from '@data/enums/ECardLabel';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import { EStatus } from '@data/enums/EStatus';
-import type { ManagerMock } from '@data/mocks/Managers';
-import { mockManagers } from '@data/mocks/Managers';
 import type { DataTableProps } from '@declarations/ui';
 import AddIcon from '@mui/icons-material/Add';
 import ApartmentIcon from '@mui/icons-material/Apartment';
@@ -11,6 +9,8 @@ import MailIcon from '@mui/icons-material/Mail';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import type { TManager } from '@services/models/ManagerSchema';
+import { useGetManagers } from '@services/queries/useManagers';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
@@ -21,16 +21,31 @@ import { useState } from 'react';
 
 import { AddManagerModal } from './AddManagerModal/AddManagerModal';
 
+type ManagerWithCompany = TManager & {
+  company: {
+    id: string;
+    name: string;
+  };
+};
+
 export const AdminManagersManagement = (): JSX.Element => {
   const { palette } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const managers = mockManagers;
+  const { data: managersData = [], isLoading } = useGetManagers();
 
-  const columns: DataTableProps<ManagerMock>['columns'] = [
+  const managers: ManagerWithCompany[] = managersData.map((manager) => ({
+    ...manager,
+    company: {
+      id: manager.companyId,
+      name: manager.companyId,
+    },
+  }));
+
+  const columns: DataTableProps<ManagerWithCompany>['columns'] = [
     {
       header: 'Nome do gestor',
-      accessor: (row: ManagerMock) => row.name,
+      accessor: (row: ManagerWithCompany) => row.name,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ManageAccountsIcon
@@ -44,7 +59,7 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: 'E-mail',
-      accessor: (row: ManagerMock) => row.email,
+      accessor: (row: ManagerWithCompany) => row.email,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <MailIcon sx={{ color: palette.neutrals[300], fontSize: '1.5rem' }} />
@@ -56,7 +71,7 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: ECardLabel.COMPANY_NAME,
-      accessor: (row: ManagerMock) => row.company.name,
+      accessor: (row: ManagerWithCompany) => row.company.name,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ApartmentIcon
@@ -70,8 +85,8 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: 'Status',
-      accessor: (row: ManagerMock) => row.active,
-      render: (_value: ReactNode, row: ManagerMock) => (
+      accessor: (row: ManagerWithCompany) => row.active,
+      render: (_value: ReactNode, row: ManagerWithCompany) => (
         <StatusBadge active={row.active} />
       ),
     },
@@ -121,8 +136,8 @@ export const AdminManagersManagement = (): JSX.Element => {
         <DataTable
           data={managers}
           columns={columns}
-          getRowId={(row: ManagerMock) => row.id}
-          loading={false}
+          getRowId={(row: ManagerWithCompany) => row.id}
+          loading={isLoading}
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {
             console.log(rowId);

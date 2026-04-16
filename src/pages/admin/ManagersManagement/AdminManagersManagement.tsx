@@ -1,19 +1,157 @@
+import { ECardLabel } from '@data/enums/ECardLabel';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
+import { EStatus } from '@data/enums/EStatus';
+import type { ManagerMock } from '@data/mocks/Managers';
+import { mockManagers } from '@data/mocks/Managers';
+import type { DataTableProps } from '@declarations/ui';
+import AddIcon from '@mui/icons-material/Add';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import MailIcon from '@mui/icons-material/Mail';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import { Box, Button, Stack, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
-import type { JSX } from 'react';
+import { StatCard } from '@UI/StatCard/StatCard';
+import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
+import type { JSX, ReactNode } from 'react';
+import { useState } from 'react';
 
 import { AddManagerModal } from './AddManagerModal/AddManagerModal';
 
 export const AdminManagersManagement = (): JSX.Element => {
+  const { palette } = useTheme();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const managers = mockManagers;
+
+  const columns: DataTableProps<ManagerMock>['columns'] = [
+    {
+      header: 'Nome do gestor',
+      accessor: (row: ManagerMock) => row.name,
+      render: (value: ReactNode) => (
+        <Stack direction="row" alignItems="center" spacing="0.5rem">
+          <ManageAccountsIcon
+            sx={{ color: palette.managers[500], fontSize: '1.5rem' }}
+          />
+          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+            {value ?? '-'}
+          </Typography>
+        </Stack>
+      ),
+    },
+    {
+      header: 'E-mail',
+      accessor: (row: ManagerMock) => row.email,
+      render: (value: ReactNode) => (
+        <Stack direction="row" alignItems="center" spacing="0.5rem">
+          <MailIcon sx={{ color: palette.neutrals[300], fontSize: '1.5rem' }} />
+          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+            {value ?? '-'}
+          </Typography>
+        </Stack>
+      ),
+    },
+    {
+      header: ECardLabel.COMPANY_NAME,
+      accessor: (row: ManagerMock) => row.company.name,
+      render: (value: ReactNode) => (
+        <Stack direction="row" alignItems="center" spacing="0.5rem">
+          <ApartmentIcon
+            sx={{ color: palette.companies[500], fontSize: '1.5rem' }}
+          />
+          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+            {value ?? '-'}
+          </Typography>
+        </Stack>
+      ),
+    },
+    {
+      header: 'Status',
+      accessor: (row: ManagerMock) => row.active,
+      render: (_value: ReactNode, row: ManagerMock) => (
+        <StatusBadge active={row.active} />
+      ),
+    },
+  ];
+
+  const activeManagers = managers.filter((manager) => manager.active).length;
+  const inactiveManagers = managers.filter((manager) => !manager.active).length;
+
   return (
     <PageContainter>
-      <PageHeader
-        title={EPageTitles.MANAGERS}
-        subtitle={EpageDescriptions.MANAGERS}
+      <Stack spacing="2.5rem">
+        <Box
+          display="flex"
+          alignItems="flex-start"
+          justifyContent="space-between"
+        >
+          <PageHeader
+            title={EPageTitles.MANAGERS}
+            subtitle={EpageDescriptions.MANAGERS}
+          />
+
+          <Button
+            startIcon={<AddIcon />}
+            variant="gradient"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Adicionar gestor
+          </Button>
+        </Box>
+
+        <Box display="flex" gap="1.5rem">
+          <StatCard
+            iconName="manager"
+            theme="managers"
+            value={activeManagers}
+            label={ECardLabel.ACTIVE_MANAGERS}
+          />
+
+          <StatCard
+            iconName="manager"
+            theme="neutrals"
+            value={inactiveManagers}
+            label={ECardLabel.INACTIVE_MANAGERS}
+          />
+        </Box>
+
+        <DataTable
+          data={managers}
+          columns={columns}
+          getRowId={(row: ManagerMock) => row.id}
+          loading={false}
+          sx={{ border: `1px solid ${palette.neutrals[200]}` }}
+          onDetailsClick={(rowId) => {
+            console.log(rowId);
+          }}
+          onSearchChange={(value) => {
+            console.log(value);
+          }}
+          onFilterChange={(value) => {
+            console.log(value);
+          }}
+          searchValue=""
+          filterValue=""
+          toolbarTitle="Lista de gestores"
+          searchPlaceholder="Buscar gestor..."
+          searchAriaLabel="Buscar gestor"
+          filterPlaceholder="Filtrar"
+          filterAriaLabel="Filtrar gestores"
+          filterOptions={[
+            { label: 'Todos', value: '' },
+            { label: EStatus.ACTIVE, value: 'true' },
+            { label: EStatus.INACTIVE, value: 'false' },
+          ]}
+        />
+      </Stack>
+
+      <AddManagerModal
+        open={isModalOpen}
+        handleClose={() => setIsModalOpen(false)}
       />
-      <AddManagerModal />
     </PageContainter>
   );
 };

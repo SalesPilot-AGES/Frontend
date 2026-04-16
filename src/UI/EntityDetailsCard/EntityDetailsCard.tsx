@@ -1,13 +1,18 @@
 import type { IEntityDetailsCardProps } from '@declarations/ui';
 import { Edit } from '@mui/icons-material';
 import { Box, Button, Paper, Typography } from '@mui/material';
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
+
+type TEntityDetailsCardProps = IEntityDetailsCardProps & {
+  headerRight?: ReactNode;
+};
 
 export const EntityDetailsCard = ({
   title,
   children,
   onEdit,
-}: IEntityDetailsCardProps): JSX.Element => {
+  headerRight,
+}: TEntityDetailsCardProps): JSX.Element => {
   return (
     <Paper
       elevation={0}
@@ -33,11 +38,12 @@ export const EntityDetailsCard = ({
           {title}
         </Typography>
 
-        {onEdit && (
-          <Button variant="contained" startIcon={<Edit />} onClick={onEdit}>
-            Editar
-          </Button>
-        )}
+        {headerRight ??
+          (onEdit && (
+            <Button variant="contained" startIcon={<Edit />} onClick={onEdit}>
+              Editar
+            </Button>
+          ))}
       </Box>
 
       <Box

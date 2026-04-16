@@ -132,7 +132,7 @@ describe('DataTable', () => {
     ).toHaveLength(2);
   });
 
-  it('renders only five items and does not show page controls', () => {
+  it('renders all provided items and does not show page controls', () => {
     const onDetailsClick = vi.fn();
 
     render(
@@ -145,7 +145,7 @@ describe('DataTable', () => {
     );
 
     expect(screen.getByText('Digital Sales')).toBeInTheDocument();
-    expect(screen.queryByText('Blue Wave')).not.toBeInTheDocument();
+    expect(screen.getByText('Blue Wave')).toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 

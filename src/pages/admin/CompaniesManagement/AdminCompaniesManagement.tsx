@@ -22,7 +22,7 @@ import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import type { JSX, ReactNode } from 'react';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { AddCompanyModal } from './AddCompanyModal/AddCompanyModal';
 
@@ -43,6 +43,8 @@ export const AdminCompaniesManagement = (): JSX.Element => {
   const { palette } = useTheme();
   const { data, isLoading } = useGetCompanies();
   const [openAddModal, setOpenAddModal] = React.useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [filterValue, setFilterValue] = useState('');
   const navigate = useNavigate();
 
   // TODO: remover mock quando a API retornar managers, sellers e meetings
@@ -54,6 +56,18 @@ export const AdminCompaniesManagement = (): JSX.Element => {
       meetings: (index % 10) * 12 + 50,
     })
   );
+
+  const filteredCompanies = useMemo(() => {
+    const query = searchValue.trim().toLowerCase();
+    return companies.filter((company) => {
+      if (filterValue === 'true' && !company.active) return false;
+      if (filterValue === 'false' && company.active) return false;
+      if (query.length === 0) return true;
+      const nameMatch = company.name.toLowerCase().includes(query);
+      const taxIdMatch = company.tax_id.toLowerCase().includes(query);
+      return nameMatch || taxIdMatch;
+    });
+  }, [companies, searchValue, filterValue]);
 
   const columns: DataTableProps<CompanyWithStats>['columns'] = [
     {
@@ -187,7 +201,7 @@ export const AdminCompaniesManagement = (): JSX.Element => {
         </Box>
 
         <DataTable
-          data={companies}
+          data={filteredCompanies}
           columns={columns}
           getRowId={(row: CompanyWithStats) => row.id}
           loading={isLoading}
@@ -198,14 +212,10 @@ export const AdminCompaniesManagement = (): JSX.Element => {
               params: { companyId: String(rowId) },
             });
           }}
-          onSearchChange={(value) => {
-            console.log(value);
-          }}
-          onFilterChange={(value) => {
-            console.log(value);
-          }}
-          searchValue=""
-          filterValue=""
+          onSearchChange={setSearchValue}
+          onFilterChange={setFilterValue}
+          searchValue={searchValue}
+          filterValue={filterValue}
           toolbarTitle="Lista de empresas"
           searchPlaceholder="Buscar empresa..."
           searchAriaLabel="Buscar empresa"

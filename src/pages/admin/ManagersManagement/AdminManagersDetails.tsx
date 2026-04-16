@@ -1,128 +1,55 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import type { ManagerMock } from '@data/mocks/Managers';
-import { mockManagers } from '@data/mocks/Managers';
 import { ArrowBack, Business, Close, Email, Save } from '@mui/icons-material';
-import { Box, Button, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Link as MuiLink,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
-import { useNavigate, useParams } from '@tanstack/react-router';
+import { useGetManagerById } from '@services/queries/useManagers';
+import { useAdminManagersDetailsEdit } from '@store/hooks/useAdminManagersDetailsEdit';
+import { Link, useParams } from '@tanstack/react-router';
 import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import { IconBox } from '@UI/IconBox/IconBox';
 import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
-import { type JSX, useState } from 'react';
+import { type JSX } from 'react';
 
 import { ManagerEditFormComponent } from './ManagerEditForm';
 
-type TManagerEditForm = {
-  name: string;
-  companyName: string;
-  email: string;
-  active: boolean;
-};
-
-const createEditForm = (manager: ManagerMock): TManagerEditForm => ({
-  name: manager.name,
-  companyName: manager.company.name,
-  email: manager.email,
-  active: manager.active,
-});
-
-const companyOptions = Array.from(
-  new Set(mockManagers.map((managerItem) => managerItem.company.name))
-);
-
 export const AdminManagersDetails = (): JSX.Element => {
-  const navigate = useNavigate();
   const { palette } = useTheme();
   const { id } = useParams({ from: EPageRoutes.ADMIN_MANAGERS_DETAILS });
 
-  const manager = mockManagers.find((managerItem) => managerItem.id === id);
-  const [managerData, setManagerData] = useState<ManagerMock | undefined>(
-    manager
-  );
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState<TManagerEditForm | null>(
-    manager ? createEditForm(manager) : null
-  );
+  const { data: manager, isLoading, isError } = useGetManagerById(id ?? null);
+  const {
+    companyOptions,
+    isCompanyValid,
+    isEditFormValid,
+    isEditing,
+    editForm,
+    updateManagerMutation,
+    handleEdit,
+    handleCancelEdit,
+    handleSaveEdit,
+    handleFieldChange,
+    handleStatusChange,
+  } = useAdminManagersDetailsEdit(manager ?? null);
 
-  const isCompanyValid = editForm
-    ? companyOptions.includes(editForm.companyName)
-    : false;
-  const isEditFormValid = isCompanyValid;
+  if (isLoading) {
+    return (
+      <PageContainter>
+        <Typography>Carregando informações do gestor...</Typography>
+      </PageContainter>
+    );
+  }
 
-  const handleGoBack = (): void => {
-    navigate({ to: EPageRoutes.ADMIN_MANAGERS });
-  };
-
-  const handleEdit = (): void => {
-    if (!managerData) {
-      return;
-    }
-
-    setEditForm(createEditForm(managerData));
-    setIsEditing(true);
-  };
-
-  const handleCancelEdit = (): void => {
-    if (!managerData) {
-      return;
-    }
-
-    setEditForm(createEditForm(managerData));
-    setIsEditing(false);
-  };
-
-  const handleSaveEdit = (): void => {
-    if (!managerData || !editForm || !isEditFormValid) {
-      return;
-    }
-
-    setManagerData({
-      ...managerData,
-      name: editForm.name,
-      email: editForm.email,
-      active: editForm.active,
-      company: {
-        ...managerData.company,
-        name: editForm.companyName,
-      },
-    });
-    setIsEditing(false);
-  };
-
-  const handleFieldChange = (
-    field: keyof Omit<TManagerEditForm, 'active'>,
-    value: string
-  ): void => {
-    setEditForm((previous) => {
-      if (!previous) {
-        return previous;
-      }
-
-      return {
-        ...previous,
-        [field]: value,
-      };
-    });
-  };
-
-  const handleStatusChange = (checked: boolean): void => {
-    setEditForm((previous) => {
-      if (!previous) {
-        return previous;
-      }
-
-      return {
-        ...previous,
-        active: checked,
-      };
-    });
-  };
-
-  if (!managerData) {
+  if (isError || !manager) {
     return <PageNotFound />;
   }
 
@@ -136,16 +63,23 @@ export const AdminManagersDetails = (): JSX.Element => {
           width: '100%',
         }}
       >
-        <Button
-          startIcon={<ArrowBack />}
-          onClick={handleGoBack}
+        <MuiLink
+          component={Link}
+          to={EPageRoutes.ADMIN_MANAGERS}
+          underline="hover"
           sx={{
-            textTransform: 'none',
-            color: palette.neutrals[600],
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.75,
+            color: palette.primary[600],
+            fontWeight: 500,
+            width: 'fit-content',
+            fontSize: '0.875rem',
           }}
         >
+          <ArrowBack sx={{ fontSize: '0.875rem' }} />
           Voltar para gestores
-        </Button>
+        </MuiLink>
 
         <Box
           sx={{
@@ -155,7 +89,7 @@ export const AdminManagersDetails = (): JSX.Element => {
           }}
         >
           <IconBox iconName="manager" theme="managers" />
-          <PageHeader title={managerData.name} subtitle="" />
+          <PageHeader title={manager.name} subtitle="" />
         </Box>
 
         <EntityDetailsCard
@@ -174,6 +108,7 @@ export const AdminManagersDetails = (): JSX.Element => {
                   variant="outlined"
                   startIcon={<Close />}
                   onClick={handleCancelEdit}
+                  disabled={updateManagerMutation.isPending}
                 >
                   Cancelar
                 </Button>
@@ -181,7 +116,7 @@ export const AdminManagersDetails = (): JSX.Element => {
                   variant="contained"
                   startIcon={<Save />}
                   onClick={handleSaveEdit}
-                  disabled={!isEditFormValid}
+                  disabled={!isEditFormValid || updateManagerMutation.isPending}
                 >
                   Salvar
                 </Button>
@@ -191,6 +126,7 @@ export const AdminManagersDetails = (): JSX.Element => {
         >
           {isEditing && editForm ? (
             <ManagerEditFormComponent
+              managerId={manager.id}
               editForm={editForm}
               isCompanyValid={isCompanyValid}
               companyOptions={companyOptions}
@@ -205,15 +141,15 @@ export const AdminManagersDetails = (): JSX.Element => {
                 gap: '2rem 4rem',
               }}
             >
-              <ItemDetail label="ID do usuário" value={managerData.id} />
+              <ItemDetail label="ID do usuário" value={manager.id} />
 
               <ItemDetail
                 label="Empresa"
-                value={managerData.company.name}
+                value={manager.company.name}
                 icon={<Business fontSize="small" />}
               />
 
-              <ItemDetail label="Nome do usuário" value={managerData.name} />
+              <ItemDetail label="Nome do usuário" value={manager.name} />
 
               <ItemDetail label="Status">
                 <Box
@@ -222,13 +158,13 @@ export const AdminManagersDetails = (): JSX.Element => {
                     alignSelf: 'flex-start',
                   }}
                 >
-                  <StatusBadge active={managerData.active} />
+                  <StatusBadge active={manager.active} />
                 </Box>
               </ItemDetail>
 
               <ItemDetail
                 label="Email de acesso"
-                value={managerData.email}
+                value={manager.email}
                 icon={<Email fontSize="small" />}
               />
             </Box>

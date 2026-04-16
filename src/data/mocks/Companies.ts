@@ -1,11 +1,14 @@
+import { EPlan } from '@data/enums/EPlan';
+import { EStatus } from '@data/enums/EStatus';
+
 export interface MockCompany {
   id: string;
   company: string;
   managers: number;
   sellers: number;
   meetings: number;
-  plan: 'Basico' | 'Pro' | 'Enterprise';
-  status: 'Ativo' | 'Inativo';
+  plan: (typeof EPlan)[keyof typeof EPlan];
+  status: (typeof EStatus)[keyof typeof EStatus];
 }
 
 export const mockCompanies: MockCompany[] = [
@@ -15,8 +18,8 @@ export const mockCompanies: MockCompany[] = [
     managers: 2,
     sellers: 12,
     meetings: 104,
-    plan: 'Pro',
-    status: 'Ativo',
+    plan: EPlan.PRO,
+    status: EStatus.ACTIVE,
   },
   {
     id: '2',
@@ -24,8 +27,8 @@ export const mockCompanies: MockCompany[] = [
     managers: 1,
     sellers: 9,
     meetings: 92,
-    plan: 'Basico',
-    status: 'Ativo',
+    plan: EPlan.BASIC,
+    status: EStatus.ACTIVE,
   },
   {
     id: '3',
@@ -33,8 +36,8 @@ export const mockCompanies: MockCompany[] = [
     managers: 1,
     sellers: 7,
     meetings: 68,
-    plan: 'Basico',
-    status: 'Inativo',
+    plan: EPlan.BASIC,
+    status: EStatus.INACTIVE,
   },
   {
     id: '4',
@@ -42,8 +45,8 @@ export const mockCompanies: MockCompany[] = [
     managers: 3,
     sellers: 14,
     meetings: 113,
-    plan: 'Pro',
-    status: 'Ativo',
+    plan: EPlan.PRO,
+    status: EStatus.ACTIVE,
   },
   {
     id: '5',
@@ -51,8 +54,8 @@ export const mockCompanies: MockCompany[] = [
     managers: 4,
     sellers: 19,
     meetings: 125,
-    plan: 'Enterprise',
-    status: 'Ativo',
+    plan: EPlan.ENTERPRISE,
+    status: EStatus.ACTIVE,
   },
   {
     id: '6',
@@ -60,8 +63,8 @@ export const mockCompanies: MockCompany[] = [
     managers: 2,
     sellers: 8,
     meetings: 77,
-    plan: 'Pro',
-    status: 'Inativo',
+    plan: EPlan.PRO,
+    status: EStatus.INACTIVE,
   },
   {
     id: '7',
@@ -69,8 +72,8 @@ export const mockCompanies: MockCompany[] = [
     managers: 2,
     sellers: 10,
     meetings: 83,
-    plan: 'Basico',
-    status: 'Ativo',
+    plan: EPlan.BASIC,
+    status: EStatus.ACTIVE,
   },
   {
     id: '8',
@@ -78,7 +81,7 @@ export const mockCompanies: MockCompany[] = [
     managers: 5,
     sellers: 23,
     meetings: 142,
-    plan: 'Enterprise',
-    status: 'Ativo',
+    plan: EPlan.ENTERPRISE,
+    status: EStatus.ACTIVE,
   },
 ];

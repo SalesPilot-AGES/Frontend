@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { formatCnpjInput } from '@hooks/formatCnpjInput';
 import {
   Box,
   FormControlLabel,
@@ -110,6 +111,14 @@ export const AddCompanyModal = ({
                 type="text"
                 error={!!errors.tax_id}
                 helperText={errors.tax_id?.message}
+                onChange={(e) =>
+                  field.onChange(formatCnpjInput(e.target.value))
+                }
+                slotProps={{
+                  htmlInput: {
+                    maxLength: 18,
+                  },
+                }}
               />
             )}
           />

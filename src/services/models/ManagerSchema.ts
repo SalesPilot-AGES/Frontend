@@ -13,7 +13,7 @@ export const ManagerSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
-const ManagerListItemApiSchema = z.object({
+export const ManagerListItemApiSchema = z.object({
   id: z.guid(),
   company_id: z.guid(),
   name: z.string(),

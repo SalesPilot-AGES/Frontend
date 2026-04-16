@@ -6,21 +6,17 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import type { Company } from '@services/models/CompanySchema';
 import {
   CreateManagerSchema,
   type TCreateManager,
 } from '@services/models/ManagerSchema';
+import { useGetCompanies } from '@services/queries/useCompanies';
 import { useCreateManager } from '@services/queries/useManagers';
 import AppModal from '@UI/AppModal/AppModal';
 import type { JSX } from 'react';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-
-const companyOptions: string[] = [
-  'SalesPilot',
-  'Tech Corp',
-  'Vision Hub',
-  'Prime Solutions',
-];
 
 export interface IAddManagerModalProps {
   open: boolean;
@@ -35,6 +31,7 @@ export const AddManagerModal = ({
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<TCreateManager>({
     resolver: zodResolver(CreateManagerSchema),
     defaultValues: {
@@ -46,11 +43,23 @@ export const AddManagerModal = ({
     },
   });
 
+  const { data: companiesPage } = useGetCompanies();
+  const companyOptions: Company[] = companiesPage?.content ?? [];
+
+  useEffect(() => {
+    if (!open) {
+      reset();
+    }
+  }, [open, reset]);
+
   const { mutate: createManager } = useCreateManager();
 
   const onSubmit = (data: TCreateManager): void => {
-    createManager(data);
-    handleClose();
+    createManager(data, {
+      onSuccess: () => {
+        handleClose();
+      },
+    });
   };
 
   return (
@@ -98,16 +107,28 @@ export const AddManagerModal = ({
             name="companyId"
             control={control}
             render={({ field }) => (
-              <Autocomplete
-                {...field}
+              <Autocomplete<Company, false, false, false>
                 disablePortal
                 options={companyOptions}
-                onChange={(_, value) => field.onChange(value)}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(a, b) => a.id === b.id}
+                value={companyOptions.find((c) => c.id === field.value) ?? null}
+                onChange={(_, company) => {
+                  field.onChange(company?.id ?? '');
+                }}
+                onBlur={field.onBlur}
                 renderInput={(params) => (
                   <TextField
                     {...params}
+                    name={field.name}
+                    inputRef={field.ref}
                     error={!!errors.companyId}
-                    helperText={errors.companyId?.message}
+                    helperText={
+                      errors.companyId?.message ??
+                      (companyOptions.length === 0
+                        ? 'Nenhuma empresa disponível para vincular.'
+                        : undefined)
+                    }
                   />
                 )}
               />

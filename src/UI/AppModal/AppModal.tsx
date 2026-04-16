@@ -55,8 +55,7 @@ export default function AppModal({
             variant="contained"
             disabled={isSaveButtonDisabled}
             onClick={() => {
-              handleSubmit();
-              handleClose();
+              void handleSubmit();
             }}
           >
             <Typography variant="body1">{'Salvar'}</Typography>

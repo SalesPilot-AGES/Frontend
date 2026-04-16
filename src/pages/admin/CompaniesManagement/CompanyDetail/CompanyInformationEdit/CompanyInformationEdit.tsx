@@ -17,8 +17,8 @@ import {
 import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import type { Dispatch, JSX, ReactNode, SetStateAction } from 'react';
 
-import type { CompanyInformationValues } from './types';
-import { PLAN_EDIT_OPTIONS } from './useCompanyInformation';
+import type { CompanyInformationValues } from '../CompanyInformationView/types';
+import { PLAN_EDIT_OPTIONS } from './useCompanyInformationEdit';
 
 export interface CompanyInformationEditProps {
   draft: CompanyInformationValues;
@@ -51,7 +51,7 @@ export const CompanyInformationEdit = ({
       <Stack spacing={2.5} sx={{ flex: { md: '1 1 58%' } }}>
         {row(
           'ID da empresa',
-          <Typography fontWeight={600}>{draft.displayId}</Typography>
+          <Typography fontWeight={600}>{draft.id}</Typography>
         )}
         <Stack spacing={0.75}>
           <Typography variant="body2" color={labelColor} fontWeight={500}>
@@ -70,8 +70,10 @@ export const CompanyInformationEdit = ({
           </Typography>
           <TextField
             fullWidth
-            value={draft.cnpj}
-            onChange={(e) => setDraft((d) => ({ ...d, cnpj: e.target.value }))}
+            value={draft.tax_id}
+            onChange={(e) =>
+              setDraft((d) => ({ ...d, tax_id: e.target.value }))
+            }
             size="small"
           />
         </Stack>
@@ -81,7 +83,7 @@ export const CompanyInformationEdit = ({
           </Typography>
           <TextField
             fullWidth
-            value={draft.phone}
+            value={'99999-9999'}
             onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
             size="small"
             slotProps={{
@@ -106,7 +108,7 @@ export const CompanyInformationEdit = ({
           </Typography>
           <TextField
             fullWidth
-            value={draft.address}
+            value={'Rua Exemplo, 123'}
             onChange={(e) =>
               setDraft((d) => ({ ...d, address: e.target.value }))
             }

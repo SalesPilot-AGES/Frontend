@@ -1,11 +1,9 @@
 import type { TPlan } from '@declarations/ui';
 
 export interface CompanyInformationValues {
-  displayId: string;
+  id: string;
   name: string;
-  cnpj: string;
-  phone: string;
-  address: string;
+  tax_id: string;
   plan: TPlan;
   active: boolean;
 }

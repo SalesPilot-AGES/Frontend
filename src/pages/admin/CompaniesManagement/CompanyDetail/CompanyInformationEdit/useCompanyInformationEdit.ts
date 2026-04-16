@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from 'react';
 import type {
   CompanyInformationProps,
   CompanyInformationValues,
-} from './types';
+} from '../CompanyInformationView/types';
 
 export const PLAN_EDIT_OPTIONS: readonly TPlan[] = [
   EPlan.BASIC,
@@ -17,11 +17,9 @@ export const PLAN_EDIT_OPTIONS: readonly TPlan[] = [
 export const pickCompanyValues = (
   props: CompanyInformationProps
 ): CompanyInformationValues => ({
-  displayId: props.displayId,
+  id: props.id,
   name: props.name,
-  cnpj: props.cnpj,
-  phone: props.phone,
-  address: props.address,
+  tax_id: props.tax_id,
   plan: props.plan,
   active: props.active,
 });
@@ -41,19 +39,17 @@ export const useCompanyInformation = (
   cancelEdit: () => void;
   saveEdit: () => void;
 } => {
-  const { displayId, name, cnpj, phone, address, plan, active, onSave } = props;
+  const { id, name, tax_id: cnpj, plan, active, onSave } = props;
 
   const propValues = useMemo(
     (): CompanyInformationValues => ({
-      displayId,
+      id,
       name,
-      cnpj,
-      phone,
-      address,
+      tax_id: cnpj,
       plan,
       active,
     }),
-    [displayId, name, cnpj, phone, address, plan, active]
+    [id, name, cnpj, plan, active]
   );
 
   const [committed, setCommitted] = useState<CompanyInformationValues | null>(

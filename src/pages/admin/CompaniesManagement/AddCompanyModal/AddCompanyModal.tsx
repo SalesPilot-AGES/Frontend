@@ -1,63 +1,70 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  Autocomplete,
   Box,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Stack,
   Switch,
   TextField,
   Typography,
 } from '@mui/material';
 import {
-  CreateManagerSchema,
-  type TCreateManager,
-} from '@services/models/ManagerSchema';
-import { useCreateManager } from '@services/queries/useManagers';
+  type CompanyCreateInput,
+  CompanyCreateInputSchema,
+} from '@services/models/CompanySchema';
+import { useCreateCompany } from '@services/queries/useCompanies';
 import AppModal from '@UI/AppModal/AppModal';
+import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import type { JSX } from 'react';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-const companyOptions: string[] = [
-  'SalesPilot',
-  'Tech Corp',
-  'Vision Hub',
-  'Prime Solutions',
-];
+import { PLAN_EDIT_OPTIONS } from '../CompanyDetail/CompanyInformationEdit/useCompanyInformationEdit';
 
-export interface IAddManagerModalProps {
+export interface IAddCompanyModalProps {
   open: boolean;
   handleClose: () => void;
 }
 
-export const AddManagerModal = ({
+export const AddCompanyModal = ({
   open,
   handleClose,
-}: IAddManagerModalProps): JSX.Element => {
+}: IAddCompanyModalProps): JSX.Element => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
-  } = useForm<TCreateManager>({
-    resolver: zodResolver(CreateManagerSchema),
+    formState: { errors, isValid },
+    reset,
+  } = useForm<CompanyCreateInput>({
+    resolver: zodResolver(CompanyCreateInputSchema),
     defaultValues: {
       name: '',
-      companyId: '',
-      email: '',
+      tax_id: '',
+      plan: 'BASIC',
       active: true,
-      preferences: {},
     },
   });
 
-  const { mutate: createManager } = useCreateManager();
+  useEffect(() => {
+    if (!open) {
+      reset();
+    }
+  }, [open, reset]);
 
-  const onSubmit = (data: TCreateManager): void => {
-    createManager(data);
+  const { mutate: createCompany } = useCreateCompany();
+
+  const onSubmit = (data: CompanyCreateInput): void => {
+    createCompany(data);
     handleClose();
   };
 
   return (
     <AppModal
-      modalName="Adicionar gerente"
+      modalName="Adicionar empresa"
       open={open}
       handleClose={handleClose}
+      isSaveButtonDisabled={!isValid}
       handleSubmit={handleSubmit(onSubmit)}
     >
       <Box
@@ -74,7 +81,7 @@ export const AddManagerModal = ({
       >
         <Box>
           <Typography sx={{ mb: 1 }} variant="body2">
-            Nome do gerente
+            Nome da empresa
           </Typography>
           <Controller
             name="name"
@@ -89,46 +96,20 @@ export const AddManagerModal = ({
             )}
           />
         </Box>
-
         <Box>
           <Typography sx={{ mb: 1 }} variant="body2">
-            Empresa
+            CNPJ
           </Typography>
           <Controller
-            name="companyId"
-            control={control}
-            render={({ field }) => (
-              <Autocomplete
-                {...field}
-                disablePortal
-                options={companyOptions}
-                onChange={(_, value) => field.onChange(value)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    error={!!errors.companyId}
-                    helperText={errors.companyId?.message}
-                  />
-                )}
-              />
-            )}
-          />
-        </Box>
-
-        <Box>
-          <Typography sx={{ mb: 1 }} variant="body2">
-            Email de acesso
-          </Typography>
-          <Controller
-            name="email"
+            name="tax_id"
             control={control}
             render={({ field }) => (
               <TextField
                 {...field}
                 fullWidth
-                type="email"
-                error={!!errors.email}
-                helperText={errors.email?.message}
+                type="text"
+                error={!!errors.tax_id}
+                helperText={errors.tax_id?.message}
               />
             )}
           />
@@ -165,7 +146,7 @@ export const AddManagerModal = ({
                   }}
                   slotProps={{
                     input: {
-                      'aria-label': 'status do gestor',
+                      'aria-label': 'status da empresa',
                     },
                   }}
                 />
@@ -173,6 +154,26 @@ export const AddManagerModal = ({
             )}
           />
         </Box>
+        <Stack spacing={0.75}>
+          <Typography variant="body2" fontWeight={500}>
+            Plano
+          </Typography>
+          <RadioGroup aria-label="Plano da empresa">
+            <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
+              {PLAN_EDIT_OPTIONS.map((planOption) => (
+                <FormControlLabel
+                  key={planOption}
+                  value={planOption}
+                  control={<Radio size="small" disableRipple />}
+                  label={
+                    <PlanBadge plan={planOption} sx={{ fontSize: 'small' }} />
+                  }
+                  sx={{ mr: 0, ml: 0 }}
+                />
+              ))}
+            </Stack>
+          </RadioGroup>
+        </Stack>
       </Box>
     </AppModal>
   );

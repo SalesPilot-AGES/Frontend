@@ -14,8 +14,11 @@ import { getRouteApi, Link } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { type JSX } from 'react';
+import React from 'react';
 
 import { CompanyInformation } from './CompanyInformation/CompanyInformation';
+import { CompanyInformationEdit } from './CompanyInformationEdit/CompanyInformationEdit';
+import { pickCompanyValues } from './CompanyInformationEdit/useCompanyInformationEdit';
 
 const companyDetailRouteApi = getRouteApi(EPageRoutes.ADMIN_COMPANY_DETAIL);
 
@@ -23,6 +26,8 @@ export const CompanyDetail = (): JSX.Element => {
   const { palette } = useTheme();
   const { companyId } = companyDetailRouteApi.useParams();
   const { data: company, isLoading } = useGetCompanyById(companyId);
+  const [editMode, setEditMode] = React.useState(false);
+  const handleSetDraft = React.useCallback(() => {}, []);
 
   return (
     <PageContainter>
@@ -114,13 +119,19 @@ export const CompanyDetail = (): JSX.Element => {
 
         {isLoading ? (
           <Typography>Carregando informações da empresa...</Typography>
-        ) : company ? (
+        ) : company && !editMode ? (
           <CompanyInformation
-            id={company.id}
+            id={String(company.id)}
             name={company.name}
             cnpj={company.tax_id}
             plan={company.plan}
             active={company.active}
+            onEdit={() => setEditMode(true)}
+          />
+        ) : company ? (
+          <CompanyInformationEdit
+            draft={pickCompanyValues(company)}
+            setDraft={handleSetDraft}
           />
         ) : (
           <Typography>Empresa não encontrada</Typography>

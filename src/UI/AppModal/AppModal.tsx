@@ -11,6 +11,7 @@ export default function AppModal({
   children,
   handleClose,
   handleSubmit,
+  isSaveButtonDisabled,
 }: IBasicModalProps): JSX.Element {
   return (
     <Modal open={open} onClose={handleClose}>
@@ -52,6 +53,7 @@ export default function AppModal({
           <Button
             startIcon={GetAppIcon('save')}
             variant="contained"
+            disabled={isSaveButtonDisabled}
             onClick={() => {
               handleSubmit();
               handleClose();

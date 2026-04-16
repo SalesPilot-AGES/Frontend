@@ -127,6 +127,7 @@ export interface IBasicModalProps {
   open: boolean;
   handleSubmit: () => void;
   children: JSX.Element;
+  isSaveButtonDisabled?: boolean;
 }
 
 export interface IEntityDetailsCardProps {

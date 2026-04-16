@@ -1,14 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Switch, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import {
   type CompanyCreateInput,
   CompanyCreateInputSchema,
 } from '@services/models/CompanySchema';
 import { useCreateCompany } from '@services/queries/useCompanies';
 import AppModal from '@UI/AppModal/AppModal';
+import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import type { JSX } from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+
+import { PLAN_EDIT_OPTIONS } from '../CompanyDetail/CompanyInformationEdit/useCompanyInformationEdit';
 
 export interface IAddCompanyModalProps {
   open: boolean;
@@ -22,7 +34,7 @@ export const AddCompanyModal = ({
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
   } = useForm<CompanyCreateInput>({
     resolver: zodResolver(CompanyCreateInputSchema),
@@ -52,6 +64,7 @@ export const AddCompanyModal = ({
       modalName="Adicionar empresa"
       open={open}
       handleClose={handleClose}
+      isSaveButtonDisabled={!isValid}
       handleSubmit={handleSubmit(onSubmit)}
     >
       <Box
@@ -141,6 +154,26 @@ export const AddCompanyModal = ({
             )}
           />
         </Box>
+        <Stack spacing={0.75}>
+          <Typography variant="body2" fontWeight={500}>
+            Plano
+          </Typography>
+          <RadioGroup aria-label="Plano da empresa">
+            <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
+              {PLAN_EDIT_OPTIONS.map((planOption) => (
+                <FormControlLabel
+                  key={planOption}
+                  value={planOption}
+                  control={<Radio size="small" disableRipple />}
+                  label={
+                    <PlanBadge plan={planOption} sx={{ fontSize: 'small' }} />
+                  }
+                  sx={{ mr: 0, ml: 0 }}
+                />
+              ))}
+            </Stack>
+          </RadioGroup>
+        </Stack>
       </Box>
     </AppModal>
   );

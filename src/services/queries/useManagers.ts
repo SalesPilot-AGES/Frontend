@@ -37,9 +37,9 @@ export const useGetManagers = (
 
 export const useGetManagerById = (
   id: string | null,
-  options?: UseQueryOptions<TManager>
-): ReturnType<typeof useQuery<TManager, Error>> => {
-  return useQuery<TManager, Error>({
+  options?: UseQueryOptions<TManagerWithCompany>
+): ReturnType<typeof useQuery<TManagerWithCompany, Error>> => {
+  return useQuery<TManagerWithCompany, Error>({
     queryKey: managersQueryKeys.detail(id || ''),
     queryFn: () => managerApi.getManagerById(id!),
     enabled: !!id,

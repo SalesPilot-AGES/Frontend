@@ -64,7 +64,7 @@ const parseManagerResponse = (data: unknown): TManagerWithCompany => {
 };
 
 export const managerApi = {
-  getManagerById: async (id: string): Promise<TManager> => {
+  getManagerById: async (id: string): Promise<TManagerWithCompany> => {
     const response = await apiClient.get<unknown>(
       `/api/collaborators/managers/${id}`
     );

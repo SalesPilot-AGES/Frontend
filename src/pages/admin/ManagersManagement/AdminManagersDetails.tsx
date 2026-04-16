@@ -1,10 +1,14 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import type { ManagerMock } from '@data/mocks/Managers';
-import { mockManagers } from '@data/mocks/Managers';
 import { ArrowBack, Business, Close, Email, Save } from '@mui/icons-material';
-import { Box, Button, useTheme } from '@mui/material';
+import { Box, Button, Typography, useTheme } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
+import type { TManagerWithCompany } from '@services/models/ManagerSchema';
+import { useGetCompanies } from '@services/queries/useCompanies';
+import {
+  useGetManagerById,
+  useUpdateManager,
+} from '@services/queries/useManagers';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import { IconBox } from '@UI/IconBox/IconBox';
@@ -12,7 +16,7 @@ import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
-import { type JSX, useState } from 'react';
+import { type JSX, useMemo, useState } from 'react';
 
 import { ManagerEditFormComponent } from './ManagerEditForm';
 
@@ -23,30 +27,30 @@ type TManagerEditForm = {
   active: boolean;
 };
 
-const createEditForm = (manager: ManagerMock): TManagerEditForm => ({
+const createEditForm = (manager: TManagerWithCompany): TManagerEditForm => ({
   name: manager.name,
   companyName: manager.company.name,
   email: manager.email,
   active: manager.active,
 });
 
-const companyOptions = Array.from(
-  new Set(mockManagers.map((managerItem) => managerItem.company.name))
-);
-
 export const AdminManagersDetails = (): JSX.Element => {
   const navigate = useNavigate();
   const { palette } = useTheme();
   const { id } = useParams({ from: EPageRoutes.ADMIN_MANAGERS_DETAILS });
 
-  const manager = mockManagers.find((managerItem) => managerItem.id === id);
-  const [managerData, setManagerData] = useState<ManagerMock | undefined>(
-    manager
+  const { data: manager, isLoading, isError } = useGetManagerById(id ?? null);
+  const { data: companiesResponse } = useGetCompanies(0, 200);
+  const updateManagerMutation = useUpdateManager();
+
+  const companyOptions = useMemo(
+    () =>
+      companiesResponse?.content.map((companyItem) => companyItem.name) ?? [],
+    [companiesResponse]
   );
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState<TManagerEditForm | null>(
-    manager ? createEditForm(manager) : null
-  );
+  const [editForm, setEditForm] = useState<TManagerEditForm | null>(null);
 
   const isCompanyValid = editForm
     ? companyOptions.includes(editForm.companyName)
@@ -58,39 +62,51 @@ export const AdminManagersDetails = (): JSX.Element => {
   };
 
   const handleEdit = (): void => {
-    if (!managerData) {
+    if (!manager) {
       return;
     }
 
-    setEditForm(createEditForm(managerData));
+    setEditForm(createEditForm(manager));
     setIsEditing(true);
   };
 
   const handleCancelEdit = (): void => {
-    if (!managerData) {
+    if (!manager) {
       return;
     }
 
-    setEditForm(createEditForm(managerData));
+    setEditForm(createEditForm(manager));
     setIsEditing(false);
   };
 
   const handleSaveEdit = (): void => {
-    if (!managerData || !editForm || !isEditFormValid) {
+    if (!manager || !editForm || !isEditFormValid) {
       return;
     }
 
-    setManagerData({
-      ...managerData,
-      name: editForm.name,
-      email: editForm.email,
-      active: editForm.active,
-      company: {
-        ...managerData.company,
-        name: editForm.companyName,
+    const company = companiesResponse?.content.find(
+      (companyItem) => companyItem.name === editForm.companyName
+    );
+    if (!company) {
+      return;
+    }
+
+    updateManagerMutation.mutate(
+      {
+        id: manager.id,
+        data: {
+          name: editForm.name,
+          email: editForm.email,
+          active: editForm.active,
+          companyId: company.id,
+        },
       },
-    });
-    setIsEditing(false);
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+        },
+      }
+    );
   };
 
   const handleFieldChange = (
@@ -122,7 +138,15 @@ export const AdminManagersDetails = (): JSX.Element => {
     });
   };
 
-  if (!managerData) {
+  if (isLoading) {
+    return (
+      <PageContainter>
+        <Typography>Carregando informações do gestor...</Typography>
+      </PageContainter>
+    );
+  }
+
+  if (isError || !manager) {
     return <PageNotFound />;
   }
 
@@ -155,7 +179,7 @@ export const AdminManagersDetails = (): JSX.Element => {
           }}
         >
           <IconBox iconName="manager" theme="managers" />
-          <PageHeader title={managerData.name} subtitle="" />
+          <PageHeader title={manager.name} subtitle="" />
         </Box>
 
         <EntityDetailsCard
@@ -174,6 +198,7 @@ export const AdminManagersDetails = (): JSX.Element => {
                   variant="outlined"
                   startIcon={<Close />}
                   onClick={handleCancelEdit}
+                  disabled={updateManagerMutation.isPending}
                 >
                   Cancelar
                 </Button>
@@ -181,7 +206,7 @@ export const AdminManagersDetails = (): JSX.Element => {
                   variant="contained"
                   startIcon={<Save />}
                   onClick={handleSaveEdit}
-                  disabled={!isEditFormValid}
+                  disabled={!isEditFormValid || updateManagerMutation.isPending}
                 >
                   Salvar
                 </Button>
@@ -205,15 +230,15 @@ export const AdminManagersDetails = (): JSX.Element => {
                 gap: '2rem 4rem',
               }}
             >
-              <ItemDetail label="ID do usuário" value={managerData.id} />
+              <ItemDetail label="ID do usuário" value={manager.id} />
 
               <ItemDetail
                 label="Empresa"
-                value={managerData.company.name}
+                value={manager.company.name}
                 icon={<Business fontSize="small" />}
               />
 
-              <ItemDetail label="Nome do usuário" value={managerData.name} />
+              <ItemDetail label="Nome do usuário" value={manager.name} />
 
               <ItemDetail label="Status">
                 <Box
@@ -222,13 +247,13 @@ export const AdminManagersDetails = (): JSX.Element => {
                     alignSelf: 'flex-start',
                   }}
                 >
-                  <StatusBadge active={managerData.active} />
+                  <StatusBadge active={manager.active} />
                 </Box>
               </ItemDetail>
 
               <ItemDetail
                 label="Email de acesso"
-                value={managerData.email}
+                value={manager.email}
                 icon={<Email fontSize="small" />}
               />
             </Box>

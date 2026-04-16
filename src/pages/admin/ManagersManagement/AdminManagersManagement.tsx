@@ -1,5 +1,6 @@
 import { ECardLabel } from '@data/enums/ECardLabel';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
+import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import { EStatus } from '@data/enums/EStatus';
 import type { DataTableProps } from '@declarations/ui';
@@ -11,6 +12,7 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { TManagerWithCompany } from '@services/models/ManagerSchema';
 import { useGetManagers } from '@services/queries/useManagers';
+import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
@@ -23,6 +25,7 @@ import { AddManagerModal } from './AddManagerModal/AddManagerModal';
 
 export const AdminManagersManagement = (): JSX.Element => {
   const { palette } = useTheme();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: managers = [], isLoading } = useGetManagers();
@@ -125,7 +128,10 @@ export const AdminManagersManagement = (): JSX.Element => {
           loading={isLoading}
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {
-            console.log(rowId);
+            navigate({
+              to: EPageRoutes.ADMIN_MANAGERS_DETAILS,
+              params: { id: String(rowId) },
+            });
           }}
           onSearchChange={(value) => {
             console.log(value);

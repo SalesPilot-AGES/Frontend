@@ -1,5 +1,3 @@
-import { EPlan } from '@data/enums/EPlan';
-import type { TPlan } from '@declarations/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formatCnpjInput } from '@hooks/formatCnpjInput';
 import {
@@ -13,6 +11,10 @@ import {
   Typography,
 } from '@mui/material';
 import {
+  PLAN_API_CODES,
+  planApiToUiLabel,
+} from '@pages/admin/CompaniesManagement/planMapping';
+import {
   type CompanyCreateInput,
   CompanyCreateInputSchema,
 } from '@services/models/CompanySchema';
@@ -22,18 +24,6 @@ import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import type { JSX } from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-
-const PLAN_CREATE_OPTIONS: readonly CompanyCreateInput['plan'][] = [
-  'BASIC',
-  'PRO',
-  'ENTERPRISE',
-] as const;
-
-const planApiToUiLabel: Record<CompanyCreateInput['plan'], TPlan> = {
-  BASIC: EPlan.BASIC,
-  PRO: EPlan.PRO,
-  ENTERPRISE: EPlan.ENTERPRISE,
-};
 
 export interface IAddCompanyModalProps {
   open: boolean;
@@ -190,7 +180,7 @@ export const AddCompanyModal = ({
                 onChange={(_, value) => field.onChange(value)}
               >
                 <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
-                  {PLAN_CREATE_OPTIONS.map((planOption) => (
+                  {PLAN_API_CODES.map((planOption) => (
                     <FormControlLabel
                       key={planOption}
                       value={planOption}

@@ -1,8 +1,11 @@
-import type { TPlan } from '@declarations/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
 import type { CompanyInformationValues } from '@pages/admin/CompaniesManagement/CompanyDetail/CompanyInformation/CompanyInformationView/types';
+import {
+  planApiToUiLabel,
+  planUiLabelToApi,
+} from '@pages/admin/CompaniesManagement/planMapping';
 import {
   type CompanyUpdateInput,
   CompanyUpdateInputSchema,
@@ -51,7 +54,7 @@ export const useCompanyInformationEditForm = ({
     defaultValues: {
       name: draft.name,
       tax_id: draft.tax_id,
-      plan: draft.plan,
+      plan: planUiLabelToApi[draft.plan],
       active: draft.active,
     },
   });
@@ -71,7 +74,10 @@ export const useCompanyInformationEditForm = ({
     setDraft((current) => ({
       ...current,
       name: values.name ?? current.name,
-      plan: (values.plan as TPlan | undefined) ?? current.plan,
+      plan:
+        values.plan !== undefined
+          ? planApiToUiLabel[values.plan]
+          : current.plan,
       active: values.active ?? current.active,
     }));
 

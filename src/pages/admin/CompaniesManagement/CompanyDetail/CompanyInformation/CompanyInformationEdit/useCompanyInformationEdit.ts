@@ -1,5 +1,8 @@
-import { EPlan } from '@data/enums/EPlan';
-import type { TPlan } from '@declarations/ui';
+import {
+  type CompanyPlanCode,
+  planApiToUiLabel,
+} from '@pages/admin/CompaniesManagement/planMapping';
+import type { CompanyDetail } from '@services/models/CompanySchema';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -8,19 +11,19 @@ import type {
   CompanyInformationValues,
 } from '../CompanyInformationView/types';
 
-export const PLAN_EDIT_OPTIONS: readonly TPlan[] = [
-  EPlan.BASIC,
-  EPlan.PRO,
-  EPlan.ENTERPRISE,
-] as const;
+const isApiPlanCode = (plan: string): plan is CompanyPlanCode =>
+  plan === 'BASIC' || plan === 'PRO' || plan === 'ENTERPRISE';
 
+/** Aceita valores de tela (`TPlan`) ou resposta da API (`BASIC` / `PRO` / `ENTERPRISE`). */
 export const pickCompanyValues = (
-  props: CompanyInformationProps
+  props:
+    | CompanyInformationProps
+    | Pick<CompanyDetail, 'id' | 'name' | 'tax_id' | 'plan' | 'active'>
 ): CompanyInformationValues => ({
   id: props.id,
   name: props.name,
   tax_id: props.tax_id,
-  plan: props.plan,
+  plan: isApiPlanCode(props.plan) ? planApiToUiLabel[props.plan] : props.plan,
   active: props.active,
 });
 

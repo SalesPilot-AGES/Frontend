@@ -9,16 +9,19 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import { planApiToUiLabel } from '@pages/admin/CompaniesManagement/planMapping';
 import { useGetCompanyById } from '@services/queries/useCompanies';
 import { getRouteApi, Link } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { StatCard } from '@UI/StatCard/StatCard';
+import type { SetStateAction } from 'react';
 import { type JSX } from 'react';
 import React from 'react';
 
 import { CompanyInformation } from './CompanyInformation/CompanyInformation';
 import { CompanyInformationEdit } from './CompanyInformation/CompanyInformationEdit/CompanyInformationEdit';
 import { pickCompanyValues } from './CompanyInformation/CompanyInformationEdit/useCompanyInformationEdit';
+import type { CompanyInformationValues } from './CompanyInformation/CompanyInformationView/types';
 
 const companyDetailRouteApi = getRouteApi(EPageRoutes.ADMIN_COMPANY_DETAIL);
 
@@ -27,15 +30,29 @@ export const CompanyDetail = (): JSX.Element => {
   const { companyId } = companyDetailRouteApi.useParams();
   const { data: company, isLoading } = useGetCompanyById(companyId);
   const [editMode, setEditMode] = React.useState(false);
-  const [draft, setDraft] = React.useState(
-    company ? pickCompanyValues(company) : undefined
-  );
+  const [draft, setDraft] = React.useState<
+    CompanyInformationValues | undefined
+  >(company ? pickCompanyValues(company) : undefined);
 
   React.useEffect(() => {
     if (company) {
       setDraft(pickCompanyValues(company));
     }
   }, [company]);
+
+  const setDraftForEdit = React.useCallback(
+    (action: SetStateAction<CompanyInformationValues>) => {
+      setDraft((prev) => {
+        if (!company) {
+          return prev;
+        }
+        const base: CompanyInformationValues =
+          prev ?? pickCompanyValues(company);
+        return typeof action === 'function' ? action(base) : action;
+      });
+    },
+    [company]
+  );
 
   return (
     <PageContainter>
@@ -132,14 +149,14 @@ export const CompanyDetail = (): JSX.Element => {
             id={String(company.id)}
             name={company.name}
             cnpj={company.tax_id}
-            plan={company.plan}
+            plan={planApiToUiLabel[company.plan]}
             active={company.active}
             onEdit={() => setEditMode(true)}
           />
         ) : company ? (
           <CompanyInformationEdit
             draft={draft ?? pickCompanyValues(company)}
-            setDraft={setDraft}
+            setDraft={setDraftForEdit}
             onSaveSuccess={() => setEditMode(false)}
             onCancel={() => setEditMode(false)}
           />

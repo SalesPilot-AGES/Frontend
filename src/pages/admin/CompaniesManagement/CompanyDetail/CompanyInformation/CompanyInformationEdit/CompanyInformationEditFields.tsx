@@ -1,5 +1,4 @@
 import { EStatus } from '@data/enums/EStatus';
-import type { TPlan } from '@declarations/ui';
 import { formatCnpjInput } from '@hooks/formatCnpjInput';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
@@ -14,13 +13,17 @@ import {
   Typography,
 } from '@mui/material';
 import type { Palette } from '@mui/material/styles';
+import {
+  type CompanyPlanCode,
+  PLAN_API_CODES,
+  planApiToUiLabel,
+} from '@pages/admin/CompaniesManagement/planMapping';
 import type { CompanyUpdateInput } from '@services/models/CompanySchema';
 import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import type { Dispatch, JSX, ReactNode, SetStateAction } from 'react';
 import { type Control, Controller } from 'react-hook-form';
 
 import type { CompanyInformationValues } from '../CompanyInformationView/types';
-import { PLAN_EDIT_OPTIONS } from './useCompanyInformationEdit';
 
 export interface CompanyInformationEditFieldsProps {
   draft: CompanyInformationValues;
@@ -172,19 +175,25 @@ export const CompanyInformationEditFields = ({
               name="company-plan"
               value={field.value}
               onChange={(_, value) => {
-                field.onChange(value);
-                const nextPlan = value as TPlan;
-                setDraft((d) => ({ ...d, plan: nextPlan }));
+                const apiPlan = value as CompanyPlanCode;
+                field.onChange(apiPlan);
+                setDraft((d) => ({
+                  ...d,
+                  plan: planApiToUiLabel[apiPlan],
+                }));
               }}
             >
               <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
-                {PLAN_EDIT_OPTIONS.map((planOption) => (
+                {PLAN_API_CODES.map((planOption) => (
                   <FormControlLabel
                     key={planOption}
                     value={planOption}
                     control={<Radio size="small" disableRipple />}
                     label={
-                      <PlanBadge plan={planOption} sx={{ fontSize: 'small' }} />
+                      <PlanBadge
+                        plan={planApiToUiLabel[planOption]}
+                        sx={{ fontSize: 'small' }}
+                      />
                     }
                     sx={{ mr: 0, ml: 0 }}
                   />

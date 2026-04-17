@@ -1,0 +1,74 @@
+name: CI/CD Frontend
+
+on:
+  push:
+    branches:
+      - main
+      - development
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install git
+        run: apk add --no-cache git || apt-get install -y git
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: |
+          pnpm config set store-dir .pnpm-store
+          pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm run build
+
+  test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install git
+        run: apk add --no-cache git || apt-get install -y git
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: |
+          pnpm config set store-dir .pnpm-store
+          pnpm install --frozen-lockfile
+      - name: Test
+        run: pnpm run test:check
+
+  secret-detection:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker-build-push:
+    runs-on: self-hosted
+    needs: [build, test, secret-detection]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+      - name: Build and push
+        run: |
+          IMAGE_TAG=${{ secrets.ECR_REGISTRY }}/salespilot/web:${{ github.sha }}
+          docker build -t $IMAGE_TAG .
+          docker push $IMAGE_TAG

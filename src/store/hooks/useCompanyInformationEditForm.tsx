@@ -56,7 +56,6 @@ export const useCompanyInformationEditForm = ({
     resolver: zodResolver(CompanyUpdatePayloadSchema),
     defaultValues: {
       name: draft.name,
-      tax_id: draft.tax_id,
       plan: planUiLabelToApi[draft.plan],
       active: draft.active,
     },

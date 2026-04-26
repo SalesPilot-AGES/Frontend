@@ -18,7 +18,7 @@ import {
   PLAN_API_CODES,
   planApiToUiLabel,
 } from '@pages/admin/CompaniesManagement/planMapping';
-import type { CompanyUpdateInput } from '@services/models/CompanySchema';
+import type { TCompanyUpdatePayload } from '@services/models/CompanySchema';
 import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import type { Dispatch, JSX, ReactNode, SetStateAction } from 'react';
 import { type Control, Controller } from 'react-hook-form';
@@ -28,7 +28,7 @@ import type { CompanyInformationValues } from '../CompanyInformationView/types';
 export interface CompanyInformationEditFieldsProps {
   draft: CompanyInformationValues;
   setDraft: Dispatch<SetStateAction<CompanyInformationValues>>;
-  control: Control<CompanyUpdateInput>;
+  control: Control<TCompanyUpdatePayload>;
   labelColor: string;
   valueColor: string;
   palette: Palette;

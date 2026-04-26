@@ -9,6 +9,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
+import { useGetCompanyById } from '@services/queries/useCompanies';
 import { useGetManagerById } from '@services/queries/useManagers';
 import { useAdminManagersDetailsEdit } from '@store/hooks/useAdminManagersDetailsEdit';
 import { Link, useParams } from '@tanstack/react-router';
@@ -27,6 +28,7 @@ export const AdminManagersDetails = (): JSX.Element => {
   const { id } = useParams({ from: EPageRoutes.ADMIN_MANAGERS_DETAILS });
 
   const { data: manager, isLoading, isError } = useGetManagerById(id ?? null);
+  const company = useGetCompanyById(manager?.company_id ?? null).data;
   const {
     companyOptions,
     isCompanyValid,
@@ -145,7 +147,7 @@ export const AdminManagersDetails = (): JSX.Element => {
 
               <ItemDetail
                 label="Empresa"
-                value={manager.company.name}
+                value={company?.name}
                 icon={<Business fontSize="small" />}
               />
 

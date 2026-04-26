@@ -1,25 +1,31 @@
-import type {
-  CompaniesResponse,
-  CompanyDetail,
-} from '@services/models/CompanySchema';
+import type { TCompany, TCompanyList } from '@services/models/CompanySchema';
 import {
-  CompaniesResponseSchema,
-  type CompanyCreateInput,
-  CompanyDetailSchema,
-  type CompanyFilters,
-  type CompanyUpdateInput,
+  CompanyListSchema,
+  CompanySchema,
+  type TCompanyCreatePayload,
+  type TCompanyFilters,
+  type TCompanyUpdatePayload,
 } from '@services/models/CompanySchema';
 
 import apiClient from './apiClient';
 
+/**
+ * @description API service for company-related operations.
+ */
 export const companyApi = {
-  // Get all companies with pagination and filtering
+  /**
+   * @description Get all companies with pagination and filtering.
+   * @param {number} page - The page number to fetch.
+   * @param {number} size - The number of items per page.
+   * @param {TCompanyFilters} filters - Filters to apply to the query.
+   * @returns {Promise<TCompanyList>} A promise that resolves to a paginated list of companies.
+   */
   getCompanies: async (
     page: number = 0,
     size: number = 10,
-    filters?: CompanyFilters
-  ): Promise<CompaniesResponse> => {
-    const response = await apiClient.get<CompaniesResponse>('/api/companies', {
+    filters?: TCompanyFilters
+  ): Promise<TCompanyList> => {
+    const response = await apiClient.get<TCompanyList>('/api/companies', {
       params: {
         page,
         size,
@@ -30,37 +36,43 @@ export const companyApi = {
         ...(filters?.sort && { sort: filters.sort }),
       },
     });
-    return CompaniesResponseSchema.parse(response.data);
+    return CompanyListSchema.parse(response.data);
   },
 
-  // Get single company by UUID
-  getCompanyById: async (uuid: string): Promise<CompanyDetail> => {
-    const response = await apiClient.get<CompanyDetail>(
-      `/api/companies/${uuid}`
-    );
-    return CompanyDetailSchema.parse(response.data);
+  /**
+   * @description Get a single company by its UUID.
+   * @param {string} uuid - The UUID of the company to fetch.
+   * @returns {Promise<TCompany>} A promise that resolves to the company data.
+   */
+  getCompanyById: async (uuid: string): Promise<TCompany> => {
+    const response = await apiClient.get<TCompany>(`/api/companies/${uuid}`);
+    return CompanySchema.parse(response.data);
   },
 
-  // Create company
-  createCompany: async (
-    company: CompanyCreateInput
-  ): Promise<CompanyDetail> => {
-    const response = await apiClient.post<CompanyDetail>(
-      '/api/companies',
-      company
-    );
-    return CompanyDetailSchema.parse(response.data);
+  /**
+   * @description Create a new company.
+   * @param {TCompanyCreatePayload} payload - The data for the new company.
+   * @returns {Promise<TCompany>} A promise that resolves to the created company data.
+   */
+  createCompany: async (payload: TCompanyCreatePayload): Promise<TCompany> => {
+    const response = await apiClient.post<TCompany>('/api/companies', payload);
+    return CompanySchema.parse(response.data);
   },
 
-  // Update company
+  /**
+   * @description Update an existing company.
+   * @param {string} uuid - The UUID of the company to update.
+   * @param {TCompanyUpdatePayload} payload - The data to update the company with.
+   * @returns {Promise<TCompany>} A promise that resolves to the updated company data.
+   */
   updateCompany: async (
     uuid: string,
-    company: CompanyUpdateInput
-  ): Promise<CompanyDetail> => {
-    const response = await apiClient.put<CompanyDetail>(
+    payload: TCompanyUpdatePayload
+  ): Promise<TCompany> => {
+    const response = await apiClient.put<TCompany>(
       `/api/companies/${uuid}`,
-      company
+      payload
     );
-    return CompanyDetailSchema.parse(response.data);
+    return CompanySchema.parse(response.data);
   },
 };

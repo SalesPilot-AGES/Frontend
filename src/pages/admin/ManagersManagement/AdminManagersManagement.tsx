@@ -10,8 +10,9 @@ import MailIcon from '@mui/icons-material/Mail';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import type { TManagerWithCompany } from '@services/models/ManagerSchema';
-import { useGetManagers } from '@services/queries/useManagers';
+import type { TManager } from '@services/models/ManagerSchema';
+import { useGetAllCompanies } from '@services/queries/useCompanies';
+import { useGetAllManagers } from '@services/queries/useManagers';
 import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
@@ -29,32 +30,36 @@ export const AdminManagersManagement = (): JSX.Element => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [filterValue, setFilterValue] = useState('');
+  const [companyId, setCompanyId] = useState<string | undefined>(undefined);
 
-  const { data: managers = [], isLoading } = useGetManagers();
+  const { data: companiesResponse } = useGetAllCompanies();
+  const companies = useMemo(
+    () => companiesResponse?.pages.flatMap((page) => page.content) ?? [],
+    [companiesResponse]
+  );
 
-  const filteredManagers = useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
-    return managers.filter((manager) => {
-      if (filterValue === 'true' && !manager.active) {
-        return false;
-      }
-      if (filterValue === 'false' && manager.active) {
-        return false;
-      }
-      if (query.length === 0) {
-        return true;
-      }
-      const nameMatch = manager.name.toLowerCase().includes(query);
-      const emailMatch = manager.email.toLowerCase().includes(query);
-      const companyMatch = manager.company.name.toLowerCase().includes(query);
-      return nameMatch || emailMatch || companyMatch;
-    });
-  }, [managers, searchValue, filterValue]);
+  const {
+    data: managersResponse,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGetAllManagers({
+    companyId: companyId!,
+    name: searchValue,
+    email: searchValue,
+    active: filterValue ? filterValue === 'true' : undefined,
+  });
 
-  const columns: DataTableProps<TManagerWithCompany>['columns'] = [
+  const managers = useMemo(
+    () => managersResponse?.pages.flatMap((page) => page.content) ?? [],
+    [managersResponse]
+  );
+
+  const columns: DataTableProps<TManager>['columns'] = [
     {
       header: 'Nome do gestor',
-      accessor: (row: TManagerWithCompany) => row.name,
+      accessor: (row: TManager) => row.name,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ManageAccountsIcon
@@ -68,7 +73,7 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: 'E-mail',
-      accessor: (row: TManagerWithCompany) => row.email,
+      accessor: (row: TManager) => row.email,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <MailIcon sx={{ color: palette.neutrals[300], fontSize: '1.5rem' }} />
@@ -80,7 +85,7 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: ECardLabel.COMPANY_NAME,
-      accessor: (row: TManagerWithCompany) => row.company.name,
+      accessor: (row: TManager) => row.company_id,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ApartmentIcon
@@ -94,8 +99,8 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: 'Status',
-      accessor: (row: TManagerWithCompany) => row.active,
-      render: (_value: ReactNode, row: TManagerWithCompany) => (
+      accessor: (row: TManager) => row.active,
+      render: (_value: ReactNode, row: TManager) => (
         <StatusBadge active={row.active} />
       ),
     },
@@ -143,9 +148,9 @@ export const AdminManagersManagement = (): JSX.Element => {
         </Box>
 
         <DataTable
-          data={filteredManagers}
+          data={managers}
           columns={columns}
-          getRowId={(row: TManagerWithCompany) => row.id}
+          getRowId={(row: TManager) => row.id}
           loading={isLoading}
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {
@@ -168,6 +173,16 @@ export const AdminManagersManagement = (): JSX.Element => {
             { label: EStatus.ACTIVE, value: 'true' },
             { label: EStatus.INACTIVE, value: 'false' },
           ]}
+          companyFilterValue={companyId}
+          onCompanyFilterChange={setCompanyId}
+          companyFilterOptions={companies.map((company) => ({
+            label: company.name,
+            value: company.id,
+          }))}
+          infiniteScroll
+          fetchNextPage={fetchNextPage}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
         />
       </Stack>
 

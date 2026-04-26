@@ -1,40 +1,53 @@
-import { z } from 'zod';
+import z from 'zod';
 
-import { PageableSchema } from './CompanySchema';
+import { PageableSchema } from './PageableSchema';
 
+/**
+ * @description Zod schema for a single manager.
+ */
 export const ManagerSchema = z.object({
-  id: z.guid(),
-  companyId: z.guid(),
-  name: z.string(),
-  email: z.string().email(),
+  id: z.string(),
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  company_id: z.string(),
   active: z.boolean(),
-  preferences: z.record(z.string(), z.unknown()),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  preferences: z.object({
+    theme: z.string(),
+    default_model: z.string(),
+  }),
+  created_at: z.string().optional(),
 });
 
-export const ManagerListItemApiSchema = z.object({
-  id: z.guid(),
-  company_id: z.guid(),
-  name: z.string(),
-  role: z.string().optional(),
-  email: z.string().email(),
+/**
+//... existing code...
+ * @description Zod schema for creating a new manager.
+ */
+export const ManagerCreatePayloadSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  company_id: z.string(),
   active: z.boolean(),
-  preferences: z.record(z.string(), z.unknown()),
-  created_at: z.string(),
-  updated_at: z.string().optional(),
-  company: z.object({
-    id: z.guid(),
-    name: z.string(),
-    tax_id: z.string().optional(),
-    plan: z.enum(['BASIC', 'PRO', 'ENTERPRISE']).optional(),
-    active: z.boolean().optional(),
-    created_at: z.string().optional(),
+  preferences: z.object({
+    theme: z.string(),
+    default_model: z.string(),
   }),
 });
 
-export const ManagersPagedResponseSchema = z.object({
-  content: z.array(ManagerListItemApiSchema),
+/**
+ * @description Zod schema for updating an existing manager.
+ */
+export const ManagerUpdatePayloadSchema = ManagerCreatePayloadSchema.pick({
+  name: true,
+  email: true,
+  active: true,
+  preferences: true,
+}).partial();
+
+/**
+ * @description Zod schema for a paginated list of managers.
+ */
+export const ManagerListSchema = z.object({
+  content: z.array(ManagerSchema),
   pageable: PageableSchema,
   total_elements: z.number().int().nonnegative(),
   total_pages: z.number().int().nonnegative(),
@@ -51,42 +64,18 @@ export const ManagersPagedResponseSchema = z.object({
   }),
 });
 
-export type TManagerWithCompany = z.infer<typeof ManagerSchema> & {
-  company: { id: string; name: string };
-};
-
-export const mapManagerListItemApiToTManagerWithCompany = (
-  row: z.infer<typeof ManagerListItemApiSchema>
-): TManagerWithCompany => {
-  const createdAt = new Date(row.created_at).toISOString();
-  const updatedAt = new Date(row.updated_at ?? row.created_at).toISOString();
-  return {
-    id: row.id,
-    companyId: row.company_id,
-    name: row.name,
-    email: row.email,
-    active: row.active,
-    preferences: row.preferences,
-    createdAt,
-    updatedAt,
-    company: { id: row.company.id, name: row.company.name },
-  };
-};
-
-export const CreateManagerSchema = ManagerSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
+/**
+ * @description Zod schema for manager filtering options.
+ */
+export const ManagerFiltersSchema = z.object({
+  companyId: z.string(),
+  name: z.string().optional(),
+  email: z.string().optional(),
+  active: z.boolean().optional(),
 });
 
-export const UpdateManagerSchema = CreateManagerSchema.partial();
-
 export type TManager = z.infer<typeof ManagerSchema>;
-export type TCreateManager = z.infer<typeof CreateManagerSchema>;
-export type TUpdateManager = z.infer<typeof UpdateManagerSchema>;
-
-/** Campos editáveis no PUT do detalhe admin (inclui troca de empresa). */
-export type TManagerAdminDetailsEditFields = Pick<
-  TManager,
-  'name' | 'email' | 'active' | 'companyId'
->;
+export type TManagerList = z.infer<typeof ManagerListSchema>;
+export type TManagerCreatePayload = z.infer<typeof ManagerCreatePayloadSchema>;
+export type TManagerUpdatePayload = z.infer<typeof ManagerUpdatePayloadSchema>;
+export type TManagerFilters = z.infer<typeof ManagerFiltersSchema>;

@@ -6,10 +6,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import type { Company } from '@services/models/CompanySchema';
+import type { TCompany } from '@services/models/CompanySchema';
 import {
-  CreateManagerSchema,
-  type TCreateManager,
+  ManagerCreatePayloadSchema,
+  type TManagerCreatePayload,
 } from '@services/models/ManagerSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
 import { useCreateManager } from '@services/queries/useManagers';
@@ -32,11 +32,11 @@ export const AddManagerModal = ({
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<TCreateManager>({
-    resolver: zodResolver(CreateManagerSchema),
+  } = useForm<TManagerCreatePayload>({
+    resolver: zodResolver(ManagerCreatePayloadSchema),
     defaultValues: {
       name: '',
-      companyId: '',
+      company_id: '',
       email: '',
       active: true,
       preferences: {},
@@ -44,7 +44,7 @@ export const AddManagerModal = ({
   });
 
   const { data: companiesPage } = useGetCompanies();
-  const companyOptions: Company[] = companiesPage?.content ?? [];
+  const companyOptions: TCompany[] = companiesPage?.content ?? [];
 
   useEffect(() => {
     if (!open) {
@@ -54,7 +54,7 @@ export const AddManagerModal = ({
 
   const { mutate: createManager } = useCreateManager();
 
-  const onSubmit = (data: TCreateManager): void => {
+  const onSubmit = (data: TManagerCreatePayload): void => {
     createManager(data, {
       onSuccess: () => {
         handleClose();
@@ -104,10 +104,10 @@ export const AddManagerModal = ({
             Empresa
           </Typography>
           <Controller
-            name="companyId"
+            name="company_id"
             control={control}
             render={({ field }) => (
-              <Autocomplete<Company, false, false, false>
+              <Autocomplete<TCompany, false, false, false>
                 disablePortal
                 options={companyOptions}
                 getOptionLabel={(option) => option.name}
@@ -122,9 +122,9 @@ export const AddManagerModal = ({
                     {...params}
                     name={field.name}
                     inputRef={field.ref}
-                    error={!!errors.companyId}
+                    error={!!errors.company_id}
                     helperText={
-                      errors.companyId?.message ??
+                      errors.company_id?.message ??
                       (companyOptions.length === 0
                         ? 'Nenhuma empresa disponível para vincular.'
                         : undefined)

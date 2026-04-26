@@ -1,5 +1,10 @@
 import z from 'zod';
 
+import { PageableSchema } from './PageableSchema';
+
+/**
+ * @description Zod schema for a single company.
+ */
 export const CompanySchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'Name is required'),
@@ -9,20 +14,10 @@ export const CompanySchema = z.object({
   created_at: z.string().optional(),
 });
 
-export const PageableSchema = z.object({
-  sort: z.object({
-    empty: z.boolean(),
-    sorted: z.boolean(),
-    unsorted: z.boolean(),
-  }),
-  offset: z.number().int().nonnegative(),
-  page_number: z.number().int().nonnegative(),
-  page_size: z.number().int().positive(),
-  paged: z.boolean(),
-  unpaged: z.boolean(),
-});
-
-export const CompaniesResponseSchema = z.object({
+/**
+ * @description Zod schema for a paginated list of companies.
+ */
+export const CompanyListSchema = z.object({
   content: z.array(CompanySchema),
   pageable: PageableSchema,
   total_elements: z.number().int().nonnegative(),
@@ -40,24 +35,24 @@ export const CompaniesResponseSchema = z.object({
   }),
 });
 
-export const CompanyDetailSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  tax_id: z.string(),
-  plan: z.enum(['BASIC', 'PRO', 'ENTERPRISE']),
-  active: z.boolean(),
-  created_at: z.string().optional(),
-});
-
-export const CompanyCreateInputSchema = z.object({
+/**
+ * @description Zod schema for creating a new company.
+ */
+export const CompanyCreatePayloadSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   tax_id: z.string().min(1, 'Tax ID is required'),
   plan: z.enum(['BASIC', 'PRO', 'ENTERPRISE']),
   active: z.boolean(),
 });
 
-export const CompanyUpdateInputSchema = CompanyCreateInputSchema.partial();
+/**
+ * @description Zod schema for updating an existing company.
+ */
+export const CompanyUpdatePayloadSchema = CompanyCreatePayloadSchema.partial();
 
+/**
+ * @description Zod schema for company filtering options.
+ */
 export const CompanyFiltersSchema = z.object({
   name: z.string().optional(),
   taxId: z.string().optional(),
@@ -66,9 +61,8 @@ export const CompanyFiltersSchema = z.object({
   sort: z.string().optional(),
 });
 
-export type Company = z.infer<typeof CompanySchema>;
-export type CompanyDetail = z.infer<typeof CompanyDetailSchema>;
-export type CompaniesResponse = z.infer<typeof CompaniesResponseSchema>;
-export type CompanyCreateInput = z.infer<typeof CompanyCreateInputSchema>;
-export type CompanyUpdateInput = z.infer<typeof CompanyUpdateInputSchema>;
-export type CompanyFilters = z.infer<typeof CompanyFiltersSchema>;
+export type TCompany = z.infer<typeof CompanySchema>;
+export type TCompanyList = z.infer<typeof CompanyListSchema>;
+export type TCompanyCreatePayload = z.infer<typeof CompanyCreatePayloadSchema>;
+export type TCompanyUpdatePayload = z.infer<typeof CompanyUpdatePayloadSchema>;
+export type TCompanyFilters = z.infer<typeof CompanyFiltersSchema>;

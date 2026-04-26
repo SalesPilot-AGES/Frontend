@@ -1,62 +1,142 @@
 import { managerApi } from '@services/api/manager';
 import type {
-  TCreateManager,
   TManager,
-  TManagerWithCompany,
-  TUpdateManager,
+  TManagerCreatePayload,
+  TManagerFilters,
+  TManagerList,
+  TManagerUpdatePayload,
 } from '@services/models/ManagerSchema';
+import type {
+  UseMutationOptions,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 import {
+  useInfiniteQuery,
   useMutation,
-  type UseMutationOptions,
   useQuery,
   useQueryClient,
-  type UseQueryOptions,
 } from '@tanstack/react-query';
 
-// Query keys
-export const managersQueryKeys = {
+/**
+ * @description Query keys for managers.
+ * @property {string[]} all - All managers.
+ * @property {function} lists - All managers lists.
+ * @property {function} list - A specific managers list with pagination and filters.
+ * @property {function} details - All manager details.
+ * @property {function} detail - A specific manager detail by id.
+ */
+export const managerQueryKeys = {
   all: ['managers'] as const,
-  lists: () => [...managersQueryKeys.all, 'list'] as const,
-  list: (page: number, pageSize: number, filters?: unknown) =>
-    [...managersQueryKeys.lists(), { page, pageSize, filters }] as const,
-  details: () => [...managersQueryKeys.all, 'detail'] as const,
-  detail: (id: string) => [...managersQueryKeys.details(), id] as const,
+  lists: () => [...managerQueryKeys.all, 'list'] as const,
+  list: (page: number, size: number, filters: TManagerFilters) =>
+    [...managerQueryKeys.lists(), { page, size, filters }] as const,
+  details: () => [...managerQueryKeys.all, 'detail'] as const,
+  detail: (id: string) => [...managerQueryKeys.details(), id] as const,
 };
 
-// GET queries
+/**
+ * @description A helper function to get query options for the managers list query.
+ * @param {number} page - The page number to fetch.
+ * @param {number} size - The number of items per page.
+ * @param {TManagerFilters} filters - Filters to apply to the query.
+ * @returns {Pick<UseQueryOptions<TManagerList, Error>, 'queryKey' | 'queryFn' | 'staleTime' | 'enabled'>} The query options.
+ */
+const getManagersListQueryOptions = (
+  page: number = 0,
+  size: number = 20,
+  filters: TManagerFilters
+): Pick<
+  UseQueryOptions<TManagerList, Error>,
+  'queryKey' | 'queryFn' | 'staleTime' | 'enabled'
+> => ({
+  queryKey: managerQueryKeys.list(page, size, filters),
+  queryFn: (): Promise<TManagerList> =>
+    managerApi.getManagers(page, size, filters),
+  staleTime: 0,
+  enabled: !!filters.companyId, // Only run query if companyId is provided
+});
+
+/**
+ * @description A query to get a paginated and filtered list of managers.
+ * @param {number} page - The page number to fetch.
+ * @param {number} size - The number of items per page.
+ * @param {TManagerFilters} filters - Filters to apply to the query.
+ * @param {UseQueryOptions<TManagerList>} options - Additional query options.
+ * @returns {ReturnType<typeof useQuery<TManagerList, Error>>} The query result.
+ */
 export const useGetManagers = (
-  options?: UseQueryOptions<TManagerWithCompany[]>
-): ReturnType<typeof useQuery<TManagerWithCompany[], Error>> => {
-  return useQuery<TManagerWithCompany[], Error>({
-    queryKey: managersQueryKeys.lists(),
-    queryFn: () => managerApi.getManagers(),
+  page: number = 0,
+  size: number = 20,
+  filters: TManagerFilters,
+  options?: UseQueryOptions<TManagerList>
+): ReturnType<typeof useQuery<TManagerList, Error>> => {
+  return useQuery<TManagerList, Error>({
+    ...getManagersListQueryOptions(page, size, filters),
+    ...options,
+  });
+};
+
+/**
+ * @description A query to get a manager by its ID.
+ * @param {string | null} uuid - The ID of the manager to fetch.
+ * @param {UseQueryOptions<TManager>} options - Additional query options.
+ * @returns {ReturnType<typeof useQuery<TManager, Error>>} The query result.
+ */
+export const useGetManagerById = (
+  uuid: string | null,
+  options?: UseQueryOptions<TManager>
+): ReturnType<typeof useQuery<TManager, Error>> => {
+  return useQuery<TManager, Error>({
+    queryKey: managerQueryKeys.detail(uuid || ''),
+    queryFn: () => managerApi.getManagerById(uuid!),
+    enabled: !!uuid, // Only run query if uuid is provided
     staleTime: 1000 * 60 * 5,
     ...options,
   });
 };
 
-export const useGetManagerById = (
-  id: string | null,
-  options?: UseQueryOptions<TManagerWithCompany>
-): ReturnType<typeof useQuery<TManagerWithCompany, Error>> => {
-  return useQuery<TManagerWithCompany, Error>({
-    queryKey: managersQueryKeys.detail(id || ''),
-    queryFn: () => managerApi.getManagerById(id!),
-    enabled: !!id,
-    ...options,
+/**
+ * @description A query to get all managers with infinite scrolling.
+ * @param {TManagerFilters} filters - Filters to apply to the query.
+ * @param {UseInfiniteQueryOptions<TManagerList>} options - Additional query options.
+ * @returns {ReturnType<typeof useInfiniteQuery<TManagerList, Error>>} The query result.
+ */
+export const useGetAllManagers = (
+  filters: TManagerFilters
+): ReturnType<typeof useInfiniteQuery<TManagerList, Error>> => {
+  return useInfiniteQuery<TManagerList, Error>({
+    queryKey: managerQueryKeys.list(0, 0, filters),
+    queryFn: () => managerApi.getManagers(0, 20, filters),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.number < lastPage.total_pages - 1) {
+        return lastPage.number + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 0,
   });
 };
 
+/**
+ * @description A mutation to create a new manager.
+ * @param {UseMutationOptions<TManager, Error, TManagerCreatePayload>} options - Mutation options.
+ * @returns {ReturnType<typeof useMutation<TManager, Error, TManagerCreatePayload>>} The mutation result.
+ */
 export const useCreateManager = (
-  options?: UseMutationOptions<TManager, Error, TCreateManager>
-): ReturnType<typeof useMutation<TManager, Error, TCreateManager>> => {
+  options?: UseMutationOptions<TManager, Error, TManagerCreatePayload>
+): ReturnType<typeof useMutation<TManager, Error, TManagerCreatePayload>> => {
   const queryClient = useQueryClient();
-  return useMutation<TManager, Error, TCreateManager>({
-    mutationFn: (data: TCreateManager) => managerApi.createManager(data),
+
+  return useMutation<TManager, Error, TManagerCreatePayload>({
+    mutationFn: managerApi.createManager,
     onSuccess: (newManager) => {
-      queryClient.invalidateQueries({ queryKey: managersQueryKeys.lists() });
+      // Invalidate and refetch managers list
+      queryClient.invalidateQueries({
+        queryKey: managerQueryKeys.lists(),
+      });
+      // Add to cache
       queryClient.setQueryData(
-        managersQueryKeys.detail(newManager.id),
+        managerQueryKeys.detail(newManager.id),
         newManager
       );
     },
@@ -64,22 +144,42 @@ export const useCreateManager = (
   });
 };
 
+/**
+ * @description A mutation to update an existing manager.
+ * @param {UseMutationOptions<TManager, Error, { uuid: string; data: TManagerUpdatePayload }>} options - Mutation options.
+ * @returns {ReturnType<typeof useMutation<TManager, Error, { uuid: string; data: TManagerUpdatePayload }>>} The mutation result.
+ */
 export const useUpdateManager = (
   options?: UseMutationOptions<
     TManager,
     Error,
-    { id: string; data: TUpdateManager }
+    { uuid: string; data: TManagerUpdatePayload }
   >
 ): ReturnType<
-  typeof useMutation<TManager, Error, { id: string; data: TUpdateManager }>
+  typeof useMutation<
+    TManager,
+    Error,
+    { uuid: string; data: TManagerUpdatePayload }
+  >
 > => {
   const queryClient = useQueryClient();
-  return useMutation<TManager, Error, { id: string; data: TUpdateManager }>({
-    mutationFn: ({ id, data }: { id: string; data: TUpdateManager }) =>
-      managerApi.updateManager(id, data),
-    onSuccess: (updatedManager, { id }) => {
-      queryClient.invalidateQueries({ queryKey: managersQueryKeys.lists() });
-      queryClient.setQueryData(managersQueryKeys.detail(id), updatedManager);
+
+  return useMutation<
+    TManager,
+    Error,
+    { uuid: string; data: TManagerUpdatePayload }
+  >({
+    mutationFn: ({ uuid, data }) => managerApi.updateManager(uuid, data),
+    onSuccess: (updatedManager) => {
+      // Update cache
+      queryClient.setQueryData(
+        managerQueryKeys.detail(updatedManager.id),
+        updatedManager
+      );
+      // Invalidate list
+      queryClient.invalidateQueries({
+        queryKey: managerQueryKeys.lists(),
+      });
     },
     ...options,
   });

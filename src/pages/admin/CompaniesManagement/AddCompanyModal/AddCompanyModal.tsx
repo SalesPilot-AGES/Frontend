@@ -15,8 +15,8 @@ import {
   planApiToUiLabel,
 } from '@pages/admin/CompaniesManagement/planMapping';
 import {
-  type CompanyCreateInput,
-  CompanyCreateInputSchema,
+  CompanyCreatePayloadSchema,
+  type TCompanyCreatePayload,
 } from '@services/models/CompanySchema';
 import { useCreateCompany } from '@services/queries/useCompanies';
 import AppModal from '@UI/AppModal/AppModal';
@@ -39,14 +39,15 @@ export const AddCompanyModal = ({
     handleSubmit,
     formState: { errors, isValid },
     reset,
-  } = useForm<CompanyCreateInput>({
-    resolver: zodResolver(CompanyCreateInputSchema),
+  } = useForm<TCompanyCreatePayload>({
+    resolver: zodResolver(CompanyCreatePayloadSchema),
     defaultValues: {
       name: '',
       tax_id: '',
       plan: 'BASIC',
       active: true,
     },
+    mode: 'onChange',
   });
 
   useEffect(() => {
@@ -55,11 +56,14 @@ export const AddCompanyModal = ({
     }
   }, [open, reset]);
 
-  const { mutate: createCompany } = useCreateCompany();
+  const { mutate: createCompany, isPending } = useCreateCompany({
+    onSuccess: () => {
+      handleClose();
+    },
+  });
 
-  const onSubmit = (data: CompanyCreateInput): void => {
+  const onSubmit = (data: TCompanyCreatePayload): void => {
     createCompany(data);
-    handleClose();
   };
 
   return (
@@ -67,8 +71,9 @@ export const AddCompanyModal = ({
       modalName="Adicionar empresa"
       open={open}
       handleClose={handleClose}
-      isSaveButtonDisabled={!isValid}
+      isSaveButtonDisabled={!isValid || isPending}
       handleSubmit={handleSubmit(onSubmit)}
+      isSaving={isPending}
     >
       <Box
         sx={{
@@ -116,10 +121,8 @@ export const AddCompanyModal = ({
                 onChange={(e) =>
                   field.onChange(formatCnpjInput(e.target.value))
                 }
-                slotProps={{
-                  htmlInput: {
-                    maxLength: 18,
-                  },
+                inputProps={{
+                  maxLength: 18,
                 }}
               />
             )}
@@ -155,10 +158,8 @@ export const AddCompanyModal = ({
                       backgroundColor: '#2E7D32',
                     },
                   }}
-                  slotProps={{
-                    input: {
-                      'aria-label': 'status da empresa',
-                    },
+                  inputProps={{
+                    'aria-label': 'status da empresa',
                   }}
                 />
               </Box>

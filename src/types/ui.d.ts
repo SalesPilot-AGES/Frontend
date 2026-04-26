@@ -117,6 +117,15 @@ export interface DataTableProps<T> {
   filterOptions?: DataTableFilterOption[];
   filterPlaceholder?: string;
   filterAriaLabel?: string;
+  companyFilterValue?: string;
+  onCompanyFilterChange?: (value: string) => void;
+  companyFilterOptions?: DataTableFilterOption[];
+  companyFilterPlaceholder?: string;
+  companyFilterAriaLabel?: string;
+  infiniteScroll?: boolean;
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 export type BadgeLook = { backgroundColor: string; color: string };

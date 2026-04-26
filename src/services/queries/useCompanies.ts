@@ -104,7 +104,7 @@ export const useGetAllCompanies = (
   filters?: TCompanyFilters
 ): ReturnType<typeof useInfiniteQuery<TCompanyList, Error>> => {
   return useInfiniteQuery<TCompanyList, Error>({
-    queryKey: companyQueryKeys.list(0, size, filters),
+    queryKey: [...companyQueryKeys.lists(), 'infinite', { size, filters }],
     queryFn: ({ pageParam = 0 }) =>
       companyApi.getCompanies(pageParam as number, size, filters),
     getNextPageParam: (lastPage) => {

@@ -25,7 +25,7 @@ import { ManagerEditFormComponent } from './ManagerEditForm';
 
 export const AdminManagersDetails = (): JSX.Element => {
   const { palette } = useTheme();
-  const { id } = useParams({ from: EPageRoutes.ADMIN_MANAGERS_DETAILS });
+  const { id } = useParams({ from: EPageRoutes.MANAGER_DETAIL });
 
   const { data: manager, isLoading, isError } = useGetManagerById(id ?? null);
   const company = useGetCompanyById(manager?.company_id ?? null).data;
@@ -67,7 +67,7 @@ export const AdminManagersDetails = (): JSX.Element => {
       >
         <MuiLink
           component={Link}
-          to={EPageRoutes.ADMIN_MANAGERS}
+          to={EPageRoutes.MANAGERS}
           underline="hover"
           sx={{
             display: 'inline-flex',

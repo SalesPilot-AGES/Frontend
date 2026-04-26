@@ -68,7 +68,7 @@ export const ManagerListSchema = z.object({
  * @description Zod schema for manager filtering options.
  */
 export const ManagerFiltersSchema = z.object({
-  companyId: z.string(),
+  companyId: z.string().optional(),
   name: z.string().optional(),
   email: z.string().optional(),
   active: z.boolean().optional(),

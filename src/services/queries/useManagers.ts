@@ -98,15 +98,15 @@ export const useGetManagerById = (
 /**
  * @description A query to get all managers with infinite scrolling.
  * @param {TManagerFilters} filters - Filters to apply to the query.
- * @param {UseInfiniteQueryOptions<TManagerList>} options - Additional query options.
  * @returns {ReturnType<typeof useInfiniteQuery<TManagerList, Error>>} The query result.
  */
 export const useGetAllManagers = (
   filters: TManagerFilters
 ): ReturnType<typeof useInfiniteQuery<TManagerList, Error>> => {
   return useInfiniteQuery<TManagerList, Error>({
-    queryKey: managerQueryKeys.list(0, 0, filters),
-    queryFn: () => managerApi.getManagers(0, 20, filters),
+    queryKey: [...managerQueryKeys.lists(), 'infinite', { filters }],
+    queryFn: ({ pageParam = 0 }) =>
+      managerApi.getManagers(pageParam as number, 20, filters),
     getNextPageParam: (lastPage) => {
       if (lastPage.number < lastPage.total_pages - 1) {
         return lastPage.number + 1;
@@ -114,6 +114,7 @@ export const useGetAllManagers = (
       return undefined;
     },
     initialPageParam: 0,
+    enabled: !!filters.companyId,
   });
 };
 

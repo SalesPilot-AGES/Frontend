@@ -31,15 +31,7 @@ export const useLoginForm = (): UseLoginFormReturn => {
     const user = loginUser(data.email, data.password);
 
     if (user) {
-      // Navigate to role-specific dashboard
-      const dashboardRoute =
-        user.role === 'admin'
-          ? EPageRoutes.ADMIN_DASHBOARD
-          : user.role === 'manager'
-            ? EPageRoutes.MANAGER_DASHBOARD
-            : EPageRoutes.SALESMAN_DASHBOARD;
-
-      navigate({ to: dashboardRoute });
+      navigate({ to: EPageRoutes.DASHBOARD });
     } else {
       setError('root', {
         message: 'Invalid email or password',

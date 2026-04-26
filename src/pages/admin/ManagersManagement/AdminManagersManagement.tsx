@@ -45,7 +45,7 @@ export const AdminManagersManagement = (): JSX.Element => {
     hasNextPage,
     isFetchingNextPage,
   } = useGetAllManagers({
-    companyId: companyId!,
+    companyId: companyId,
     name: searchValue,
     email: searchValue,
     active: filterValue ? filterValue === 'true' : undefined,
@@ -155,7 +155,7 @@ export const AdminManagersManagement = (): JSX.Element => {
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {
             navigate({
-              to: EPageRoutes.ADMIN_MANAGERS_DETAILS,
+              to: EPageRoutes.MANAGER_DETAIL,
               params: { id: String(rowId) },
             });
           }}

@@ -6,20 +6,9 @@ import {
   selectUserRole,
   useAuthStore,
 } from '@store/authStore';
-import { useNavigate } from '@tanstack/react-router';
 
 export const useCurrentUser = (): User | null => {
   return useAuthStore(selectUser);
-};
-
-export const useRequireUser = (): User => {
-  const user = useAuthStore(selectUser);
-  const navigate = useNavigate({ from: '/' });
-  if (!user) {
-    navigate({ to: '/login' });
-    throw new Error('User not authenticated');
-  }
-  return user;
 };
 
 export const useCurrentUsername = (): string => {

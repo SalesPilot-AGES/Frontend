@@ -23,7 +23,7 @@ import { CompanyInformationEdit } from './CompanyInformation/CompanyInformationE
 import { pickCompanyValues } from './CompanyInformation/CompanyInformationEdit/useCompanyInformationEdit';
 import type { CompanyInformationValues } from './CompanyInformation/CompanyInformationView/types';
 
-const companyDetailRouteApi = getRouteApi(EPageRoutes.ADMIN_COMPANY_DETAIL);
+const companyDetailRouteApi = getRouteApi(EPageRoutes.COMPANY_DETAIL);
 
 export const CompanyDetail = (): JSX.Element => {
   const { palette } = useTheme();
@@ -59,7 +59,7 @@ export const CompanyDetail = (): JSX.Element => {
       <Stack spacing={3} sx={{ width: '100%', alignSelf: 'flex-start' }}>
         <MuiLink
           component={Link}
-          to={EPageRoutes.ADMIN_COMPANIES}
+          to={EPageRoutes.COMPANIES}
           underline="hover"
           sx={{
             display: 'inline-flex',

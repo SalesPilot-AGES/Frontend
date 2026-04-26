@@ -137,7 +137,7 @@ export const AdminCompaniesManagement = (): JSX.Element => {
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {
             navigate({
-              to: EPageRoutes.ADMIN_COMPANY_DETAIL,
+              to: EPageRoutes.COMPANY_DETAIL,
               params: { companyId: String(rowId) },
             });
           }}

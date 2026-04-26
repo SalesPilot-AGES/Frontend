@@ -9,6 +9,51 @@ import {
 
 import apiClient from './apiClient';
 
+type TCompanyApiPayload = {
+  name: string;
+  tax_id: string;
+  plan: string;
+  active: boolean;
+};
+
+type TCompanyApiResponse = {
+  id: string;
+  name: string;
+  tax_id: string;
+  plan: string;
+  active: boolean;
+  created_at?: string;
+};
+
+const toCompanyApiPayload = (
+  payload: TCompanyCreatePayload
+): TCompanyApiPayload => ({
+  name: payload.name,
+  tax_id: payload.tax_id.replace(/\D/g, ''),
+  plan: payload.plan,
+  active: payload.active,
+});
+
+const toCompanyUpdateApiPayload = (
+  payload: TCompanyUpdatePayload
+): Record<string, unknown> => ({
+  ...(payload.name && { name: payload.name }),
+  ...(payload.tax_id && { tax_id: payload.tax_id.replace(/\D/g, '') }),
+  ...(payload.plan && { plan: payload.plan }),
+  ...(payload.active !== undefined && { active: payload.active }),
+});
+
+const normalizeCompanyResponse = (data: TCompanyApiResponse): TCompany => {
+  return {
+    id: data.id,
+    name: data.name,
+    tax_id: data.tax_id,
+    plan: data.plan as 'BASIC' | 'PRO' | 'ENTERPRISE',
+    active: data.active,
+    created_at: data.created_at,
+  };
+};
+
 /**
  * @description API service for company-related operations.
  */
@@ -45,8 +90,10 @@ export const companyApi = {
    * @returns {Promise<TCompany>} A promise that resolves to the company data.
    */
   getCompanyById: async (uuid: string): Promise<TCompany> => {
-    const response = await apiClient.get<TCompany>(`/api/companies/${uuid}`);
-    return CompanySchema.parse(response.data);
+    const response = await apiClient.get<TCompanyApiResponse>(
+      `/api/companies/${uuid}`
+    );
+    return CompanySchema.parse(normalizeCompanyResponse(response.data));
   },
 
   /**
@@ -55,8 +102,11 @@ export const companyApi = {
    * @returns {Promise<TCompany>} A promise that resolves to the created company data.
    */
   createCompany: async (payload: TCompanyCreatePayload): Promise<TCompany> => {
-    const response = await apiClient.post<TCompany>('/api/companies', payload);
-    return CompanySchema.parse(response.data);
+    const response = await apiClient.post<TCompanyApiResponse>(
+      '/api/companies',
+      toCompanyApiPayload(payload)
+    );
+    return CompanySchema.parse(normalizeCompanyResponse(response.data));
   },
 
   /**
@@ -69,10 +119,10 @@ export const companyApi = {
     uuid: string,
     payload: TCompanyUpdatePayload
   ): Promise<TCompany> => {
-    const response = await apiClient.put<TCompany>(
+    const response = await apiClient.put<TCompanyApiResponse>(
       `/api/companies/${uuid}`,
-      payload
+      toCompanyUpdateApiPayload(payload)
     );
-    return CompanySchema.parse(response.data);
+    return CompanySchema.parse(normalizeCompanyResponse(response.data));
   },
 };

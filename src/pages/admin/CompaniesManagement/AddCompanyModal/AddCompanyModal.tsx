@@ -14,6 +14,7 @@ import {
   PLAN_API_CODES,
   planApiToUiLabel,
 } from '@pages/admin/CompaniesManagement/planMapping';
+import { getApiError } from '@services/api/errorHandler';
 import {
   CompanyCreatePayloadSchema,
   type TCompanyCreatePayload,
@@ -62,9 +63,22 @@ export const AddCompanyModal = ({
     onSuccess: () => {
       handleClose();
     },
+    onError: (error) => {
+      const apiError = getApiError(error);
+      const fallbackMessage =
+        apiError.status === 500
+          ? 'Erro interno no servidor ao criar a empresa. Tente novamente e verifique os logs da API.'
+          : 'Nao foi possivel criar a empresa. Tente novamente.';
+
+      setError('root', {
+        type: 'server',
+        message: apiError.message || fallbackMessage,
+      });
+    },
   });
 
   const onSubmit = (data: TCompanyCreatePayload): void => {
+    clearErrors('root');
     createCompany(data);
   };
 
@@ -226,6 +240,13 @@ export const AddCompanyModal = ({
             )}
           />
         </Stack>
+        {errors.root?.message ? (
+          <Box sx={{ gridColumn: { xs: '1 / -1', md: '1 / -1' } }}>
+            <Typography variant="body2" color="error.main">
+              {errors.root.message}
+            </Typography>
+          </Box>
+        ) : null}
       </Box>
     </AppModal>
   );

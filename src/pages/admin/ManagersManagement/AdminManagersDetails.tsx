@@ -12,7 +12,8 @@ import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { useGetCompanyById } from '@services/queries/useCompanies';
 import { useGetManagerById } from '@services/queries/useManagers';
 import { useAdminManagersDetailsEdit } from '@store/hooks/useAdminManagersDetailsEdit';
-import { Link, useParams } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import { IconBox } from '@UI/IconBox/IconBox';
 import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
@@ -25,7 +26,9 @@ import { ManagerEditFormComponent } from './ManagerEditForm';
 
 export const AdminManagersDetails = (): JSX.Element => {
   const { palette } = useTheme();
-  const { id } = useParams({ from: EPageRoutes.MANAGER_DETAIL });
+  const { id } = useParams({ strict: false }) as {
+    id: string;
+  };
 
   const { data: manager, isLoading, isError } = useGetManagerById(id ?? null);
   const company = useGetCompanyById(manager?.company_id ?? null).data;

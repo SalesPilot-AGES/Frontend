@@ -11,10 +11,12 @@ export const ManagerSchema = z.object({
   email: z.string().email('Invalid email address'),
   company_id: z.string(),
   active: z.boolean(),
-  preferences: z.object({
-    theme: z.string(),
-    default_model: z.string(),
-  }),
+  preferences: z
+    .object({
+      theme: z.string(),
+      default_model: z.string(),
+    })
+    .nullable(),
   created_at: z.string().optional(),
 });
 

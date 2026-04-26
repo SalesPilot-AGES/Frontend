@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { planApiToUiLabel } from '@pages/admin/CompaniesManagement/planMapping';
 import { useGetCompanyById } from '@services/queries/useCompanies';
-import { getRouteApi, Link } from '@tanstack/react-router';
+import { Link,useParams } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { StatCard } from '@UI/StatCard/StatCard';
 import type { SetStateAction } from 'react';
@@ -23,11 +23,9 @@ import { CompanyInformationEdit } from './CompanyInformation/CompanyInformationE
 import { pickCompanyValues } from './CompanyInformation/CompanyInformationEdit/useCompanyInformationEdit';
 import type { CompanyInformationValues } from './CompanyInformation/CompanyInformationView/types';
 
-const companyDetailRouteApi = getRouteApi(EPageRoutes.COMPANY_DETAIL);
-
 export const CompanyDetail = (): JSX.Element => {
   const { palette } = useTheme();
-  const { companyId } = companyDetailRouteApi.useParams();
+  const { companyId } = useParams({ strict: false }) as { companyId: string };
   const { data: company, isLoading } = useGetCompanyById(companyId);
   const [editMode, setEditMode] = React.useState(false);
   const [draft, setDraft] = React.useState<

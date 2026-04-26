@@ -53,7 +53,6 @@ const getManagersListQueryOptions = (
   queryFn: (): Promise<TManagerList> =>
     managerApi.getManagers(page, size, filters),
   staleTime: 0,
-  enabled: !!filters.companyId, // Only run query if companyId is provided
 });
 
 /**
@@ -114,7 +113,6 @@ export const useGetAllManagers = (
       return undefined;
     },
     initialPageParam: 0,
-    enabled: !!filters.companyId,
   });
 };
 
@@ -129,19 +127,16 @@ export const useCreateManager = (
   const queryClient = useQueryClient();
 
   return useMutation<TManager, Error, TManagerCreatePayload>({
+    ...options,
     mutationFn: managerApi.createManager,
-    onSuccess: (newManager) => {
-      // Invalidate and refetch managers list
-      queryClient.invalidateQueries({
-        queryKey: managerQueryKeys.lists(),
-      });
-      // Add to cache
+    onSuccess: (newManager, variables, onMutateResult, context) => {
+      queryClient.invalidateQueries({ queryKey: managerQueryKeys.lists() });
       queryClient.setQueryData(
         managerQueryKeys.detail(newManager.id),
         newManager
       );
+      options?.onSuccess?.(newManager, variables, onMutateResult, context);
     },
-    ...options,
   });
 };
 
@@ -170,18 +165,15 @@ export const useUpdateManager = (
     Error,
     { uuid: string; data: TManagerUpdatePayload }
   >({
+    ...options,
     mutationFn: ({ uuid, data }) => managerApi.updateManager(uuid, data),
-    onSuccess: (updatedManager) => {
-      // Update cache
+    onSuccess: (updatedManager, variables, onMutateResult, context) => {
       queryClient.setQueryData(
         managerQueryKeys.detail(updatedManager.id),
         updatedManager
       );
-      // Invalidate list
-      queryClient.invalidateQueries({
-        queryKey: managerQueryKeys.lists(),
-      });
+      queryClient.invalidateQueries({ queryKey: managerQueryKeys.lists() });
+      options?.onSuccess?.(updatedManager, variables, onMutateResult, context);
     },
-    ...options,
   });
 };

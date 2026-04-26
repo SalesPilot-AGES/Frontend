@@ -7,8 +7,14 @@ import { PageableSchema } from './PageableSchema';
  */
 export const CompanySchema = z.object({
   id: z.string(),
-  name: z.string().min(1, 'Name is required'),
-  tax_id: z.string().min(1, 'Tax ID is required'),
+  name: z.string().trim().min(1, 'Informe o nome da empresa para continuar.'),
+  tax_id: z
+    .string()
+    .trim()
+    .min(1, 'Informe o CNPJ da empresa para continuar.')
+    .refine((value) => value.replace(/\D/g, '').length === 14, {
+      message: 'CNPJ invalido. Digite os 14 digitos.',
+    }),
   plan: z.enum(['BASIC', 'PRO', 'ENTERPRISE']),
   active: z.boolean(),
   created_at: z.string().optional(),
@@ -39,8 +45,14 @@ export const CompanyListSchema = z.object({
  * @description Zod schema for creating a new company.
  */
 export const CompanyCreatePayloadSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  tax_id: z.string().min(1, 'Tax ID is required'),
+  name: z.string().trim().min(1, 'Informe o nome da empresa para continuar.'),
+  tax_id: z
+    .string()
+    .trim()
+    .min(1, 'Informe o CNPJ da empresa para continuar.')
+    .refine((value) => value.replace(/\D/g, '').length === 14, {
+      message: 'CNPJ invalido. Digite os 14 digitos.',
+    }),
   plan: z.enum(['BASIC', 'PRO', 'ENTERPRISE']),
   active: z.boolean(),
 });

@@ -35,10 +35,12 @@ export const AddCompanyModal = ({
   handleClose,
 }: IAddCompanyModalProps): JSX.Element => {
   const {
+    clearErrors,
     control,
     handleSubmit,
     formState: { errors, isValid },
     reset,
+    setError,
   } = useForm<TCompanyCreatePayload>({
     resolver: zodResolver(CompanyCreatePayloadSchema),
     defaultValues: {
@@ -73,7 +75,6 @@ export const AddCompanyModal = ({
       handleClose={handleClose}
       isSaveButtonDisabled={!isValid || isPending}
       handleSubmit={handleSubmit(onSubmit)}
-      isSaving={isPending}
     >
       <Box
         sx={{
@@ -111,21 +112,46 @@ export const AddCompanyModal = ({
           <Controller
             name="tax_id"
             control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                type="text"
-                error={!!errors.tax_id}
-                helperText={errors.tax_id?.message}
-                onChange={(e) =>
-                  field.onChange(formatCnpjInput(e.target.value))
-                }
-                inputProps={{
-                  maxLength: 18,
-                }}
-              />
-            )}
+            render={({ field }) => {
+              const taxIdDigitsCount = field.value.replace(/\D/g, '').length;
+              const isTaxIdIncomplete = taxIdDigitsCount < 14;
+              const isManualTaxIdError = errors.tax_id?.type === 'manual';
+              const showSchemaTaxIdError =
+                !!errors.tax_id && !isManualTaxIdError && !isTaxIdIncomplete;
+
+              return (
+                <TextField
+                  {...field}
+                  fullWidth
+                  type="text"
+                  error={isManualTaxIdError || showSchemaTaxIdError}
+                  helperText={
+                    isManualTaxIdError || showSchemaTaxIdError
+                      ? errors.tax_id?.message
+                      : undefined
+                  }
+                  onChange={(e) => {
+                    const nextValue = e.target.value;
+
+                    if (/[A-Za-z]/.test(nextValue)) {
+                      setError('tax_id', {
+                        type: 'manual',
+                        message: 'Apenas numeros aceitos.',
+                      });
+                      return;
+                    }
+
+                    clearErrors('tax_id');
+                    field.onChange(formatCnpjInput(nextValue));
+                  }}
+                  slotProps={{
+                    htmlInput: {
+                      maxLength: 18,
+                    },
+                  }}
+                />
+              );
+            }}
           />
         </Box>
 

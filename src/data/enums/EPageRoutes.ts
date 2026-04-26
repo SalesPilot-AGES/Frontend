@@ -1,6 +1,6 @@
 export const EPageRoutes = {
   LOGIN: '/login',
-  DASHBOARD: '/dashboard',
+  DASHBOARD: '/painel',
   COMPANIES: '/empresas',
   COMPANY_DETAIL: '/empresas/$companyId',
   MANAGERS: '/gestores',

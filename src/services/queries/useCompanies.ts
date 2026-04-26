@@ -106,7 +106,7 @@ export const useGetAllCompanies = (
   return useInfiniteQuery<TCompanyList, Error>({
     queryKey: companyQueryKeys.list(0, size, filters),
     queryFn: ({ pageParam = 0 }) =>
-      companyApi.getCompanies(pageParam, size, filters),
+      companyApi.getCompanies(pageParam as number, size, filters),
     getNextPageParam: (lastPage) => {
       if (lastPage.number < lastPage.total_pages - 1) {
         return lastPage.number + 1;
@@ -128,19 +128,16 @@ export const useCreateCompany = (
   const queryClient = useQueryClient();
 
   return useMutation<TCompany, Error, TCompanyCreatePayload>({
+    ...options,
     mutationFn: companyApi.createCompany,
-    onSuccess: (newCompany) => {
-      // Invalidate and refetch companies list
-      queryClient.invalidateQueries({
-        queryKey: companyQueryKeys.lists(),
-      });
-      // Add to cache
+    onSuccess: (newCompany, variables, onMutateResult, context) => {
+      queryClient.invalidateQueries({ queryKey: companyQueryKeys.lists() });
       queryClient.setQueryData(
         companyQueryKeys.detail(newCompany.id),
         newCompany
       );
+      options?.onSuccess?.(newCompany, variables, onMutateResult, context);
     },
-    ...options,
   });
 };
 
@@ -169,18 +166,15 @@ export const useUpdateCompany = (
     Error,
     { uuid: string; data: TCompanyUpdatePayload }
   >({
+    ...options,
     mutationFn: ({ uuid, data }) => companyApi.updateCompany(uuid, data),
-    onSuccess: (updatedCompany) => {
-      // Update cache
+    onSuccess: (updatedCompany, variables, onMutateResult, context) => {
       queryClient.setQueryData(
         companyQueryKeys.detail(updatedCompany.id),
         updatedCompany
       );
-      // Invalidate list
-      queryClient.invalidateQueries({
-        queryKey: companyQueryKeys.lists(),
-      });
+      queryClient.invalidateQueries({ queryKey: companyQueryKeys.lists() });
+      options?.onSuccess?.(updatedCompany, variables, onMutateResult, context);
     },
-    ...options,
   });
 };

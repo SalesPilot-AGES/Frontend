@@ -60,7 +60,11 @@ export const CompanyCreatePayloadSchema = z.object({
 /**
  * @description Zod schema for updating an existing company.
  */
-export const CompanyUpdatePayloadSchema = CompanyCreatePayloadSchema.partial();
+export const CompanyUpdatePayloadSchema = CompanyCreatePayloadSchema.pick({
+  name: true,
+  plan: true,
+  active: true,
+}).partial();
 
 /**
  * @description Zod schema for company filtering options.

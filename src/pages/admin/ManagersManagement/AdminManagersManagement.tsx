@@ -85,13 +85,22 @@ export const AdminManagersManagement = (): JSX.Element => {
     },
     {
       header: ECardLabel.COMPANY_NAME,
-      accessor: (row: TManager) => row.company_id,
+      accessor: (row: TManager): string => {
+        const company = companies.find((c) => c.id === row.company_id);
+        return company ? company.name : row.company_id;
+      },
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ApartmentIcon
             sx={{ color: palette.companies[500], fontSize: '1.5rem' }}
           />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+          <Typography
+            fontWeight={500}
+            fontSize="1rem"
+            lineHeight="1.375rem"
+            noWrap
+            sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
             {value ?? '-'}
           </Typography>
         </Stack>
@@ -175,10 +184,13 @@ export const AdminManagersManagement = (): JSX.Element => {
           ]}
           companyFilterValue={companyId}
           onCompanyFilterChange={setCompanyId}
-          companyFilterOptions={companies.map((company) => ({
-            label: company.name,
-            value: company.id,
-          }))}
+          companyFilterOptions={[
+            { label: 'Todas as empresas', value: '' },
+            ...companies.map((company) => ({
+              label: company.name,
+              value: company.id,
+            })),
+          ]}
           infiniteScroll
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}

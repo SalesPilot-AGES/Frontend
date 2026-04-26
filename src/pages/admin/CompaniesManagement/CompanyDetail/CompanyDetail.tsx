@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { planApiToUiLabel } from '@pages/admin/CompaniesManagement/planMapping';
 import { useGetCompanyById } from '@services/queries/useCompanies';
-import { Link,useParams } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { StatCard } from '@UI/StatCard/StatCard';
 import type { SetStateAction } from 'react';

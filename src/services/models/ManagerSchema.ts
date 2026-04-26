@@ -21,7 +21,6 @@ export const ManagerSchema = z.object({
 });
 
 /**
-//... existing code...
  * @description Zod schema for creating a new manager.
  */
 export const ManagerCreatePayloadSchema = z.object({
@@ -41,6 +40,7 @@ export const ManagerCreatePayloadSchema = z.object({
 export const ManagerUpdatePayloadSchema = ManagerCreatePayloadSchema.pick({
   name: true,
   email: true,
+  company_id: true,
   active: true,
   preferences: true,
 }).partial();

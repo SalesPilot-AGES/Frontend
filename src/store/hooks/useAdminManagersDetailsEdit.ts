@@ -93,7 +93,12 @@ export const useAdminManagersDetailsEdit = (
         data: {
           name: editForm.name,
           email: editForm.email,
+          company_id: editForm.companyId,
           active: editForm.active,
+          preferences: manager.preferences ?? {
+            theme: 'light',
+            default_model: 'gpt-3.5-turbo',
+          },
         },
       },
       {

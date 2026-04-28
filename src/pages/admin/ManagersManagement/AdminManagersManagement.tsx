@@ -10,7 +10,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import type { TManager } from '@services/models/ManagerSchema';
+import type { TManager, TManagerFilters } from '@services/models/ManagerSchema';
 import { useGetAllCompanies } from '@services/queries/useCompanies';
 import { useGetAllManagers } from '@services/queries/useManagers';
 import { useNavigate } from '@tanstack/react-router';
@@ -28,8 +28,7 @@ export const AdminManagersManagement = (): JSX.Element => {
   const { palette } = useTheme();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-  const [filterValue, setFilterValue] = useState('');
+  const [filters, setFilters] = useState<TManagerFilters>({});
   const [companyId, setCompanyId] = useState<string | undefined>(undefined);
 
   const { data: companiesResponse } = useGetAllCompanies();
@@ -46,9 +45,9 @@ export const AdminManagersManagement = (): JSX.Element => {
     isFetchingNextPage,
   } = useGetAllManagers({
     companyId: companyId,
-    name: searchValue,
-    email: searchValue,
-    active: filterValue ? filterValue === 'true' : undefined,
+    name: filters.name,
+    email: filters.email,
+    active: filters.active,
   });
 
   const managers = useMemo(
@@ -168,17 +167,22 @@ export const AdminManagersManagement = (): JSX.Element => {
               params: { id: String(rowId) },
             });
           }}
-          onSearchChange={setSearchValue}
-          onFilterChange={setFilterValue}
-          searchValue={searchValue}
-          filterValue={filterValue}
+          onSearchChange={(value) => setFilters({ ...filters, name: value })}
+          onFilterChange={(value) =>
+            setFilters({
+              ...filters,
+              active: value ? value === 'true' : undefined,
+            })
+          }
+          searchValue={filters.name}
+          filterValue={filters.active == null ? '' : String(filters.active)}
           toolbarTitle="Lista de gestores"
           searchPlaceholder="Buscar gestor..."
           searchAriaLabel="Buscar gestor"
           filterPlaceholder="Filtrar"
           filterAriaLabel="Filtrar gestores"
           filterOptions={[
-            { label: 'Todos', value: '' },
+            { label: 'Todos os status', value: '' },
             { label: EStatus.ACTIVE, value: 'true' },
             { label: EStatus.INACTIVE, value: 'false' },
           ]}

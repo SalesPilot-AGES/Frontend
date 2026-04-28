@@ -149,14 +149,14 @@ export const AdminCompaniesManagement = (): JSX.Element => {
             })
           }
           searchValue={filters.name}
-          filterValue={String(filters.active)}
+          filterValue={filters.active == null ? '' : String(filters.active)}
           toolbarTitle="Lista de empresas"
           searchPlaceholder="Buscar empresa..."
           searchAriaLabel="Buscar empresa"
-          filterPlaceholder="Filtrar"
+          filterPlaceholder="Filtrar por status"
           filterAriaLabel="Filtrar empresas"
           filterOptions={[
-            { label: 'Todos', value: '' },
+            { label: 'Todos os status', value: '' },
             { label: EStatus.ACTIVE, value: 'true' },
             { label: EStatus.INACTIVE, value: 'false' },
           ]}

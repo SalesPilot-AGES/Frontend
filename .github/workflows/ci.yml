@@ -38,9 +38,27 @@ jobs:
         run: |
           docker run --rm -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect --source /path --exit-code 1
 
-  docker-build-push:
+  sonarqube:
     runs-on: self-hosted
     needs: [build-and-test, secret-detection]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v3
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=salespilot-frontend
+            -Dsonar.sources=src
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/*.spec.ts,**/*.test.ts,**/*.spec.tsx,**/*.test.tsx
+
+  docker-build-push:
+    runs-on: self-hosted
+    needs: [build-and-test, secret-detection, sonarqube]
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4

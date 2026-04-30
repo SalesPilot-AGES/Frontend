@@ -10,6 +10,7 @@ export const EPageRoutes = {
   ADMIN_MANAGERS_DETAILS: '/admin/gestores/$id',
   ADMIN_SALESMEN: '/admin/vendedores',
   ADMIN_MEETINGS: '/admin/reuniões',
+  ADMIN_MEETING_DETAIL: '/admin/reuniões/$meetingId',
 
   // Manager Routes
   MANAGER_DASHBOARD: '/gestor',

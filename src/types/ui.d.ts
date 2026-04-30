@@ -14,7 +14,11 @@ export type TIconName =
   | 'login'
   | 'logout'
   | 'close'
-  | 'save';
+  | 'save'
+  | 'clock'
+  | 'sentimentSad'
+  | 'sentimentNeutral'
+  | 'sentimentHappy';
 
 export interface IHeaderProps {
   title: string;
@@ -142,4 +146,12 @@ export interface IItemDetailProps {
   icon?: JSX.Element;
   children?: ReactNode;
   sx?: SxProps;
+}
+
+export type TSentimentLevel = (typeof ESentiment)[keyof typeof ESentiment];
+
+export interface ISentimentConfig {
+  level: TSentimentLevel;
+  iconName: TIconName;
+  theme: TColorThemeOptions;
 }

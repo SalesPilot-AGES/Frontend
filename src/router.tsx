@@ -71,6 +71,12 @@ const adminMeetingsRoute = createRoute({
   component: AdminMeetingsManagement,
 });
 
+const adminMeetingDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: EPageRoutes.ADMIN_MEETING_DETAIL,
+  component: PageNotFound,
+});
+
 // Manager Routes
 const managerDashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -114,6 +120,7 @@ const routeTree = rootRoute.addChildren([
   managerDetailsRoute,
   adminSalesmenRoute,
   adminMeetingsRoute,
+  adminMeetingDetailRoute,
   // Manager Routes
   managerDashboardRoute,
   managerSalesmenRoute,

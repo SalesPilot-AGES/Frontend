@@ -1,8 +1,9 @@
-import type { ECardLabel } from '@data/enums/ECardLabel';
-import type { SxProps } from '@mui/material';
-import type { JSX, ReactNode } from 'react';
-
-import type { TColorThemeOptions } from './hooks';
+import type { EDataTableColumnAlignment } from '@data/enums/EDataTableColumnAlignment';
+import type { EDataTableColumnVariant } from '@data/enums/EDataTableColumnVariant';
+import type { EPlan } from '@data/enums/EPlan';
+import type { EStatus } from '@data/enums/EStatus';
+import type { ChipProps } from '@mui/material';
+import type { ReactNode } from 'react';
 
 export type TIconName =
   | 'logo'
@@ -16,58 +17,8 @@ export type TIconName =
   | 'close'
   | 'save';
 
-export interface IHeaderProps {
-  title: string;
-  subtitle?: string;
-  alignment?: 'left' | 'center' | 'right';
-}
-
-export interface IPageHeaderProps {
-  title: string;
-  subtitle?: string;
-  alignment?: 'left' | 'center' | 'right';
-}
-
-export interface IPageContainerProps {
-  children: React.ReactNode;
-}
-
-export interface IIconBoxProps {
-  iconName: TIconName;
-  theme?: TColorThemeOptions;
-  sx?: SxProps;
-}
-
-export interface IStatCardProps {
-  iconName: TIconName;
-  theme?: TColorThemeOptions;
-  value: number | string;
-  label: ECardLabel;
-  sx?: SxProps;
-}
-
-export interface ILayoutProps {
-  children?: ReactNode;
-}
-
-export interface MenuItem {
-  label: string;
-  path: string;
-  icon: JSX.Element;
-}
-
 export type TStatus = (typeof EStatus)[keyof typeof EStatus];
 export type TPlan = (typeof EPlan)[keyof typeof EPlan];
-
-export interface IStatusBadgeProps {
-  active: boolean;
-  sx?: SxProps;
-}
-
-export interface IPlanBadgeProps {
-  plan: TPlan;
-  sx?: SxProps;
-}
 
 export type DataTableIconColorTuple = readonly [
   r: number,
@@ -129,26 +80,3 @@ export interface DataTableProps<T> {
 }
 
 export type BadgeLook = { backgroundColor: string; color: string };
-
-export interface IBasicModalProps {
-  modalName: string;
-  handleClose: () => void;
-  open: boolean;
-  handleSubmit: () => void;
-  children: JSX.Element;
-  isSaveButtonDisabled?: boolean;
-}
-
-export interface IEntityDetailsCardProps {
-  title: string;
-  children: React.ReactNode;
-  onEdit?: () => void;
-}
-
-export interface IItemDetailProps {
-  label: string;
-  value?: string;
-  icon?: JSX.Element;
-  children?: ReactNode;
-  sx?: SxProps;
-}

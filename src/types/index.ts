@@ -9,19 +9,14 @@ export type { PaletteColorOptions } from './theme';
 export type { TColorThemeOptions, TColorThemeResult } from './hooks';
 export type { LoginFormData, UseLoginFormReturn } from './hooks';
 
-// UI types
+// UI utility types (non-component)
 export type { TIconName } from './ui';
+export type { TPlan, TStatus } from './ui';
 export type {
-  IHeaderProps,
-  IIconBoxProps,
-  ILayoutProps,
-  IPageContainerProps,
-  IPageHeaderProps,
-  MenuItem,
+  DataTableAccessor,
+  DataTableColumn,
+  DataTableFilterOption,
 } from './ui';
-
-// Form types
-export type { DemoAccountsInfoProps } from './forms';
 
 // Model types
 export type { Company } from './models';

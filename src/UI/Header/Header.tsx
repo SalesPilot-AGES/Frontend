@@ -1,6 +1,11 @@
-import type { IHeaderProps } from '@declarations';
 import { Stack, Typography, useTheme } from '@mui/material';
 import type { JSX } from 'react';
+
+export interface IHeaderProps {
+  title: string;
+  subtitle?: string;
+  alignment?: 'left' | 'center' | 'right';
+}
 
 export const Header = ({
   title,

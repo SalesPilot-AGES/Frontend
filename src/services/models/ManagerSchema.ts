@@ -9,7 +9,7 @@ export const ManagerSchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
-  company_id: z.string(),
+  company: z.object({ id: z.string(), name: z.string() }),
   active: z.boolean(),
   preferences: z
     .object({
@@ -28,10 +28,12 @@ export const ManagerCreatePayloadSchema = z.object({
   email: z.string().email('Invalid email address'),
   company_id: z.string(),
   active: z.boolean(),
-  preferences: z.object({
-    theme: z.string(),
-    default_model: z.string(),
-  }),
+  preferences: z
+    .object({
+      theme: z.string(),
+      default_model: z.string(),
+    })
+    .optional(),
 });
 
 /**

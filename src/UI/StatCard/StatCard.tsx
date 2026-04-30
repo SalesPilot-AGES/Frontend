@@ -1,7 +1,18 @@
-import type { IStatCardProps } from '@declarations/ui';
+import { ECardLabel } from '@data/enums/ECardLabel';
+import type { TColorThemeOptions } from '@declarations/hooks';
+import type { TIconName } from '@declarations/ui';
+import type { SxProps } from '@mui/material';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { IconBox } from '@UI/IconBox/IconBox';
 import type { JSX } from 'react';
+
+export interface IStatCardProps {
+  iconName: TIconName;
+  theme?: TColorThemeOptions;
+  value: number | string;
+  label: (typeof ECardLabel)[keyof typeof ECardLabel];
+  sx?: SxProps;
+}
 
 export const StatCard = ({
   iconName,

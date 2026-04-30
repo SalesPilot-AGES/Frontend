@@ -1,6 +1,11 @@
-import type { IPageHeaderProps } from '@declarations';
 import { Stack, Typography, useTheme } from '@mui/material';
 import type { JSX } from 'react';
+
+export interface IPageHeaderProps {
+  title: string;
+  subtitle?: string;
+  alignment?: 'left' | 'center' | 'right';
+}
 
 export const PageHeader = ({
   title,

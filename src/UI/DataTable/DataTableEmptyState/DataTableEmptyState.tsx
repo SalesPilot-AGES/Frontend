@@ -2,7 +2,7 @@ import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material';
 import type { JSX } from 'react';
 
-export interface DataTableEmptyStateProps {
+export interface IDataTableEmptyStateProps {
   colSpan: number;
   emptyTitle: string;
   emptyDescription: string;
@@ -16,7 +16,7 @@ export const DataTableEmptyState = ({
   emptyDescription,
   emptyStateIconBg,
   emptyStateIconFg,
-}: DataTableEmptyStateProps): JSX.Element => (
+}: IDataTableEmptyStateProps): JSX.Element => (
   <TableRow>
     <TableCell colSpan={colSpan} sx={{ borderBottom: 'none', py: 6 }}>
       <Stack alignItems="center" spacing={1.5}>

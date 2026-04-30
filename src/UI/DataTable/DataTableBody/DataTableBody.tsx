@@ -1,8 +1,3 @@
-import {
-  buildSkeletonWidths,
-  type DataTableSurfaceColors,
-  ROWS_PER_PAGE,
-} from '@hooks/useDataTable';
 import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import {
   Button,
@@ -20,6 +15,11 @@ import { useEffect, useRef } from 'react';
 import type { DataTableColumn } from '../../../types/ui';
 import { DataTableBodyCell } from '../DataTableBodyCell/DataTableBodyCell';
 import { DataTableEmptyState } from '../DataTableEmptyState/DataTableEmptyState';
+import {
+  buildSkeletonWidths,
+  type DataTableSurfaceColors,
+  ROWS_PER_PAGE,
+} from '../useDataTable';
 
 export interface DataTableBodyProps<T> {
   columns: DataTableColumn<T>[];

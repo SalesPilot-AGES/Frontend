@@ -75,10 +75,7 @@ export const companyApi = {
     uuid: string,
     payload: TCompanyUpdatePayload
   ): Promise<TCompany> => {
-    const response = await apiClient.put(`/api/companies/${uuid}`, {
-      ...payload,
-      ...(payload.tax_id && { tax_id: payload.tax_id.replace(/\D/g, '') }),
-    });
+    const response = await apiClient.put(`/api/companies/${uuid}`, payload);
     return CompanySchema.parse(response.data);
   },
 };

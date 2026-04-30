@@ -12,10 +12,10 @@ import {
 import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
 
-import type { DataTableSurfaceColors } from '../../../hooks/useDataTable';
 import type { DataTableFilterOption } from '../../../types/ui';
+import type { DataTableSurfaceColors } from '../useDataTable';
 
-export interface DataTableToolbarProps {
+export interface IDataTableToolbarProps {
   toolbarTitle?: string;
   showSearch: boolean;
   searchValue?: string;
@@ -59,7 +59,7 @@ export const DataTableToolbar = ({
   companyFilterAriaLabel,
   surface,
   palette,
-}: DataTableToolbarProps): JSX.Element => {
+}: IDataTableToolbarProps): JSX.Element => {
   const pillControlSx: SxProps<Theme> = {
     flex: 1,
     minWidth: 0,

@@ -1,15 +1,15 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
-import { AdminCompaniesManagement } from '@pages/admin/CompaniesManagement/AdminCompaniesManagement';
-import { CompanyDetail } from '@pages/admin/CompaniesManagement/CompanyDetail/CompanyDetail';
-import { AdminManagersDetails } from '@pages/admin/ManagersManagement/AdminManagersDetails';
-import { AdminManagersManagement } from '@pages/admin/ManagersManagement/AdminManagersManagement';
-import { DashboardPage } from '@pages/DashboardPage';
-import { Layout } from '@pages/Layout';
+import { CompaniesPage } from '@pages/CompaniesPage/CompaniesPage';
+import { CompanyDetail } from '@pages/CompaniesPage/CompanyDetail/CompanyDetail';
+import { DashboardPage } from '@pages/DashboardPage/DashboardPage';
+import { Layout } from '@pages/Layout/Layout';
 import { Login } from '@pages/Login/Login';
-import { MeetingsPage } from '@pages/MeetingsPage';
+import { ManagersDetails } from '@pages/ManagersPage/ManagersDetails/ManagersDetails';
+import { ManagersPage } from '@pages/ManagersPage/ManagersPage';
+import { MeetingsPage } from '@pages/MeetingsPage/MeetingsPage';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
-import { RootComponent } from '@pages/RootComponent';
-import { SalesmenPage } from '@pages/SalesmenPage';
+import { RootComponent } from '@pages/RootComponent/RootComponent';
+import { SalesmenPage } from '@pages/SalesmenPage/SalesmenPage';
 import { useAuthStore } from '@store/authStore';
 import {
   createRootRoute,
@@ -53,7 +53,6 @@ const indexRoute = createRoute({
   },
 });
 
-// Layout route — no URL segment, wraps all authenticated pages
 const protectedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'protected',
@@ -67,7 +66,6 @@ const dashboardRoute = createRoute({
   component: DashboardPage,
 });
 
-// Admin-only group — no URL segment, adds role guard
 const adminGroupRoute = createRoute({
   getParentRoute: () => protectedRoute,
   id: 'admin',
@@ -77,7 +75,7 @@ const adminGroupRoute = createRoute({
 const companiesRoute = createRoute({
   getParentRoute: () => adminGroupRoute,
   path: EPageRoutes.COMPANIES,
-  component: AdminCompaniesManagement,
+  component: CompaniesPage,
 });
 
 const companyDetailRoute = createRoute({
@@ -89,13 +87,13 @@ const companyDetailRoute = createRoute({
 const managersRoute = createRoute({
   getParentRoute: () => adminGroupRoute,
   path: EPageRoutes.MANAGERS,
-  component: AdminManagersManagement,
+  component: ManagersPage,
 });
 
 const managerDetailRoute = createRoute({
   getParentRoute: () => adminGroupRoute,
   path: EPageRoutes.MANAGER_DETAIL,
-  component: AdminManagersDetails,
+  component: ManagersDetails,
 });
 
 const salesmenRoute = createRoute({

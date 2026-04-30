@@ -9,7 +9,7 @@ import apiClient from './apiClient';
 
 export type TMeetingFilters = {
   search?: string;
-  status?: string;
+  companies?: string;
 };
 
 export const meetingApi = {
@@ -27,7 +27,7 @@ export const meetingApi = {
         page,
         size,
         ...(filters?.search && { search: filters.search }),
-        ...(filters?.status && { status: filters.status }),
+        ...(filters?.companies && { companies: filters.companies }),
       },
     });
 

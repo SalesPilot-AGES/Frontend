@@ -9,6 +9,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { TMeetingListItem } from '@services/models/MeetingSchema';
+import { useGetCompanies } from '@services/queries/useCompanies';
 import { useGetMeetings } from '@services/queries/useMeetings';
 import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
@@ -26,12 +27,6 @@ const formatDuration = (minutes: number): string => {
   return `${minutes} min`;
 };
 
-const statusLabelMap: Record<string, string> = {
-  completed: 'Concluída',
-  scheduled: 'Agendada',
-  canceled: 'Cancelada',
-};
-
 export const AdminMeetingsManagement = (): JSX.Element => {
   const { palette } = useTheme();
   const navigate = useNavigate();
@@ -42,15 +37,37 @@ export const AdminMeetingsManagement = (): JSX.Element => {
   const filters = useMemo(
     () => ({
       ...(searchValue.trim() && { search: searchValue.trim() }),
-      ...(filterValue && { status: filterValue }),
+      ...(filterValue && { companies: filterValue }),
     }),
     [searchValue, filterValue]
   );
 
+  const { data: companiesPage } = useGetCompanies(0, 100);
   const { data, isLoading } = useGetMeetings(0, 20, filters);
 
-  const meetings = data?.content ?? [];
+  const meetings = useMemo(() => data?.content ?? [], [data?.content]);
   const summary = data?.summary;
+
+  const filteredMeetings = useMemo(() => {
+    if (!filterValue) {
+      return meetings;
+    }
+
+    return meetings.filter((meeting) => meeting.companyName === filterValue);
+  }, [meetings, filterValue]);
+
+  const companyFilterOptions = useMemo(() => {
+    const companyNames = Array.from(
+      new Set((companiesPage?.content ?? []).map((company) => company.name))
+    )
+      .filter((name) => name.trim().length > 0)
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+    return [
+      { label: 'Todas', value: '' },
+      ...companyNames.map((name) => ({ label: name, value: name })),
+    ];
+  }, [companiesPage]);
 
   const sentimentConfig = getSentimentConfig(summary?.success_rate);
 
@@ -120,15 +137,6 @@ export const AdminMeetingsManagement = (): JSX.Element => {
         </Stack>
       ),
     },
-    {
-      header: 'Status',
-      accessor: (row: TMeetingListItem) => row.status,
-      render: (value: ReactNode) => (
-        <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-          {typeof value === 'string' ? (statusLabelMap[value] ?? value) : '-'}
-        </Typography>
-      ),
-    },
   ];
 
   return (
@@ -167,7 +175,7 @@ export const AdminMeetingsManagement = (): JSX.Element => {
         </Box>
 
         <DataTable
-          data={meetings}
+          data={filteredMeetings}
           columns={columns}
           getRowId={(row: TMeetingListItem) => row.id}
           loading={isLoading}
@@ -185,14 +193,9 @@ export const AdminMeetingsManagement = (): JSX.Element => {
           toolbarTitle="Lista de reuniões"
           searchPlaceholder="Buscar reunião..."
           searchAriaLabel="Buscar reunião"
-          filterPlaceholder="Filtrar status"
-          filterAriaLabel="Filtrar reuniões por status"
-          filterOptions={[
-            { label: 'Todos', value: '' },
-            { label: 'Concluída', value: 'completed' },
-            { label: 'Agendada', value: 'scheduled' },
-            { label: 'Cancelada', value: 'canceled' },
-          ]}
+          filterPlaceholder="Filtrar empresa"
+          filterAriaLabel="Filtrar reuniões por empresa"
+          filterOptions={companyFilterOptions}
         />
       </Stack>
     </PageContainter>

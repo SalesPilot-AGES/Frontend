@@ -20,6 +20,7 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
       parser: tseslint.parser,
+      
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,

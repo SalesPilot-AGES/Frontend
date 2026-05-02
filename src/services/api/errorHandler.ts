@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import z, { ZodError } from 'zod';
+import { ZodError } from 'zod';
 
 export interface ApiError {
   message: string;
@@ -19,9 +19,8 @@ export const getErrorMessage = (error: unknown): string => {
   }
 
   if (error instanceof ZodError) {
-    const fieldErrors = z.treeifyError(error);
-    const errors = Object.entries(fieldErrors)
-      .map(([field, messages]) => `${field}: ${messages?.join(', ')}`)
+    const errors = error.issues
+      .map((issue) => `${issue.path.join('.') || 'root'}: ${issue.message}`)
       .join('; ');
     return errors || 'Validation error';
   }

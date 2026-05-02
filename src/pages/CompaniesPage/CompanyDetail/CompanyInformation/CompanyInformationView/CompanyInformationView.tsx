@@ -1,4 +1,3 @@
-import type { TPlan } from '@declarations/ui';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
@@ -6,13 +5,7 @@ import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import type { JSX, ReactNode } from 'react';
 
-export interface ICompanyInformationViewProps {
-  id: string;
-  name: string;
-  tax_id: string;
-  plan: TPlan;
-  active: boolean;
-}
+import type { CompanyInformationValues } from './types';
 
 export const CompanyInformationView = ({
   id,
@@ -20,7 +13,7 @@ export const CompanyInformationView = ({
   tax_id,
   plan,
   active,
-}: ICompanyInformationViewProps): JSX.Element => {
+}: CompanyInformationValues): JSX.Element => {
   const { palette } = useTheme();
   const labelColor = palette.neutrals[600];
   const valueColor = palette.neutrals[800];

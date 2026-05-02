@@ -9,19 +9,9 @@ import {
 import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
 import { type JSX } from 'react';
 
-export type TManagerEditForm = {
-  name: string;
-  companyId: string;
-  email: string;
-  active: boolean;
-};
+import type { TManagerCompanyOption, TManagerEditForm } from './types';
 
-export type TManagerCompanyOption = {
-  id: string;
-  name: string;
-};
-
-type IManagerEditFormProps = {
+type IManagerInformationEditProps = {
   managerId: string;
   editForm: TManagerEditForm;
   isCompanyValid: boolean;
@@ -33,24 +23,18 @@ type IManagerEditFormProps = {
   onStatusChange: (checked: boolean) => void;
 };
 
-export const ManagerEditForm = ({
+export const ManagerInformationEdit = ({
   managerId,
   editForm,
   isCompanyValid,
   companyOptions,
   onFieldChange,
   onStatusChange,
-}: IManagerEditFormProps): JSX.Element => {
+}: IManagerInformationEditProps): JSX.Element => {
   const { palette } = useTheme();
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1.5rem',
-      }}
-    >
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <ItemDetail label="ID do usuário" value={managerId} />
 
       <Box
@@ -60,41 +44,25 @@ export const ManagerEditForm = ({
           gap: '1.5rem 2rem',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-          }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             Nome do usuario
           </Typography>
           <TextField
             value={editForm.name}
-            onChange={(event) => {
-              onFieldChange('name', event.target.value);
-            }}
+            onChange={(e) => onFieldChange('name', e.target.value)}
             fullWidth
           />
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-          }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             Empresa
           </Typography>
           <TextField
             select
             value={editForm.companyId}
-            onChange={(event) => {
-              onFieldChange('companyId', event.target.value);
-            }}
+            onChange={(e) => onFieldChange('companyId', e.target.value)}
             fullWidth
             error={!isCompanyValid && editForm.companyId === ''}
             helperText={
@@ -112,32 +80,18 @@ export const ManagerEditForm = ({
           </TextField>
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-          }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             Email de acesso
           </Typography>
           <TextField
             value={editForm.email}
-            onChange={(event) => {
-              onFieldChange('email', event.target.value);
-            }}
+            onChange={(e) => onFieldChange('email', e.target.value)}
             fullWidth
           />
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-          }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
             Status
           </Typography>
@@ -154,9 +108,7 @@ export const ManagerEditForm = ({
             </Typography>
             <Switch
               checked={editForm.active}
-              onChange={(event) => {
-                onStatusChange(event.target.checked);
-              }}
+              onChange={(e) => onStatusChange(e.target.checked)}
               sx={{
                 '& .MuiSwitch-switchBase.Mui-checked': {
                   color: palette.success[400],

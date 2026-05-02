@@ -6,9 +6,9 @@ import { useMemo, useState } from 'react';
 import type {
   TManagerCompanyOption,
   TManagerEditForm,
-} from './ManagerEditForm/ManagerEditForm';
+} from './ManagerInformationEdit/types';
 
-export type UseManagersDetailsResult = {
+export type UseManagerInformationResult = {
   companyOptions: TManagerCompanyOption[];
   isCompanyValid: boolean;
   isEditFormValid: boolean;
@@ -32,9 +32,9 @@ const createEditForm = (manager: TManager): TManagerEditForm => ({
   active: manager.active,
 });
 
-export const useManagersDetails = (
+export const useManagerInformation = (
   manager: TManager | null
-): UseManagersDetailsResult => {
+): UseManagerInformationResult => {
   const { data: companiesResponse } = useGetCompanies(0, 200);
   const updateManagerMutation = useUpdateManager();
 
@@ -90,11 +90,7 @@ export const useManagersDetails = (
           company_id: editForm.companyId,
         },
       },
-      {
-        onSuccess: () => {
-          setIsEditing(false);
-        },
-      }
+      { onSuccess: () => setIsEditing(false) }
     );
   };
 

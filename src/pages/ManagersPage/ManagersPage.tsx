@@ -31,7 +31,10 @@ export const ManagersPage = (): JSX.Element => {
   const [filterValue, setFilterValue] = useState('');
 
   const { data: managersData, isLoading } = useGetManagers(0, 20, {});
-  const managers = managersData?.content ?? [];
+  const managers = useMemo(
+    () => managersData?.content ?? [],
+    [managersData?.content]
+  );
 
   const filteredManagers = useMemo(() => {
     const query = searchValue.trim().toLowerCase();

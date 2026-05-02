@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
-import type { CompanyInformationValues } from '@pages/CompaniesPage/CompanyDetail/CompanyInformation/CompanyInformationView/types';
 import {
   CompanyUpdatePayloadSchema,
   type TCompanyUpdatePayload,
@@ -15,13 +14,15 @@ import {
   type UseFormHandleSubmit,
 } from 'react-hook-form';
 
-export interface UseCompanyInformationEditFormParams {
+import type { CompanyInformationValues } from '../CompanyInformationView/types';
+
+export interface UseCompanyInformationEditParams {
   draft: CompanyInformationValues;
   setDraft: Dispatch<SetStateAction<CompanyInformationValues>>;
   onSaveSuccess?: () => void;
 }
 
-export interface UseCompanyInformationEditFormResult {
+export interface UseCompanyInformationEditResult {
   palette: Theme['palette'];
   control: Control<TCompanyUpdatePayload>;
   handleSubmit: UseFormHandleSubmit<
@@ -35,11 +36,11 @@ export interface UseCompanyInformationEditFormResult {
   valueColor: string;
 }
 
-export const useCompanyInformationEditForm = ({
+export const useCompanyInformationEdit = ({
   draft,
   setDraft,
   onSaveSuccess,
-}: UseCompanyInformationEditFormParams): UseCompanyInformationEditFormResult => {
+}: UseCompanyInformationEditParams): UseCompanyInformationEditResult => {
   const { palette } = useTheme();
   const labelColor = palette.neutrals[600];
   const valueColor = palette.neutrals[800];

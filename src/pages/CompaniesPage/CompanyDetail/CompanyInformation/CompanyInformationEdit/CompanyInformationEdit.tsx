@@ -1,9 +1,9 @@
 import { Button, Paper, Stack, Typography } from '@mui/material';
-import { useCompanyInformationEditForm } from '@pages/CompaniesPage/hooks/useCompanyInformationEditForm';
 import type { Dispatch, JSX, SetStateAction } from 'react';
 
 import type { CompanyInformationValues } from '../CompanyInformationView/types';
 import { CompanyInformationEditFields } from './CompanyInformationEditFields/CompanyInformationEditFields';
+import { useCompanyInformationEdit } from './useCompanyInformationEdit';
 
 export interface CompanyInformationEditProps {
   draft: CompanyInformationValues;
@@ -27,7 +27,7 @@ export const CompanyInformationEdit = ({
     isSubmitting,
     labelColor,
     valueColor,
-  } = useCompanyInformationEditForm({
+  } = useCompanyInformationEdit({
     draft,
     setDraft,
     onSaveSuccess,

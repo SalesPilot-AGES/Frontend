@@ -176,7 +176,11 @@ export const AddCompanyModal = ({
                 value={field.value}
                 onChange={(_, value) => field.onChange(value)}
               >
-                <Stack spacing={1} flexDirection={{ xs: 'column', md: 'row' }}>
+                <Stack
+                  flexDirection={{ xs: 'column', md: 'row' }}
+                  alignItems="center"
+                  sx={{ gap: 1 }}
+                >
                   {PLAN_API_CODES.map((planOption) => (
                     <FormControlLabel
                       key={planOption}

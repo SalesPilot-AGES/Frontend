@@ -14,7 +14,6 @@ import { Link, useParams } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { pickCompanyValues } from '@utils/pickCompanyValues';
-import { planApiToUiLabel } from '@utils/planMapping';
 import type { SetStateAction } from 'react';
 import { type JSX } from 'react';
 import React from 'react';
@@ -144,11 +143,7 @@ export const CompanyDetail = (): JSX.Element => {
           <Typography>Carregando informações da empresa...</Typography>
         ) : company && !editMode ? (
           <CompanyInformation
-            id={String(company.id)}
-            name={company.name}
-            cnpj={company.tax_id}
-            plan={planApiToUiLabel[company.plan]}
-            active={company.active}
+            viewValues={draft ?? pickCompanyValues(company)}
             onEdit={() => setEditMode(true)}
           />
         ) : company ? (

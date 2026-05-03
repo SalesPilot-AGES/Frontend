@@ -1,131 +1,134 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { AdminCompaniesManagement } from '@pages/admin/CompaniesManagement/AdminCompaniesManagement';
 import { CompanyDetail } from '@pages/admin/CompaniesManagement/CompanyDetail/CompanyDetail';
-import { AdminDashboard } from '@pages/admin/Dashboard/AdminDashboard';
 import { AdminManagersDetails } from '@pages/admin/ManagersManagement/AdminManagersDetails';
 import { AdminManagersManagement } from '@pages/admin/ManagersManagement/AdminManagersManagement';
-import { AdminMeetingsManagement } from '@pages/admin/MeetingsManagement/AdminMeetingsManagement';
-import { AdminSalesmenManagement } from '@pages/admin/SalesmenManagement/AdminSalesmenManagement';
+import { DashboardPage } from '@pages/DashboardPage';
+import { Layout } from '@pages/Layout';
 import { Login } from '@pages/Login/Login';
-import { ManagerDashboard } from '@pages/manager/Dashboard/ManagerDashboard';
-import { ManagerMeetingsManagement } from '@pages/manager/MeetingsManagement/ManagerMeetingsManagement';
-import { ManagerSalesmenManagement } from '@pages/manager/SalesmenManagement/ManagerSalesmenManagement';
+import { MeetingsPage } from '@pages/MeetingsPage';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { RootComponent } from '@pages/RootComponent';
-import { SalesmanDashboard } from '@pages/salesman/Dashboard/SalesmanDashboard';
-import { SalesmanMeetingsManagement } from '@pages/salesman/MeetingsManagement/SalesmanMeetingsManagement';
-import { createRootRoute, createRoute, Router } from '@tanstack/react-router';
+import { SalesmenPage } from '@pages/SalesmenPage';
+import { useAuthStore } from '@store/authStore';
+import {
+  createRootRoute,
+  createRoute,
+  redirect,
+  Router,
+} from '@tanstack/react-router';
+
+const requireAuth = (): void => {
+  const user = useAuthStore.getState().user;
+  if (!user) throw redirect({ to: EPageRoutes.LOGIN });
+};
+
+const requireAdmin = (): void => {
+  const user = useAuthStore.getState().user;
+  if (user?.role !== 'admin') throw redirect({ to: EPageRoutes.DASHBOARD });
+};
+
+const requireAdminOrManager = (): void => {
+  const user = useAuthStore.getState().user;
+  if (user?.role === 'salesmen') throw redirect({ to: EPageRoutes.DASHBOARD });
+};
 
 const rootRoute = createRootRoute({
   component: RootComponent,
   notFoundComponent: PageNotFound,
 });
 
-// Login route (no layout)
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: EPageRoutes.LOGIN,
   component: Login,
 });
 
-// Admin Routes
-const adminDashboardRoute = createRoute({
+const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: EPageRoutes.ADMIN_DASHBOARD,
-  component: AdminDashboard,
+  path: '/',
+  beforeLoad: () => {
+    const user = useAuthStore.getState().user;
+    throw redirect({ to: user ? EPageRoutes.DASHBOARD : EPageRoutes.LOGIN });
+  },
 });
 
-const companiesManagementRoute = createRoute({
+// Layout route — no URL segment, wraps all authenticated pages
+const protectedRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: EPageRoutes.ADMIN_COMPANIES,
+  id: 'protected',
+  component: Layout,
+  beforeLoad: requireAuth,
+});
+
+const dashboardRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: EPageRoutes.DASHBOARD,
+  component: DashboardPage,
+});
+
+// Admin-only group — no URL segment, adds role guard
+const adminGroupRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  id: 'admin',
+  beforeLoad: requireAdmin,
+});
+
+const companiesRoute = createRoute({
+  getParentRoute: () => adminGroupRoute,
+  path: EPageRoutes.COMPANIES,
   component: AdminCompaniesManagement,
 });
 
 const companyDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.ADMIN_COMPANY_DETAIL,
+  getParentRoute: () => adminGroupRoute,
+  path: EPageRoutes.COMPANY_DETAIL,
   component: CompanyDetail,
 });
 
-const managersManagementRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.ADMIN_MANAGERS,
+const managersRoute = createRoute({
+  getParentRoute: () => adminGroupRoute,
+  path: EPageRoutes.MANAGERS,
   component: AdminManagersManagement,
 });
 
-const managerDetailsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.ADMIN_MANAGERS_DETAILS,
+const managerDetailRoute = createRoute({
+  getParentRoute: () => adminGroupRoute,
+  path: EPageRoutes.MANAGER_DETAIL,
   component: AdminManagersDetails,
 });
 
-const adminSalesmenRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.ADMIN_SALESMEN,
-  component: AdminSalesmenManagement,
+const salesmenRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: EPageRoutes.SALESMEN,
+  component: SalesmenPage,
+  beforeLoad: requireAdminOrManager,
 });
 
-const adminMeetingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.ADMIN_MEETINGS,
-  component: AdminMeetingsManagement,
+const meetingsRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: EPageRoutes.MEETINGS,
+  component: MeetingsPage,
 });
 
-// Manager Routes
-const managerDashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.MANAGER_DASHBOARD,
-  component: ManagerDashboard,
-});
-
-const managerSalesmenRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.MANAGER_SALESMEN,
-  component: ManagerSalesmenManagement,
-});
-
-const managerMeetingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.MANAGER_MEETINGS,
-  component: ManagerMeetingsManagement,
-});
-
-// Salesmen Routes
-const salesmenDashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.SALESMAN_DASHBOARD,
-  component: SalesmanDashboard,
-});
-
-const salesmenMeetingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: EPageRoutes.SALESMAN_MEETINGS,
-  component: SalesmanMeetingsManagement,
-});
-
-// Create route tree with all routes
 const routeTree = rootRoute.addChildren([
+  indexRoute,
   loginRoute,
-  // Admin Routes
-  adminDashboardRoute,
-  companiesManagementRoute,
-  companyDetailRoute,
-  managersManagementRoute,
-  managerDetailsRoute,
-  adminSalesmenRoute,
-  adminMeetingsRoute,
-  // Manager Routes
-  managerDashboardRoute,
-  managerSalesmenRoute,
-  managerMeetingsRoute,
-  // Salesmen Routes
-  salesmenDashboardRoute,
-  salesmenMeetingsRoute,
+  protectedRoute.addChildren([
+    dashboardRoute,
+    adminGroupRoute.addChildren([
+      companiesRoute,
+      companyDetailRoute,
+      managersRoute,
+      managerDetailRoute,
+    ]),
+    salesmenRoute,
+    meetingsRoute,
+  ]),
 ]);
 
 export const router = new Router({ routeTree });
 
-// Register router for type safety
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;

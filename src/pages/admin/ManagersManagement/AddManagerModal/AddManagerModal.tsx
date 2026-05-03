@@ -6,10 +6,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import type { Company } from '@services/models/CompanySchema';
+import { getApiError } from '@services/api/errorHandler';
+import type { TCompany } from '@services/models/CompanySchema';
 import {
-  CreateManagerSchema,
-  type TCreateManager,
+  ManagerCreatePayloadSchema,
+  type TManagerCreatePayload,
 } from '@services/models/ManagerSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
 import { useCreateManager } from '@services/queries/useManagers';
@@ -30,21 +31,27 @@ export const AddManagerModal = ({
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
-  } = useForm<TCreateManager>({
-    resolver: zodResolver(CreateManagerSchema),
+    setError,
+    clearErrors,
+  } = useForm<TManagerCreatePayload>({
+    resolver: zodResolver(ManagerCreatePayloadSchema),
+    mode: 'onChange',
     defaultValues: {
       name: '',
-      companyId: '',
+      company_id: '',
       email: '',
       active: true,
-      preferences: {},
+      preferences: {
+        theme: 'light',
+        default_model: 'gpt-4o',
+      },
     },
   });
 
   const { data: companiesPage } = useGetCompanies();
-  const companyOptions: Company[] = companiesPage?.content ?? [];
+  const companyOptions: TCompany[] = companiesPage?.content ?? [];
 
   useEffect(() => {
     if (!open) {
@@ -52,14 +59,27 @@ export const AddManagerModal = ({
     }
   }, [open, reset]);
 
-  const { mutate: createManager } = useCreateManager();
+  const { mutate: createManager, isPending } = useCreateManager({
+    onSuccess: () => {
+      handleClose();
+    },
+    onError: (error) => {
+      const apiError = getApiError(error);
+      const fallbackMessage =
+        apiError.status === 409
+          ? 'Já existe um gestor com este e-mail nesta empresa.'
+          : 'Não foi possível criar o gestor. Tente novamente.';
 
-  const onSubmit = (data: TCreateManager): void => {
-    createManager(data, {
-      onSuccess: () => {
-        handleClose();
-      },
-    });
+      setError('root', {
+        type: 'server',
+        message: apiError.message || fallbackMessage,
+      });
+    },
+  });
+
+  const onSubmit = (data: TManagerCreatePayload): void => {
+    clearErrors('root');
+    createManager(data);
   };
 
   return (
@@ -67,6 +87,7 @@ export const AddManagerModal = ({
       modalName="Adicionar gerente"
       open={open}
       handleClose={handleClose}
+      isSaveButtonDisabled={!isValid || isPending}
       handleSubmit={handleSubmit(onSubmit)}
     >
       <Box
@@ -104,10 +125,10 @@ export const AddManagerModal = ({
             Empresa
           </Typography>
           <Controller
-            name="companyId"
+            name="company_id"
             control={control}
             render={({ field }) => (
-              <Autocomplete<Company, false, false, false>
+              <Autocomplete<TCompany, false, false, false>
                 disablePortal
                 options={companyOptions}
                 getOptionLabel={(option) => option.name}
@@ -122,9 +143,9 @@ export const AddManagerModal = ({
                     {...params}
                     name={field.name}
                     inputRef={field.ref}
-                    error={!!errors.companyId}
+                    error={!!errors.company_id}
                     helperText={
-                      errors.companyId?.message ??
+                      errors.company_id?.message ??
                       (companyOptions.length === 0
                         ? 'Nenhuma empresa disponível para vincular.'
                         : undefined)
@@ -194,6 +215,14 @@ export const AddManagerModal = ({
             )}
           />
         </Box>
+
+        {errors.root?.message ? (
+          <Box sx={{ gridColumn: '1 / -1' }}>
+            <Typography variant="body2" color="error.main">
+              {errors.root.message}
+            </Typography>
+          </Box>
+        ) : null}
       </Box>
     </AppModal>
   );

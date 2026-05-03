@@ -1,8 +1,16 @@
-import type { IIconBoxProps } from '@declarations';
-import { useColorTheme } from '@hooks/useColorTheme';
+import type { TColorThemeOptions } from '@declarations/hooks';
+import type { TIconName } from '@declarations/ui';
+import type { SxProps } from '@mui/material';
 import { Box } from '@mui/material';
+import { useColorTheme } from '@theme/hooks/useColorTheme';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
+
+export interface IIconBoxProps {
+  iconName: TIconName;
+  theme?: TColorThemeOptions;
+  sx?: SxProps;
+}
 
 export const IconBox = ({
   iconName,

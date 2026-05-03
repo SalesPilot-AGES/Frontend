@@ -1,9 +1,4 @@
 import {
-  type DataTableSurfaceColors,
-  formatHeaderMultiline,
-  iconTupleToCss,
-} from '@hooks/useDataTable';
-import {
   Box,
   Stack,
   TableCell,
@@ -15,8 +10,13 @@ import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
 
 import type { DataTableColumn } from '../../../types/ui';
+import {
+  type DataTableSurfaceColors,
+  formatHeaderMultiline,
+  iconTupleToCss,
+} from '../useDataTable';
 
-export interface DataTableHeadProps<T> {
+export interface IDataTableHeadProps<T> {
   columns: DataTableColumn<T>[];
   surface: DataTableSurfaceColors;
   palette: Palette;
@@ -26,7 +26,7 @@ export const DataTableHead = <T,>({
   columns,
   surface,
   palette,
-}: DataTableHeadProps<T>): JSX.Element => {
+}: IDataTableHeadProps<T>): JSX.Element => {
   const headerCellSx = {
     backgroundColor: surface.headerBg,
     borderBottom: `1px solid ${surface.divider}`,

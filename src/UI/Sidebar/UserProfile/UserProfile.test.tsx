@@ -12,7 +12,7 @@ vi.mock('@store/hooks/useCurrentUser', () => ({
   })),
 }));
 
-vi.mock('./UseUserProfile', () => ({
+vi.mock('./useUserProfile', () => ({
   useUserProfile: vi.fn(() => ({
     handleLogout: vi.fn(),
   })),

@@ -1,4 +1,3 @@
-import { useDataTable } from '@hooks/useDataTable';
 import { Paper, Table, TableContainer } from '@mui/material';
 import type { JSX } from 'react';
 
@@ -6,6 +5,7 @@ import type { DataTableProps } from '../../types/ui';
 import { DataTableBody } from './DataTableBody/DataTableBody';
 import { DataTableHead } from './DataTableHead/DataTableHead';
 import { DataTableToolbar } from './DataTableToolbar/DataTableToolbar';
+import { useDataTable } from './useDataTable';
 
 export const DataTable = <T,>({
   columns,

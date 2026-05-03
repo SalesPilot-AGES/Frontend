@@ -1,9 +1,15 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
-import type { MenuItem } from '@declarations';
 import type { UserRole } from '@store/authStore';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
+import type { JSX } from 'react';
 
-export const getMenuItems = (userRole: UserRole): MenuItem[] => {
+export interface IMenuItem {
+  label: string;
+  path: string;
+  icon: JSX.Element;
+}
+
+export const getMenuItems = (userRole: UserRole): IMenuItem[] => {
   switch (userRole) {
     case 'admin':
       return [

@@ -3,7 +3,7 @@ import { useCurrentUser } from '@store/hooks/useCurrentUser';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
-import { useUserProfile } from './UseUserProfile';
+import { useUserProfile } from './useUserProfile';
 
 export const UserProfile = (): JSX.Element | null => {
   const { handleLogout } = useUserProfile();

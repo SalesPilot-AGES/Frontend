@@ -31,6 +31,26 @@ export const useColorTheme = (
         color: palette.meetings[500],
         backgroundColor: palette.meetings[200],
       };
+    case 'success':
+      return {
+        color: palette.success[300],
+        backgroundColor: palette.success[100],
+      };
+    case 'warning':
+      return {
+        color: palette.warning[400],
+        backgroundColor: palette.warning[100],
+      };
+    case 'error':
+      return {
+        color: palette.error[300],
+        backgroundColor: palette.error[100],
+      };
+    case 'info':
+      return {
+        color: palette.info[500],
+        backgroundColor: palette.info[100],
+      };
     case 'neutrals':
       return {
         color: palette.neutrals[400],

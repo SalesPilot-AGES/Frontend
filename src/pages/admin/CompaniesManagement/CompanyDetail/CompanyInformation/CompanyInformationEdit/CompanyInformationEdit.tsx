@@ -1,5 +1,5 @@
 import { Button, Paper, Stack, Typography } from '@mui/material';
-import { useCompanyInformationEditForm } from '@store/hooks/useCompanyInformationEditForm';
+import { useCompanyInformationEditForm } from '@store/hooks/useAdminCompaniesDetailsEdit';
 import type { Dispatch, JSX, SetStateAction } from 'react';
 
 import type { CompanyInformationValues } from '../CompanyInformationView/types';

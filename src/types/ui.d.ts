@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 
 export type TIconName =
   | 'logo'
+  | 'clock'
   | 'dashboard'
   | 'company'
   | 'manager'
@@ -15,7 +16,10 @@ export type TIconName =
   | 'login'
   | 'logout'
   | 'close'
-  | 'save';
+  | 'save'
+  | 'sentimentSad'
+  | 'sentimentNeutral'
+  | 'sentimentHappy';
 
 export type TStatus = (typeof EStatus)[keyof typeof EStatus];
 export type TPlan = (typeof EPlan)[keyof typeof EPlan];
@@ -80,3 +84,9 @@ export interface DataTableProps<T> {
 }
 
 export type BadgeLook = { backgroundColor: string; color: string };
+
+export interface ISentimentConfig {
+  level: TSentimentLevel;
+  iconName: TIconName;
+  theme: TColorThemeOptions;
+}

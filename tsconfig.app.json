@@ -31,8 +31,7 @@
       "@tests/*": ["src/tests/*"],
       "@utils/*": ["src/utils/*"],
       "@theme/*": ["src/theme/*"],
-      "@UI/*": ["src/UI/*"],
-      "@utils/*": ["src/utils/*"]
+      "@UI/*": ["src/UI/*"]
     },
 
     /* Linting */

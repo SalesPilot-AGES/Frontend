@@ -2,8 +2,7 @@ import type {
   TManagerCompanyOption,
   TManagerEditForm,
 } from '@pages/admin/ManagersManagement/ManagerEditForm';
-import { buildAdminManagerDetailsUpdatePayload } from '@services/api/manager';
-import type { TManagerWithCompany } from '@services/models/ManagerSchema';
+import type { TManager } from '@services/models/ManagerSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
 import { useUpdateManager } from '@services/queries/useManagers';
 import { useMemo, useState } from 'react';
@@ -25,15 +24,15 @@ export type UseAdminManagersDetailsEditResult = {
   handleStatusChange: (checked: boolean) => void;
 };
 
-const createEditForm = (manager: TManagerWithCompany): TManagerEditForm => ({
+const createEditForm = (manager: TManager): TManagerEditForm => ({
   name: manager.name,
-  companyId: manager.company.id,
+  companyId: manager.company_id,
   email: manager.email,
   active: manager.active,
 });
 
 export const useAdminManagersDetailsEdit = (
-  manager: TManagerWithCompany | null
+  manager: TManager | null
 ): UseAdminManagersDetailsEditResult => {
   const { data: companiesResponse } = useGetCompanies(0, 200);
   const updateManagerMutation = useUpdateManager();
@@ -44,11 +43,11 @@ export const useAdminManagersDetailsEdit = (
         id: companyItem.id,
         name: companyItem.name,
       })) ?? [];
-    if (manager && !fromApi.some((row) => row.id === manager.company.id)) {
-      return [
-        { id: manager.company.id, name: manager.company.name },
-        ...fromApi,
-      ];
+    if (manager && !fromApi.some((row) => row.id === manager.company_id)) {
+      const companyName =
+        fromApi.find((row) => row.id === manager.company_id)?.name ??
+        'Unknown Company';
+      return [{ id: manager.company_id, name: companyName }, ...fromApi];
     }
     return fromApi;
   }, [companiesResponse, manager]);
@@ -88,15 +87,20 @@ export const useAdminManagersDetailsEdit = (
       return;
     }
 
-    const data = buildAdminManagerDetailsUpdatePayload(manager, {
-      name: editForm.name,
-      email: editForm.email,
-      active: editForm.active,
-      companyId: editForm.companyId,
-    });
-
     updateManagerMutation.mutate(
-      { id: manager.id, data },
+      {
+        uuid: manager.id,
+        data: {
+          name: editForm.name,
+          email: editForm.email,
+          company_id: editForm.companyId,
+          active: editForm.active,
+          preferences: manager.preferences ?? {
+            theme: 'light',
+            default_model: 'gpt-3.5-turbo',
+          },
+        },
+      },
       {
         onSuccess: () => {
           setIsEditing(false);

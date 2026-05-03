@@ -14,9 +14,10 @@ import {
   PLAN_API_CODES,
   planApiToUiLabel,
 } from '@pages/admin/CompaniesManagement/planMapping';
+import { getApiError } from '@services/api/errorHandler';
 import {
-  type CompanyCreateInput,
-  CompanyCreateInputSchema,
+  CompanyCreatePayloadSchema,
+  type TCompanyCreatePayload,
 } from '@services/models/CompanySchema';
 import { useCreateCompany } from '@services/queries/useCompanies';
 import AppModal from '@UI/AppModal/AppModal';
@@ -35,18 +36,21 @@ export const AddCompanyModal = ({
   handleClose,
 }: IAddCompanyModalProps): JSX.Element => {
   const {
+    clearErrors,
     control,
     handleSubmit,
     formState: { errors, isValid },
     reset,
-  } = useForm<CompanyCreateInput>({
-    resolver: zodResolver(CompanyCreateInputSchema),
+    setError,
+  } = useForm<TCompanyCreatePayload>({
+    resolver: zodResolver(CompanyCreatePayloadSchema),
     defaultValues: {
       name: '',
       tax_id: '',
       plan: 'BASIC',
       active: true,
     },
+    mode: 'onChange',
   });
 
   useEffect(() => {
@@ -55,11 +59,27 @@ export const AddCompanyModal = ({
     }
   }, [open, reset]);
 
-  const { mutate: createCompany } = useCreateCompany();
+  const { mutate: createCompany, isPending } = useCreateCompany({
+    onSuccess: () => {
+      handleClose();
+    },
+    onError: (error) => {
+      const apiError = getApiError(error);
+      const fallbackMessage =
+        apiError.status === 500
+          ? 'Erro interno no servidor ao criar a empresa. Tente novamente e verifique os logs da API.'
+          : 'Nao foi possivel criar a empresa. Tente novamente.';
 
-  const onSubmit = (data: CompanyCreateInput): void => {
+      setError('root', {
+        type: 'server',
+        message: apiError.message || fallbackMessage,
+      });
+    },
+  });
+
+  const onSubmit = (data: TCompanyCreatePayload): void => {
+    clearErrors('root');
     createCompany(data);
-    handleClose();
   };
 
   return (
@@ -67,7 +87,7 @@ export const AddCompanyModal = ({
       modalName="Adicionar empresa"
       open={open}
       handleClose={handleClose}
-      isSaveButtonDisabled={!isValid}
+      isSaveButtonDisabled={!isValid || isPending}
       handleSubmit={handleSubmit(onSubmit)}
     >
       <Box
@@ -106,23 +126,46 @@ export const AddCompanyModal = ({
           <Controller
             name="tax_id"
             control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                type="text"
-                error={!!errors.tax_id}
-                helperText={errors.tax_id?.message}
-                onChange={(e) =>
-                  field.onChange(formatCnpjInput(e.target.value))
-                }
-                slotProps={{
-                  htmlInput: {
-                    maxLength: 18,
-                  },
-                }}
-              />
-            )}
+            render={({ field }) => {
+              const taxIdDigitsCount = field.value.replace(/\D/g, '').length;
+              const isTaxIdIncomplete = taxIdDigitsCount < 14;
+              const isManualTaxIdError = errors.tax_id?.type === 'manual';
+              const showSchemaTaxIdError =
+                !!errors.tax_id && !isManualTaxIdError && !isTaxIdIncomplete;
+
+              return (
+                <TextField
+                  {...field}
+                  fullWidth
+                  type="text"
+                  error={isManualTaxIdError || showSchemaTaxIdError}
+                  helperText={
+                    isManualTaxIdError || showSchemaTaxIdError
+                      ? errors.tax_id?.message
+                      : undefined
+                  }
+                  onChange={(e) => {
+                    const nextValue = e.target.value;
+
+                    if (/[A-Za-z]/.test(nextValue)) {
+                      setError('tax_id', {
+                        type: 'manual',
+                        message: 'Apenas numeros aceitos.',
+                      });
+                      return;
+                    }
+
+                    clearErrors('tax_id');
+                    field.onChange(formatCnpjInput(nextValue));
+                  }}
+                  slotProps={{
+                    htmlInput: {
+                      maxLength: 18,
+                    },
+                  }}
+                />
+              );
+            }}
           />
         </Box>
 
@@ -155,10 +198,8 @@ export const AddCompanyModal = ({
                       backgroundColor: '#2E7D32',
                     },
                   }}
-                  slotProps={{
-                    input: {
-                      'aria-label': 'status da empresa',
-                    },
+                  inputProps={{
+                    'aria-label': 'status da empresa',
                   }}
                 />
               </Box>
@@ -199,6 +240,13 @@ export const AddCompanyModal = ({
             )}
           />
         </Stack>
+        {errors.root?.message ? (
+          <Box sx={{ gridColumn: { xs: '1 / -1', md: '1 / -1' } }}>
+            <Typography variant="body2" color="error.main">
+              {errors.root.message}
+            </Typography>
+          </Box>
+        ) : null}
       </Box>
     </AppModal>
   );

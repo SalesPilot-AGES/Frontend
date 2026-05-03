@@ -1,8 +1,8 @@
 import { EPlan } from '@data/enums/EPlan';
 import type { TPlan } from '@declarations/ui';
-import type { Company } from '@services/models/CompanySchema';
+import type { TCompany } from '@services/models/CompanySchema';
 
-export type CompanyPlanCode = Company['plan'];
+export type CompanyPlanCode = TCompany['plan'];
 
 export const PLAN_API_CODES: readonly CompanyPlanCode[] = [
   'BASIC',

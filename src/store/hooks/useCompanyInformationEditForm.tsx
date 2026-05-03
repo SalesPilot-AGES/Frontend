@@ -7,8 +7,8 @@ import {
   planUiLabelToApi,
 } from '@pages/admin/CompaniesManagement/planMapping';
 import {
-  type CompanyUpdateInput,
-  CompanyUpdateInputSchema,
+  CompanyUpdatePayloadSchema,
+  type TCompanyUpdatePayload,
 } from '@services/models/CompanySchema';
 import { useUpdateCompany } from '@services/queries/useCompanies';
 import type { Dispatch, JSX, ReactNode, SetStateAction } from 'react';
@@ -26,9 +26,12 @@ export interface UseCompanyInformationEditFormParams {
 
 export interface UseCompanyInformationEditFormResult {
   palette: Theme['palette'];
-  control: Control<CompanyUpdateInput>;
-  handleSubmit: UseFormHandleSubmit<CompanyUpdateInput, CompanyUpdateInput>;
-  onSubmit: (values: CompanyUpdateInput) => Promise<void>;
+  control: Control<TCompanyUpdatePayload>;
+  handleSubmit: UseFormHandleSubmit<
+    TCompanyUpdatePayload,
+    TCompanyUpdatePayload
+  >;
+  onSubmit: (values: TCompanyUpdatePayload) => Promise<void>;
   isValid: boolean;
   isSubmitting: boolean;
   labelColor: string;
@@ -49,11 +52,10 @@ export const useCompanyInformationEditForm = ({
     control,
     handleSubmit,
     formState: { isValid, isSubmitting },
-  } = useForm<CompanyUpdateInput>({
-    resolver: zodResolver(CompanyUpdateInputSchema),
+  } = useForm<TCompanyUpdatePayload>({
+    resolver: zodResolver(CompanyUpdatePayloadSchema),
     defaultValues: {
       name: draft.name,
-      tax_id: draft.tax_id,
       plan: planUiLabelToApi[draft.plan],
       active: draft.active,
     },
@@ -61,7 +63,7 @@ export const useCompanyInformationEditForm = ({
 
   const { mutateAsync: updateCompany } = useUpdateCompany();
 
-  const onSubmit = async (values: CompanyUpdateInput): Promise<void> => {
+  const onSubmit = async (values: TCompanyUpdatePayload): Promise<void> => {
     await updateCompany({
       uuid: draft.id,
       data: {

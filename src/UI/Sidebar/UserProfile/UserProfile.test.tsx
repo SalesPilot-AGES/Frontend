@@ -5,7 +5,7 @@ import { UserProfile } from './UserProfile';
 
 // Mock the hooks
 vi.mock('@store/hooks/useCurrentUser', () => ({
-  useRequireUser: vi.fn(() => ({
+  useCurrentUser: vi.fn(() => ({
     name: 'John Doe',
     email: 'john.doe@example.com',
     role: 'admin',

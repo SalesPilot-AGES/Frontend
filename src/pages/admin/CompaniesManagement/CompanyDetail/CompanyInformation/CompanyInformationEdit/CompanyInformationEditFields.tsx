@@ -1,5 +1,4 @@
 import { EStatus } from '@data/enums/EStatus';
-import { formatCnpjInput } from '@hooks/formatCnpjInput';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import {
@@ -18,7 +17,7 @@ import {
   PLAN_API_CODES,
   planApiToUiLabel,
 } from '@pages/admin/CompaniesManagement/planMapping';
-import type { CompanyUpdateInput } from '@services/models/CompanySchema';
+import type { TCompanyUpdatePayload } from '@services/models/CompanySchema';
 import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import type { Dispatch, JSX, ReactNode, SetStateAction } from 'react';
 import { type Control, Controller } from 'react-hook-form';
@@ -28,7 +27,7 @@ import type { CompanyInformationValues } from '../CompanyInformationView/types';
 export interface CompanyInformationEditFieldsProps {
   draft: CompanyInformationValues;
   setDraft: Dispatch<SetStateAction<CompanyInformationValues>>;
-  control: Control<CompanyUpdateInput>;
+  control: Control<TCompanyUpdatePayload>;
   labelColor: string;
   valueColor: string;
   palette: Palette;
@@ -76,34 +75,7 @@ export const CompanyInformationEditFields = ({
           )}
         />
       </Stack>
-      <Stack spacing={0.75}>
-        <Typography variant="body2" color={labelColor} fontWeight={500}>
-          CNPJ
-        </Typography>
-        <Controller
-          name="tax_id"
-          control={control}
-          render={({ field, fieldState }) => (
-            <TextField
-              {...field}
-              fullWidth
-              size="small"
-              error={!!fieldState.error}
-              helperText={fieldState.error?.message}
-              onChange={(e) => {
-                const maskedTaxId = formatCnpjInput(e.target.value);
-                field.onChange(maskedTaxId);
-                setDraft((d) => ({ ...d, tax_id: maskedTaxId }));
-              }}
-              slotProps={{
-                htmlInput: {
-                  maxLength: 18,
-                },
-              }}
-            />
-          )}
-        />
-      </Stack>
+      {row('CNPJ', <Typography fontWeight={600}>{draft.tax_id}</Typography>)}
       <Stack spacing={0.75}>
         <Typography variant="body2" color={labelColor} fontWeight={500}>
           Telefone

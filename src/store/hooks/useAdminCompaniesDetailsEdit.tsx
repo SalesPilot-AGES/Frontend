@@ -18,13 +18,13 @@ import {
   type UseFormHandleSubmit,
 } from 'react-hook-form';
 
-export interface UseCompanyInformationEditFormParams {
+export interface useCompanyInformationEditFormParams {
   draft: CompanyInformationValues;
   setDraft: Dispatch<SetStateAction<CompanyInformationValues>>;
   onSaveSuccess?: () => void;
 }
 
-export interface UseCompanyInformationEditFormResult {
+export interface useCompanyInformationEditFormResult {
   palette: Theme['palette'];
   control: Control<TCompanyUpdatePayload>;
   handleSubmit: UseFormHandleSubmit<
@@ -43,7 +43,7 @@ export const useCompanyInformationEditForm = ({
   draft,
   setDraft,
   onSaveSuccess,
-}: UseCompanyInformationEditFormParams): UseCompanyInformationEditFormResult => {
+}: useCompanyInformationEditFormParams): useCompanyInformationEditFormResult => {
   const { palette } = useTheme();
   const labelColor = palette.neutrals[600];
   const valueColor = palette.neutrals[800];

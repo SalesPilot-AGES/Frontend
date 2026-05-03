@@ -1,4 +1,4 @@
-import { EPageRoutes } from '@data/enums/EPageRoutes';
+// import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import type { DataTableProps } from '@declarations/ui';
 import { getSentimentConfig } from '@hooks/useSentiment';
@@ -11,7 +11,7 @@ import { useTheme } from '@mui/material/styles';
 import type { TMeetingListItem } from '@services/models/MeetingSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
 import { useGetMeetings } from '@services/queries/useMeetings';
-import { useNavigate } from '@tanstack/react-router';
+// import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
@@ -29,7 +29,7 @@ const formatDuration = (minutes: number): string => {
 
 export const AdminMeetingsManagement = (): JSX.Element => {
   const { palette } = useTheme();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [searchValue, setSearchValue] = useState('');
   const [filterValue, setFilterValue] = useState('');
@@ -181,10 +181,11 @@ export const AdminMeetingsManagement = (): JSX.Element => {
           loading={isLoading}
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
           onDetailsClick={(rowId) => {
-            navigate({
-              to: EPageRoutes.ADMIN_MEETING_DETAIL,
-              params: { meetingId: String(rowId) },
-            });
+            console.log('Detalhes da reunião', rowId);
+            // navigate({
+            //   to: EPageRoutes.MEETING_DETAIL,
+            //   params: { id: String(rowId) },
+            // });
           }}
           onSearchChange={setSearchValue}
           onFilterChange={setFilterValue}

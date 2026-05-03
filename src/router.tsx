@@ -1,6 +1,7 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { AdminCompaniesManagement } from '@pages/admin/CompaniesManagement/AdminCompaniesManagement';
-import { CompanyDetail } from '@pages/admin/CompaniesManagement/CompanyDetail/CompanyDetail';
+import { CompanyDetail } from '@pages/admin/CompaniesManagement/CompanyDetail/AdminCompaniesDetails';
+// import { AdminMeetingDetails } from '@pages/admin/MeetingsManagement/AdminMeetingDetails';
 import { AdminManagersDetails } from '@pages/admin/ManagersManagement/AdminManagersDetails';
 import { AdminManagersManagement } from '@pages/admin/ManagersManagement/AdminManagersManagement';
 import { DashboardPage } from '@pages/DashboardPage';
@@ -111,6 +112,12 @@ const meetingsRoute = createRoute({
   component: MeetingsPage,
 });
 
+// const meetingDetailRoute = createRoute({
+//   getParentRoute: () => protectedRoute,
+//   path: EPageRoutes.MEETING_DETAIL,
+//   component: AdminMeetingDetails,
+// });
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -121,6 +128,7 @@ const routeTree = rootRoute.addChildren([
       companyDetailRoute,
       managersRoute,
       managerDetailRoute,
+      // meetingDetailRoute,
     ]),
     salesmenRoute,
     meetingsRoute,

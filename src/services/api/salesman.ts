@@ -4,6 +4,7 @@ import type {
 } from '@services/models/SalesmanSchema';
 import {
   mapSalesmanListItemApiToTSalesmanWithCompany,
+  SalesmanSchema,
   SalesmenPagedResponseSchema,
   type TCreateSalesman,
 } from '@services/models/SalesmanSchema';
@@ -19,6 +20,6 @@ export const salesmanApi = {
 
   createSalesman: async (data: TCreateSalesman): Promise<TSalesman> => {
     const response = await apiClient.post<TSalesman>('/api/salesmen', data);
-    return response.data;
+    return SalesmanSchema.parse(response.data);
   },
 };

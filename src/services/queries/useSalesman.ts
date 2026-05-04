@@ -36,13 +36,14 @@ export const useCreateSalesman = (
   const queryClient = useQueryClient();
   return useMutation<TSalesman, Error, TCreateSalesman>({
     mutationFn: (data: TCreateSalesman) => salesmanApi.createSalesman(data),
-    onSuccess: (newSalesman: TSalesman) => {
+    ...options,
+    onSuccess: (newSalesman: TSalesman, ...args) => {
       queryClient.invalidateQueries({ queryKey: salesmenQueryKeys.lists() });
       queryClient.setQueryData(
         salesmenQueryKeys.detail(newSalesman.id),
         newSalesman
       );
+      options?.onSuccess?.(newSalesman, ...args);
     },
-    ...options,
   });
 };

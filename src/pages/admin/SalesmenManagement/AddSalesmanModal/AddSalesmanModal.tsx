@@ -1,179 +1,200 @@
-import type { SelectChangeEvent } from '@mui/material';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
+  Autocomplete,
+  Box,
   Switch,
   TextField,
+  Typography,
 } from '@mui/material';
-import type { TSalesmanWithCompany } from '@services/models/SalesmanSchema';
+import type { Company } from '@services/models/CompanySchema';
+import {
+  CreateSalesmanSchema,
+  type TCreateSalesman,
+} from '@services/models/SalesmanSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
 import { useCreateSalesman } from '@services/queries/useSalesman';
-import { salesmenQueryKeys } from '@services/queries/useSalesman';
-import { useQueryClient } from '@tanstack/react-query';
 import AppModal from '@UI/AppModal/AppModal';
-import React, { useState } from 'react';
+import type { JSX } from 'react';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
-interface AddSalesmanModalProps {
+export interface IAddSalesmanModalProps {
   open: boolean;
   handleClose: () => void;
 }
 
-interface FormData {
-  name: string;
-  email: string;
-  companyId: string;
-  isActive: boolean;
-}
-
-interface FormErrors {
-  name?: string;
-  email?: string;
-  companyId?: string;
-}
-
-export function AddSalesmanModal({
+export const AddSalesmanModal = ({
   open,
   handleClose,
-}: AddSalesmanModalProps): React.JSX.Element {
-  const queryClient = useQueryClient();
-  const { mutate: createSalesman, isPending } = useCreateSalesman();
-  const { data: companies } = useGetCompanies();
-
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    companyId: '',
-    isActive: true,
+}: IAddSalesmanModalProps): JSX.Element => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<TCreateSalesman>({
+    resolver: zodResolver(CreateSalesmanSchema),
+    defaultValues: {
+      name: '',
+      companyId: '',
+      email: '',
+      active: true,
+    },
   });
 
-  const [errors, setErrors] = useState<FormErrors>({});
+  const { data: companiesPage } = useGetCompanies();
+  const companyOptions: Company[] = companiesPage?.content ?? [];
 
-  function validateEmail(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function validate(): boolean {
-    const newErrors: FormErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Nome é obrigatório';
-    if (!formData.email.trim()) {
-      newErrors.email = 'E-mail é obrigatório';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'E-mail inválido';
+  useEffect(() => {
+    if (!open) {
+      reset();
     }
-    if (!formData.companyId) newErrors.companyId = 'Empresa é obrigatória';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }
+  }, [open, reset]);
 
-  function handleSubmit(): void {
-    if (!validate()) return;
-    createSalesman(
-      {
-        name: formData.name,
-        email: formData.email,
-        companyId: formData.companyId,
-        active: formData.isActive,
+  const { mutate: createSalesman } = useCreateSalesman();
+
+  const onSubmit = (data: TCreateSalesman): void => {
+    createSalesman(data, {
+      onSuccess: () => {
+        handleClose();
       },
-      {
-        onSuccess: (): void => {
-          void queryClient.invalidateQueries({
-            queryKey: salesmenQueryKeys.lists(),
-          });
-          onClose();
-        },
-      }
-    );
-  }
-
-  function onClose(): void {
-    setFormData({ name: '', email: '', companyId: '', isActive: true });
-    setErrors({});
-    handleClose();
-  }
+    });
+  };
 
   return (
     <AppModal
       modalName="Adicionar vendedor"
       open={open}
-      handleClose={onClose}
-      handleSubmit={handleSubmit}
-      isSaveButtonDisabled={isPending}
+      handleClose={handleClose}
+      handleSubmit={handleSubmit(onSubmit)}
+      isSaveButtonDisabled={false}
     >
-      <Stack direction="row" flexWrap="wrap" gap={3} p={2}>
-        <TextField
-          label="Nome do vendedor"
-          InputLabelProps={{ shrink: true }}
-          value={formData.name}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setFormData({ ...formData, name: e.target.value })
-          }
-          error={!!errors.name}
-          helperText={errors.name}
-          required
-          sx={{ flex: '1 1 45%' }}
-        />
-
-        <FormControl
-          required
-          error={!!errors.companyId}
-          sx={{ flex: '1 1 45%' }}
-        >
-          <InputLabel>Empresa</InputLabel>
-          <Select
-            value={formData.companyId}
-            label="Empresa"
-            notched
-            onChange={(e: SelectChangeEvent<string>) =>
-              setFormData({ ...formData, companyId: e.target.value })
-            }
-          >
-            {companies?.content?.map(
-              (company: TSalesmanWithCompany['company']) => (
-                <MenuItem key={company.id} value={company.id}>
-                  {company.name}
-                </MenuItem>
-              )
+      <Box
+        sx={{
+          width: '100%',
+          boxSizing: 'border-box',
+          padding: '48px',
+          marginBottom: '48px',
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+          columnGap: '32px',
+          rowGap: '32px',
+        }}
+      >
+        <Box>
+          <Typography sx={{ mb: 1 }} variant="body2">
+            Nome do vendedor
+          </Typography>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                error={!!errors.name}
+                helperText={errors.name?.message}
+              />
             )}
-          </Select>
-          {errors.companyId && (
-            <FormHelperText>{errors.companyId}</FormHelperText>
-          )}
-          <InputLabel shrink>Empresa</InputLabel>
-        </FormControl>
+          />
+        </Box>
 
-        <TextField
-          label="Email de acesso"
-          type="email"
-          InputLabelProps={{ shrink: true }}
-          value={formData.email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setFormData({ ...formData, email: e.target.value })
-          }
-          error={!!errors.email}
-          helperText={errors.email}
-          required
-          sx={{ flex: '1 1 45%' }}
-        />
+        <Box>
+          <Typography sx={{ mb: 1 }} variant="body2">
+            Empresa
+          </Typography>
+          <Controller
+            name="companyId"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete<Company, false, false, false>
+                disablePortal
+                options={companyOptions}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(a, b) => a.id === b.id}
+                value={companyOptions.find((c) => c.id === field.value) ?? null}
+                onChange={(_, company) => {
+                  field.onChange(company?.id ?? '');
+                }}
+                onBlur={field.onBlur}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    name={field.name}
+                    inputRef={field.ref}
+                    error={!!errors.companyId}
+                    helperText={
+                      errors.companyId?.message ??
+                      (companyOptions.length === 0
+                        ? 'Nenhuma empresa disponível para vincular.'
+                        : undefined)
+                    }
+                  />
+                )}
+              />
+            )}
+          />
+        </Box>
 
-        <FormControlLabel
-          sx={{ flex: '1 1 45%', alignSelf: 'center' }}
-          control={
-            <Switch
-              checked={formData.isActive}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ ...formData, isActive: e.target.checked })
-              }
-              color="primary"
-            />
-          }
-          label={formData.isActive ? 'Ativo' : 'Inativo'}
-        />
-      </Stack>
+        <Box>
+          <Typography sx={{ mb: 1 }} variant="body2">
+            Email de acesso
+          </Typography>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                type="email"
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            )}
+          />
+        </Box>
+
+        <Box>
+          <Typography sx={{ mb: 1 }} variant="body2">
+            Status
+          </Typography>
+          <Controller
+            name="active"
+            control={control}
+            render={({ field }) => (
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                }}
+              >
+                <Typography variant="body2">
+                  {field.value ? 'Ativo' : 'Inativo'}
+                </Typography>
+                <Switch
+                  {...field}
+                  checked={field.value}
+                  sx={{
+                    '& .MuiSwitch-switchBase.Mui-checked': {
+                      color: '#2E7D32',
+                    },
+                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                      backgroundColor: '#2E7D32',
+                    },
+                  }}
+                  slotProps={{
+                    input: {
+                      'aria-label': 'status do vendedor',
+                    },
+                  }}
+                />
+              </Box>
+            )}
+          />
+        </Box>
+      </Box>
     </AppModal>
   );
-}
+};

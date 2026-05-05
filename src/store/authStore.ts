@@ -23,9 +23,12 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      setUser: (user: User | null): void =>
-        set({ user, isAuthenticated: user !== null }),
-      logout: (): void => set({ user: null, isAuthenticated: false }),
+      setUser: (user: User | null): void => {
+        set({ user, isAuthenticated: user !== null });
+      },
+      logout: (): void => {
+        set({ user: null, isAuthenticated: false });
+      },
       loginUser: (email: string, password: string): User | null => {
         if (password !== MOCK_PASSWORD) {
           return null;

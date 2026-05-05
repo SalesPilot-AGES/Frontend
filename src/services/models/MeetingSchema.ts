@@ -21,8 +21,8 @@ export const MeetingListItemApiSchema = z.object({
   meeting_type: z.string(),
 
   scheduled_for: z.string(),
-  started_at: z.string(),
-  ended_at: z.string(),
+  started_at: z.string().nullable(),
+  ended_at: z.string().nullable(),
 
   duration_seconds: z.number(),
   status: z.string(),
@@ -42,7 +42,8 @@ export const MeetingSummarySchema = z.object({
  */
 export const MeetingsResponseSchema = z.object({
   content: z.array(MeetingListItemApiSchema),
-  totalElements: z.number(),
+  total_elements: z.number(),
+  total_pages: z.number(),
   summary: MeetingSummarySchema,
 });
 

@@ -35,7 +35,7 @@ export const meetingApi = {
 
     return {
       content: parsedResponse.content.map(mapMeetingListItem),
-      totalElements: parsedResponse.totalElements,
+      totalElements: parsedResponse.total_elements,
       summary: parsedResponse.summary,
     };
   },

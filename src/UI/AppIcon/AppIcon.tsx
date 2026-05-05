@@ -1,4 +1,5 @@
 import type { TIconName } from '@declarations';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import CloseIcon from '@mui/icons-material/Close';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -28,6 +29,14 @@ export const GetAppIcon = (name: TIconName): JSX.Element => {
       return <PersonIcon />;
     case 'meeting':
       return <EventNoteIcon />;
+    case 'duration':
+      return <AccessTimeIcon />;
+    case 'sentimentSad':
+      return <SentimentVeryDissatisfiedIcon />;
+    case 'sentimentNeutral':
+      return <SentimentNeutralIcon />;
+    case 'sentimentHappy':
+      return <SentimentSatisfiedAltIcon />;
     case 'login':
       return <LoginIcon />;
     case 'logout':
@@ -36,12 +45,6 @@ export const GetAppIcon = (name: TIconName): JSX.Element => {
       return <CloseIcon />;
     case 'save':
       return <SaveIcon />;
-    case 'sentimentHappy':
-      return <SentimentSatisfiedAltIcon />;
-    case 'sentimentNeutral':
-      return <SentimentNeutralIcon />;
-    case 'sentimentSad':
-      return <SentimentVeryDissatisfiedIcon />;
     default:
       return <ElectricBoltIcon />;
   }

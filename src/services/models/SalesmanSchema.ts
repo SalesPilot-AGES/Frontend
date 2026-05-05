@@ -2,18 +2,40 @@ import z from 'zod';
 
 import { PageableSchema } from './PageableSchema';
 
-/**
- * @description Shared company shape used in salesman entities.
- */
 export const SalesmanCompanySchema = z.object({
   id: z.string(),
-  name: z.string().min(1, 'Company name is required'),
+  name: z.string(),
 });
 
 /**
- * @description Zod schema for a single salesman entity.
+ * @description Zod schema for a single salesman entity returned by API.
  */
 export const SalesmanSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  company: SalesmanCompanySchema,
+  active: z.boolean(),
+  role: z.string().optional(),
+  phone: z.string().nullable().optional(),
+  average_feeling: z.number().min(0).max(100).nullable().optional(),
+  average_sentiment: z.number().min(0).max(100).nullable().optional(),
+  total_meetings: z.number().int().nonnegative().optional(),
+  preferences: z
+    .object({
+      theme: z.string().nullable(),
+      default_model: z.string().nullable(),
+    })
+    .nullable()
+    .optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+});
+
+/**
+ * @description Frontend shape for salesman list rows in admin table.
+ */
+export const SalesmanListItemSchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
@@ -24,47 +46,18 @@ export const SalesmanSchema = z.object({
 });
 
 /**
- * @description API shape for salesman list rows.
- */
-export const SalesmanListItemApiSchema = z.object({
-  id: z.string(),
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email address'),
-  company_id: z.string(),
-  company_name: z.string().min(1, 'Company name is required'),
-  active: z.boolean(),
-  average_sentiment: z.number().min(0).max(100).nullable().optional(),
-  created_at: z.string().optional(),
-});
-
-/**
- * @description Frontend shape used for salesman list rows.
- */
-export const SalesmanListItemSchema = SalesmanSchema.pick({
-  id: true,
-  name: true,
-  email: true,
-  company: true,
-  active: true,
-  average_sentiment: true,
-  created_at: true,
-});
-
-/**
- * @description Maps API list payload to the frontend list shape with company object.
+ * @description Normalizes salesman API item to table shape.
  */
 export const mapSalesmanListItemApiToTSalesmanWithCompany = (
-  payload: z.infer<typeof SalesmanListItemApiSchema>
+  payload: z.infer<typeof SalesmanSchema>
 ): z.infer<typeof SalesmanListItemSchema> => ({
   id: payload.id,
   name: payload.name,
   email: payload.email,
-  company: {
-    id: payload.company_id,
-    name: payload.company_name,
-  },
+  company: payload.company,
   active: payload.active,
-  average_sentiment: payload.average_sentiment ?? null,
+  average_sentiment:
+    payload.average_sentiment ?? payload.average_feeling ?? null,
   created_at: payload.created_at,
 });
 
@@ -76,6 +69,13 @@ export const SalesmanCreateInputSchema = z.object({
   email: z.string().email('Invalid email address'),
   company_id: z.string().min(1, 'Company is required'),
   active: z.boolean(),
+  preferences: z
+    .object({
+      theme: z.string().nullable(),
+      default_model: z.string().nullable(),
+    })
+    .nullable()
+    .optional(),
 });
 
 /**
@@ -86,13 +86,14 @@ export const SalesmanUpdateInputSchema = SalesmanCreateInputSchema.pick({
   email: true,
   company_id: true,
   active: true,
+  preferences: true,
 }).partial();
 
 /**
  * @description API schema for paginated salesman list responses.
  */
 export const SalesmanListApiSchema = z.object({
-  content: z.array(SalesmanListItemApiSchema),
+  content: z.array(SalesmanSchema),
   pageable: PageableSchema,
   total_elements: z.number().int().nonnegative(),
   total_pages: z.number().int().nonnegative(),
@@ -128,8 +129,6 @@ export const SalesmanFiltersSchema = z.object({
 
 export type TSalesman = z.infer<typeof SalesmanSchema>;
 export type TSalesmanWithCompany = z.infer<typeof SalesmanListItemSchema>;
-export type TSalesmanListItem = z.infer<typeof SalesmanListItemSchema>;
-export type TSalesmanListItemApi = z.infer<typeof SalesmanListItemApiSchema>;
 export type TSalesmanCreateInput = z.infer<typeof SalesmanCreateInputSchema>;
 export type TSalesmanUpdateInput = z.infer<typeof SalesmanUpdateInputSchema>;
 export type TSalesmanList = z.infer<typeof SalesmanListSchema>;

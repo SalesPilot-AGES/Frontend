@@ -156,7 +156,7 @@ export const AdminMeetingsPage = (): JSX.Element => {
           />
 
           <StatCard
-            iconName="clock"
+            iconName="duration"
             theme="neutrals"
             value={
               summary

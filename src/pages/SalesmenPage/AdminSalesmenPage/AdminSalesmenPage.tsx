@@ -1,5 +1,6 @@
 import { ECardLabel } from '@data/enums/ECardLabel';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
+import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import { EStatus } from '@data/enums/EStatus';
 import { getSentimentConfig } from '@hooks/useSentiment';
@@ -8,6 +9,7 @@ import { Box, Button, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { TSalesmanWithCompany } from '@services/models/SalesmanSchema';
 import { useGetSalesmen } from '@services/queries/useSalesmen';
+import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
@@ -22,6 +24,7 @@ import {
 
 export const AdminSalesmenPage = (): JSX.Element => {
   const { palette } = useTheme();
+  const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
   const [filterValue, setFilterValue] = useState('');
   const { data: salesmenData, isLoading } = useGetSalesmen(0, 20, {});
@@ -112,7 +115,12 @@ export const AdminSalesmenPage = (): JSX.Element => {
           getRowId={(row: TSalesmanWithCompany) => row.id}
           loading={isLoading}
           sx={{ border: `1px solid ${palette.neutrals[200]}` }}
-          onDetailsClick={(rowId) => void rowId}
+          onDetailsClick={(rowId) => {
+            navigate({
+              to: EPageRoutes.SALESMAN_DETAIL,
+              params: { id: String(rowId) },
+            });
+          }}
           onSearchChange={setSearchValue}
           onFilterChange={setFilterValue}
           searchValue={searchValue}

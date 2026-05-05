@@ -14,11 +14,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 /**
  * @description Query keys for salesmen.
- * @property {string[]} all - All salesmen.
- * @property {function} lists - All salesmen lists.
- * @property {function} list - A specific salesmen list with pagination and filters.
- * @property {function} details - All salesman details.
- * @property {function} detail - A specific salesman detail by id.
  */
 export const salesmenQueryKeys = {
   all: ['salesmen'] as const,
@@ -29,13 +24,6 @@ export const salesmenQueryKeys = {
   detail: (id: string) => [...salesmenQueryKeys.details(), id] as const,
 };
 
-/**
- * @description A helper function to get query options for the salesmen list query.
- * @param {number} page - The page number to fetch.
- * @param {number} size - The number of items per page.
- * @param {TSalesmanFilters} filters - Filters to apply to the query.
- * @returns {Pick<UseQueryOptions<TSalesmanList, Error>, 'queryKey' | 'queryFn' | 'staleTime'>} The query options.
- */
 const getSalesmenListQueryOptions = (
   page: number = 0,
   size: number = 20,
@@ -51,12 +39,7 @@ const getSalesmenListQueryOptions = (
 });
 
 /**
- * @description A query to get a paginated and filtered list of salesmen.
- * @param {number} page - The page number to fetch.
- * @param {number} size - The number of items per page.
- * @param {TSalesmanFilters} filters - Filters to apply to the query.
- * @param {UseQueryOptions<TSalesmanList>} options - Additional query options.
- * @returns {ReturnType<typeof useQuery<TSalesmanList, Error>>} The query result.
+ * @description Query to get a paginated and filtered list of salesmen.
  */
 export const useGetSalesmen = (
   page: number = 0,
@@ -71,10 +54,7 @@ export const useGetSalesmen = (
 };
 
 /**
- * @description A query to get a salesman by its ID.
- * @param {string | null} uuid - The ID of the salesman to fetch.
- * @param {UseQueryOptions<TSalesman>} options - Additional query options.
- * @returns {ReturnType<typeof useQuery<TSalesman, Error>>} The query result.
+ * @description Query to get a salesman by ID.
  */
 export const useGetSalesmanById = (
   uuid: string | null,
@@ -90,9 +70,7 @@ export const useGetSalesmanById = (
 };
 
 /**
- * @description A mutation to create a new salesman.
- * @param {UseMutationOptions<TSalesman, Error, TSalesmanCreateInput>} options - Mutation options.
- * @returns {ReturnType<typeof useMutation<TSalesman, Error, TSalesmanCreateInput>>} The mutation result.
+ * @description Mutation to create a new salesman.
  */
 export const useCreateSalesman = (
   options?: UseMutationOptions<TSalesman, Error, TSalesmanCreateInput>
@@ -114,9 +92,7 @@ export const useCreateSalesman = (
 };
 
 /**
- * @description A mutation to update an existing salesman.
- * @param {UseMutationOptions<TSalesman, Error, { uuid: string; data: TSalesmanUpdateInput }>} options - Mutation options.
- * @returns {ReturnType<typeof useMutation<TSalesman, Error, { uuid: string; data: TSalesmanUpdateInput }>>} The mutation result.
+ * @description Mutation to update an existing salesman.
  */
 export const useUpdateSalesman = (
   options?: UseMutationOptions<

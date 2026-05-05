@@ -2,6 +2,12 @@ import { EPageTitles } from '@data/enums/EPageTitles';
 import { render, screen } from '@tests/testUtils';
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('@tanstack/react-router', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@tanstack/react-router')>();
+  return { ...actual, useNavigate: () => vi.fn() };
+});
+
 vi.mock('@services/queries/useSalesmen', () => ({
   useGetSalesmen: vi.fn(() => ({ data: undefined, isLoading: false })),
 }));

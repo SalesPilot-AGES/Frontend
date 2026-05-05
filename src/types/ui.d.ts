@@ -17,6 +17,7 @@ export type TIconName =
   | 'logout'
   | 'close'
   | 'save'
+  | 'duration'
   | 'sentimentSad'
   | 'sentimentNeutral'
   | 'sentimentHappy';

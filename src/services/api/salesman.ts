@@ -14,6 +14,18 @@ import {
 
 import apiClient from './apiClient';
 
+const fetchSellerList = async (): Promise<TSalesman[]> => {
+  const response = await apiClient.get<unknown>('/api/collaborators/sellers', {
+    params: {
+      page: 0,
+      size: 200,
+    },
+  });
+
+  const parsed = SalesmanListApiSchema.parse(response.data);
+  return parsed.content;
+};
+
 /**
  * @description API service for salesman-related operations.
  */
@@ -31,7 +43,7 @@ export const salesmanApi = {
     filters?: TSalesmanFilters
   ): Promise<TSalesmanList> => {
     const response = await apiClient.get<unknown>(
-      '/api/collaborators/salesmen',
+      '/api/collaborators/sellers',
       {
         params: {
           page,
@@ -60,10 +72,21 @@ export const salesmanApi = {
    * @returns {Promise<TSalesman>} A promise that resolves to the salesman data.
    */
   getSalesmanById: async (uuid: string): Promise<TSalesman> => {
-    const response = await apiClient.get<unknown>(
-      `/api/collaborators/salesmen/${uuid}`
-    );
-    return SalesmanSchema.parse(response.data);
+    try {
+      const response = await apiClient.get<unknown>(
+        `/api/collaborators/sellers/${uuid}`
+      );
+      return SalesmanSchema.parse(response.data);
+    } catch {
+      const sellers = await fetchSellerList();
+      const seller = sellers.find((row) => row.id === uuid);
+
+      if (!seller) {
+        throw new Error('Seller not found');
+      }
+
+      return seller;
+    }
   },
 
   /**
@@ -73,7 +96,7 @@ export const salesmanApi = {
    */
   createSalesman: async (payload: TSalesmanCreateInput): Promise<TSalesman> => {
     const response = await apiClient.post<unknown>(
-      '/api/collaborators/salesmen',
+      '/api/collaborators/sellers',
       payload
     );
     return SalesmanSchema.parse(response.data);
@@ -90,7 +113,7 @@ export const salesmanApi = {
     payload: TSalesmanUpdateInput
   ): Promise<TSalesman> => {
     const response = await apiClient.put<unknown>(
-      `/api/collaborators/salesmen/${uuid}`,
+      `/api/collaborators/sellers/${uuid}`,
       payload
     );
     return SalesmanSchema.parse(response.data);

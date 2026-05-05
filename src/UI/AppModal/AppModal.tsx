@@ -1,18 +1,26 @@
-import type { IBasicModalProps } from '@declarations/ui';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
-import ModalHeader from '@UI/AppModal/ModalHeader/ModalHeader';
+import { ModalHeader } from '@UI/AppModal/ModalHeader/ModalHeader';
 import type { JSX } from 'react';
 
-export default function AppModal({
+export interface IAppModalProps {
+  modalName: string;
+  handleClose: () => void;
+  open: boolean;
+  handleSubmit: () => void;
+  children: JSX.Element;
+  isSaveButtonDisabled?: boolean;
+}
+
+export const AppModal = ({
   modalName,
   open,
   children,
   handleClose,
   handleSubmit,
   isSaveButtonDisabled,
-}: IBasicModalProps): JSX.Element {
+}: IAppModalProps): JSX.Element => {
   return (
     <Modal open={open} onClose={handleClose}>
       <Stack
@@ -64,4 +72,4 @@ export default function AppModal({
       </Stack>
     </Modal>
   );
-}
+};

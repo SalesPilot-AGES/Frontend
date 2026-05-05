@@ -1,112 +1,85 @@
-import type {
-  TCreateManager,
-  TManager,
-  TManagerAdminDetailsEditFields,
-  TManagerWithCompany,
-  TUpdateManager,
-} from '@services/models/ManagerSchema';
+import type { TManager, TManagerList } from '@services/models/ManagerSchema';
 import {
-  ManagerListItemApiSchema,
-  ManagersPagedResponseSchema,
-  mapManagerListItemApiToTManagerWithCompany,
+  ManagerListSchema,
+  ManagerSchema,
+  type TManagerCreatePayload,
+  type TManagerFilters,
+  type TManagerUpdatePayload,
 } from '@services/models/ManagerSchema';
 
 import apiClient from './apiClient';
 
-const preferencesToApi = (
-  prefs: Record<string, unknown>
-): Record<string, unknown> => {
-  const out: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(prefs)) {
-    if (key === 'defaultModel') {
-      out.default_model = value;
-    } else {
-      out[key] = value;
-    }
-  }
-  return out;
-};
-
-const createManagerToApiBody = (
-  data: TCreateManager
-): Record<string, unknown> => ({
-  company_id: data.companyId,
-  name: data.name,
-  email: data.email,
-  active: data.active,
-  preferences: preferencesToApi(data.preferences ?? {}),
-});
-
-const updateManagerToApiBody = (
-  data: TUpdateManager
-): Record<string, unknown> => {
-  const body: Record<string, unknown> = {};
-  if (data.companyId !== undefined) {
-    body.company_id = data.companyId;
-  }
-  if (data.name !== undefined) {
-    body.name = data.name;
-  }
-  if (data.email !== undefined) {
-    body.email = data.email;
-  }
-  if (data.active !== undefined) {
-    body.active = data.active;
-  }
-  if (data.preferences !== undefined) {
-    body.preferences = preferencesToApi(data.preferences);
-  }
-  return body;
-};
-
-const parseManagerResponse = (data: unknown): TManagerWithCompany => {
-  const row = ManagerListItemApiSchema.parse(data);
-  return mapManagerListItemApiToTManagerWithCompany(row);
-};
-
-export const buildAdminManagerDetailsUpdatePayload = (
-  manager: TManagerWithCompany,
-  fields: TManagerAdminDetailsEditFields
-): TUpdateManager => ({
-  name: fields.name,
-  email: fields.email,
-  active: fields.active,
-  companyId: fields.companyId,
-  preferences: manager.preferences,
-});
-
+/**
+ * @description API service for manager-related operations.
+ */
 export const managerApi = {
-  getManagerById: async (id: string): Promise<TManagerWithCompany> => {
-    const response = await apiClient.get<unknown>(
-      `/api/collaborators/managers/${id}`
-    );
-    return parseManagerResponse(response.data);
-  },
-
-  getManagers: async (): Promise<TManagerWithCompany[]> => {
-    const response = await apiClient.get<unknown>(
-      '/api/collaborators/managers'
-    );
-    const page = ManagersPagedResponseSchema.parse(response.data);
-    return page.content.map(mapManagerListItemApiToTManagerWithCompany);
-  },
-
-  createManager: async (data: TCreateManager): Promise<TManager> => {
-    const response = await apiClient.post<unknown>(
+  /**
+   * @description Get all managers with pagination and filtering.
+   * @param {number} page - The page number to fetch.
+   * @param {number} size - The number of items per page.
+   * @param {TManagerFilters} filters - Filters to apply to the query.
+   * @returns {Promise<TManagerList>} A promise that resolves to a paginated list of managers.
+   */
+  getManagers: async (
+    page: number = 0,
+    size: number = 10,
+    filters: TManagerFilters
+  ): Promise<TManagerList> => {
+    const response = await apiClient.get<TManagerList>(
       '/api/collaborators/managers',
-      createManagerToApiBody(data)
+      {
+        params: {
+          page,
+          size,
+          companyId: filters.companyId,
+          ...(filters.name && { name: filters.name }),
+          ...(filters.email && { email: filters.email }),
+          ...(filters.active !== undefined && { active: filters.active }),
+        },
+      }
     );
-    return parseManagerResponse(response.data);
+    return ManagerListSchema.parse(response.data);
   },
 
-  updateManager: async (
-    id: string,
-    data: TUpdateManager
-  ): Promise<TManager> => {
-    const response = await apiClient.put<unknown>(
-      `/api/collaborators/managers/${id}`,
-      updateManagerToApiBody(data)
+  /**
+   * @description Get a single manager by its UUID.
+   * @param {string} uuid - The UUID of the manager to fetch.
+   * @returns {Promise<TManager>} A promise that resolves to the manager data.
+   */
+  getManagerById: async (uuid: string): Promise<TManager> => {
+    const response = await apiClient.get<TManager>(
+      `/api/collaborators/managers/${uuid}`
     );
-    return parseManagerResponse(response.data);
+    return ManagerSchema.parse(response.data);
+  },
+
+  /**
+   * @description Create a new manager.
+   * @param {TManagerCreatePayload} payload - The data for the new manager.
+   * @returns {Promise<TManager>} A promise that resolves to the created manager data.
+   */
+  createManager: async (payload: TManagerCreatePayload): Promise<TManager> => {
+    const response = await apiClient.post<TManager>(
+      '/api/collaborators/managers',
+      payload
+    );
+    return ManagerSchema.parse(response.data);
+  },
+
+  /**
+   * @description Update an existing manager.
+   * @param {string} uuid - The UUID of the manager to update.
+   * @param {TManagerUpdatePayload} payload - The data to update the manager with.
+   * @returns {Promise<TManager>} A promise that resolves to the updated manager data.
+   */
+  updateManager: async (
+    uuid: string,
+    payload: TManagerUpdatePayload
+  ): Promise<TManager> => {
+    const response = await apiClient.put<TManager>(
+      `/api/collaborators/managers/${uuid}`,
+      payload
+    );
+    return ManagerSchema.parse(response.data);
   },
 };

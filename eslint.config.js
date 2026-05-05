@@ -60,4 +60,10 @@ export default defineConfig([
       ],
     },
   },
+  {
+    files: ['**/*.test.tsx', '**/*.test.ts', '**/*.spec.tsx', '**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off',
+    },
+  },
 ]);

@@ -6,14 +6,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import type { Company } from '@services/models/CompanySchema';
+import type { TCompany } from '@services/models/CompanySchema';
 import {
   CreateSalesmanSchema,
   type TCreateSalesman,
 } from '@services/models/SalesmanSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
 import { useCreateSalesman } from '@services/queries/useSalesman';
-import AppModal from '@UI/AppModal/AppModal';
+import { AppModal } from '@UI/AppModal/AppModal';
 import type { JSX } from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -43,7 +43,7 @@ export const AddSalesmanModal = ({
   });
 
   const { data: companiesPage } = useGetCompanies();
-  const companyOptions: Company[] = companiesPage?.content ?? [];
+  const companyOptions: TCompany[] = companiesPage?.content ?? [];
 
   useEffect(() => {
     if (!open) {
@@ -107,7 +107,7 @@ export const AddSalesmanModal = ({
             name="companyId"
             control={control}
             render={({ field }) => (
-              <Autocomplete<Company, false, false, false>
+              <Autocomplete<TCompany, false, false, false>
                 disablePortal
                 options={companyOptions}
                 getOptionLabel={(option) => option.name}

@@ -1,7 +1,13 @@
-import type { IPlanBadgeProps } from '@declarations/ui';
+import type { TPlan } from '@declarations/ui';
+import type { SxProps } from '@mui/material';
 import type { JSX } from 'react';
 
 import { StyledPlanBadge } from './PlanBadge.style';
+
+export interface IPlanBadgeProps {
+  plan: TPlan;
+  sx?: SxProps;
+}
 
 export const PlanBadge = ({ plan, sx }: IPlanBadgeProps): JSX.Element => {
   return (

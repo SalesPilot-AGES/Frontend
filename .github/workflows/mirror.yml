@@ -17,4 +17,5 @@ jobs:
       - name: Push to SalesPilot GitLab
         run: |
           git remote add gitlab https://${{ secrets.GITLAB_USERNAME }}:${{ secrets.GITLAB_TOKEN }}@tools.ages.pucrs.br/salespilot/frontend.git
+
           git push gitlab HEAD:refs/heads/${{ github.ref_name }} --force

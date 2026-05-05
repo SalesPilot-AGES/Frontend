@@ -9,7 +9,7 @@ import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
 import { DemoAccountsInfo } from './DemoAccountsInfo/DemoAccountsInfo';
-import { useLoginForm } from './UseLoginForm';
+import { useLoginForm } from './useLoginForm';
 
 export const LoginForm = (): JSX.Element => {
   const { register, handleSubmit, errors, onSubmit, setValue } = useLoginForm();

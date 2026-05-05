@@ -5,13 +5,20 @@ import Typography from '@mui/material/Typography';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
-export default function ModalHeader({
-  modalName,
-  handleClose,
-}: {
+export interface IModalHeaderProps {
   modalName: string;
   handleClose: () => void;
-}): JSX.Element {
+}
+
+interface IHeaderButtonProps {
+  icon: TIconName;
+  onClick: () => void;
+}
+
+export const ModalHeader = ({
+  modalName,
+  handleClose,
+}: IModalHeaderProps): JSX.Element => {
   return (
     <Box
       display="flex"
@@ -29,15 +36,9 @@ export default function ModalHeader({
       <HeaderButton icon="close" onClick={handleClose} />
     </Box>
   );
-}
+};
 
-function HeaderButton({
-  icon,
-  onClick,
-}: {
-  icon: TIconName;
-  onClick: () => void;
-}): JSX.Element {
+const HeaderButton = ({ icon, onClick }: IHeaderButtonProps): JSX.Element => {
   return (
     <Button
       sx={{
@@ -56,4 +57,4 @@ function HeaderButton({
       {GetAppIcon(icon)}
     </Button>
   );
-}
+};

@@ -1,6 +1,9 @@
-import type { IPageContainerProps } from '@declarations';
 import { Box, useTheme } from '@mui/material';
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
+
+export interface IPageContainerProps {
+  children: ReactNode;
+}
 
 export const PageContainter = ({
   children,

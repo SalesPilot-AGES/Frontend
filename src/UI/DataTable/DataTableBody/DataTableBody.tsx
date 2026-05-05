@@ -1,10 +1,7 @@
-import {
-  buildSkeletonWidths,
-  type DataTableSurfaceColors,
-  ROWS_PER_PAGE,
-} from '@hooks/useDataTable';
 import EastRoundedIcon from '@mui/icons-material/EastRounded';
 import {
+  Button,
+  CircularProgress,
   IconButton,
   Skeleton,
   TableBody,
@@ -13,10 +10,16 @@ import {
 } from '@mui/material';
 import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
+import { useEffect, useRef } from 'react';
 
 import type { DataTableColumn } from '../../../types/ui';
 import { DataTableBodyCell } from '../DataTableBodyCell/DataTableBodyCell';
 import { DataTableEmptyState } from '../DataTableEmptyState/DataTableEmptyState';
+import {
+  buildSkeletonWidths,
+  type DataTableSurfaceColors,
+  ROWS_PER_PAGE,
+} from '../useDataTable';
 
 export interface DataTableBodyProps<T> {
   columns: DataTableColumn<T>[];
@@ -28,6 +31,10 @@ export interface DataTableBodyProps<T> {
   emptyDescription: string;
   surface: DataTableSurfaceColors;
   palette: Palette;
+  infiniteScroll?: boolean;
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 export const DataTableBody = <T,>({
@@ -40,8 +47,38 @@ export const DataTableBody = <T,>({
   emptyDescription,
   surface,
   palette,
+  infiniteScroll,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
 }: DataTableBodyProps<T>): JSX.Element => {
   const skeletonWidths = buildSkeletonWidths(columns.length);
+  const tableBodyRef = useRef<HTMLTableSectionElement>(null);
+
+  useEffect(() => {
+    if (!infiniteScroll || !tableBodyRef.current) return;
+
+    const handleScroll = (): void => {
+      if (
+        tableBodyRef.current &&
+        tableBodyRef.current.parentElement &&
+        tableBodyRef.current.parentElement.scrollTop +
+          tableBodyRef.current.parentElement.clientHeight >=
+          tableBodyRef.current.parentElement.scrollHeight - 20 &&
+        hasNextPage &&
+        !isFetchingNextPage
+      ) {
+        fetchNextPage?.();
+      }
+    };
+
+    const parentElement = tableBodyRef.current.parentElement;
+    parentElement?.addEventListener('scroll', handleScroll);
+
+    return (): void => {
+      parentElement?.removeEventListener('scroll', handleScroll);
+    };
+  }, [infiniteScroll, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const bodyCellSx = {
     borderBottom: `1px solid ${surface.divider}`,
@@ -54,7 +91,7 @@ export const DataTableBody = <T,>({
   };
 
   return (
-    <TableBody>
+    <TableBody ref={tableBodyRef}>
       {loading ? (
         Array.from({ length: ROWS_PER_PAGE }).map((_, rowIndex) => (
           <TableRow
@@ -95,61 +132,79 @@ export const DataTableBody = <T,>({
           </TableRow>
         ))
       ) : data.length > 0 ? (
-        data.map((row) => {
-          const rowId = getRowId(row);
+        <>
+          {data.map((row) => {
+            const rowId = getRowId(row);
 
-          return (
-            <TableRow
-              key={String(rowId)}
-              hover
-              sx={{
-                '&:hover td': {
-                  backgroundColor: surface.rowHoverBg,
-                },
-              }}
-            >
-              {columns.map((column) => (
-                <TableCell
-                  key={column.header}
-                  align={column.align ?? 'left'}
-                  sx={bodyCellSx}
-                >
-                  <DataTableBodyCell
-                    row={row}
-                    column={column}
-                    palette={palette}
-                    bodyTextColor={surface.bodyText}
-                  />
-                </TableCell>
-              ))}
-              <TableCell
-                align="center"
+            return (
+              <TableRow
+                key={String(rowId)}
+                hover
                 sx={{
-                  ...bodyCellSx,
-                  position: 'sticky',
-                  right: 0,
-                  zIndex: 1,
-                  minWidth: 120,
-                  width: 120,
+                  '&:hover td': {
+                    backgroundColor: surface.rowHoverBg,
+                  },
                 }}
               >
-                <IconButton
-                  aria-label={`Ver detalhes de ${String(rowId)}`}
-                  onClick={() => onDetailsClick(rowId)}
-                  size="small"
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.header}
+                    align={column.align ?? 'left'}
+                    sx={bodyCellSx}
+                  >
+                    <DataTableBodyCell
+                      row={row}
+                      column={column}
+                      palette={palette}
+                      bodyTextColor={surface.bodyText}
+                    />
+                  </TableCell>
+                ))}
+                <TableCell
+                  align="center"
                   sx={{
-                    color: surface.detailsAction,
-                    p: 0.5,
-                    '&:hover': { backgroundColor: 'transparent' },
-                    '& .MuiSvgIcon-root': { fontSize: 20 },
+                    ...bodyCellSx,
+                    position: 'sticky',
+                    right: 0,
+                    zIndex: 1,
+                    minWidth: 120,
+                    width: 120,
                   }}
                 >
-                  <EastRoundedIcon fontSize="small" />
-                </IconButton>
+                  <IconButton
+                    aria-label={`Ver detalhes de ${String(rowId)}`}
+                    onClick={() => onDetailsClick(rowId)}
+                    size="small"
+                    sx={{
+                      color: surface.detailsAction,
+                      p: 0.5,
+                      '&:hover': { backgroundColor: 'transparent' },
+                      '& .MuiSvgIcon-root': { fontSize: 20 },
+                    }}
+                  >
+                    <EastRoundedIcon fontSize="small" />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+          {infiniteScroll && hasNextPage && (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length + 1}
+                style={{ textAlign: 'center', padding: '1rem' }}
+              >
+                {isFetchingNextPage ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <Button onClick={() => fetchNextPage?.()}>
+                    Carregar mais
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
-          );
-        })
+          )}
+        </>
       ) : (
         <DataTableEmptyState
           colSpan={columns.length + 1}

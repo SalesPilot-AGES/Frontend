@@ -1,29 +1,4 @@
-import { useCurrentUser } from '@store/hooks/useCurrentUser';
-import { Outlet, useLocation, useNavigate } from '@tanstack/react-router';
-import { type JSX, useEffect } from 'react';
+import { Outlet } from '@tanstack/react-router';
+import type { JSX } from 'react';
 
-import { Layout } from './Layout';
-
-// Root route - renders Layout for app routes, or direct component for login
-export const RootComponent = (): JSX.Element => {
-  const navigate = useNavigate({ from: '/' });
-  const user = useCurrentUser();
-  const location = useLocation();
-
-  useEffect(() => {
-    // redirect to login if not authenticated and not already on login page
-    if (!user) {
-      navigate({ to: '/login', replace: true });
-    }
-  }, [user, navigate]);
-
-  const isLoginPage = location.pathname === '/login';
-
-  return isLoginPage ? (
-    <Outlet />
-  ) : (
-    <Layout>
-      <Outlet />
-    </Layout>
-  );
-};
+export const RootComponent = (): JSX.Element => <Outlet />;

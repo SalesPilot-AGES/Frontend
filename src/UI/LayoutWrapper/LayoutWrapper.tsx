@@ -1,14 +1,13 @@
-import { Layout } from '@pages/Layout';
+import { Layout } from '@pages/Layout/Layout';
 import type { JSX } from 'react';
 
-export function withLayout<P extends object>(
+export const withLayout = <P extends object>(
   Component: React.ComponentType<P>
-) {
-  return function LayoutWrapper(props: P): JSX.Element {
-    return (
-      <Layout>
-        <Component {...props} />
-      </Layout>
-    );
-  };
-}
+): ((props: P) => JSX.Element) => {
+  const LayoutWrapper = (props: P): JSX.Element => (
+    <Layout>
+      <Component {...props} />
+    </Layout>
+  );
+  return LayoutWrapper;
+};

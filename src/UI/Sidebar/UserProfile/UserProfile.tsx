@@ -1,14 +1,15 @@
 import { Avatar, Box, IconButton, Typography, useTheme } from '@mui/material';
-import { useRequireUser } from '@store/hooks/useCurrentUser';
+import { useCurrentUser } from '@store/hooks/useCurrentUser';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
-import { useUserProfile } from './UseUserProfile';
+import { useUserProfile } from './useUserProfile';
 
-export const UserProfile = (): JSX.Element => {
+export const UserProfile = (): JSX.Element | null => {
   const { handleLogout } = useUserProfile();
-  const user = useRequireUser();
+  const user = useCurrentUser();
   const { palette } = useTheme();
+  if (!user) return null;
   return (
     <Box
       sx={{

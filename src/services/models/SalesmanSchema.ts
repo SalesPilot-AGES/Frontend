@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { PageableSchema } from './CompanySchema';
+import { PageableSchema } from './PageableSchema';
 
 export const SalesmanSchema = z.object({
   id: z.string().uuid(),

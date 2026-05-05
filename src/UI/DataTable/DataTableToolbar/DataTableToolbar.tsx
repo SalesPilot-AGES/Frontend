@@ -12,10 +12,10 @@ import {
 import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
 
-import type { DataTableSurfaceColors } from '../../../hooks/useDataTable';
 import type { DataTableFilterOption } from '../../../types/ui';
+import type { DataTableSurfaceColors } from '../useDataTable';
 
-export interface DataTableToolbarProps {
+export interface IDataTableToolbarProps {
   toolbarTitle?: string;
   showSearch: boolean;
   searchValue?: string;
@@ -28,6 +28,12 @@ export interface DataTableToolbarProps {
   filterOptions: DataTableFilterOption[];
   filterPlaceholder: string;
   filterAriaLabel: string;
+  showCompanyFilter: boolean;
+  companyFilterValue?: string;
+  onCompanyFilterChange?: (value: string) => void;
+  companyFilterOptions: DataTableFilterOption[];
+  companyFilterPlaceholder: string;
+  companyFilterAriaLabel: string;
   surface: DataTableSurfaceColors;
   palette: Palette;
 }
@@ -45,9 +51,15 @@ export const DataTableToolbar = ({
   filterOptions,
   filterPlaceholder,
   filterAriaLabel,
+  showCompanyFilter,
+  companyFilterValue,
+  onCompanyFilterChange,
+  companyFilterOptions,
+  companyFilterPlaceholder,
+  companyFilterAriaLabel,
   surface,
   palette,
-}: DataTableToolbarProps): JSX.Element => {
+}: IDataTableToolbarProps): JSX.Element => {
   const pillControlSx: SxProps<Theme> = {
     flex: 1,
     minWidth: 0,
@@ -159,6 +171,54 @@ export const DataTableToolbar = ({
             sx={pillControlSx}
           >
             {filterOptions.map((opt) => (
+              <MenuItem
+                key={opt.value === '' ? '__all' : opt.value}
+                value={opt.value}
+              >
+                {opt.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        ) : null}
+        {showCompanyFilter ? (
+          <TextField
+            select
+            value={companyFilterValue ?? ''}
+            onChange={(event) => onCompanyFilterChange?.(event.target.value)}
+            size="small"
+            fullWidth
+            SelectProps={{
+              displayEmpty: true,
+              inputProps: { 'aria-label': companyFilterAriaLabel },
+              renderValue: (selected) => {
+                if (selected === '' || selected == null) {
+                  return (
+                    <Typography
+                      component="span"
+                      sx={{ color: surface.filterMuted, fontSize: '0.875rem' }}
+                    >
+                      {companyFilterPlaceholder}
+                    </Typography>
+                  );
+                }
+                return (
+                  companyFilterOptions.find((opt) => opt.value === selected)
+                    ?.label ?? String(selected)
+                );
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FilterListRoundedIcon
+                    sx={{ color: surface.filterMuted, fontSize: 20 }}
+                  />
+                </InputAdornment>
+              ),
+            }}
+            sx={pillControlSx}
+          >
+            {companyFilterOptions.map((opt) => (
               <MenuItem
                 key={opt.value === '' ? '__all' : opt.value}
                 value={opt.value}

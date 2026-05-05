@@ -9,6 +9,7 @@ import { ManagersPage } from '@pages/ManagersPage/ManagersPage';
 import { MeetingsPage } from '@pages/MeetingsPage/MeetingsPage';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { RootComponent } from '@pages/RootComponent/RootComponent';
+import { MeetingDetail } from '@pages/salesman/MeetingsManagement/MeetingDetail/MeetingDetail';
 import { SalesmenPage } from '@pages/SalesmenPage/SalesmenPage';
 import { useAuthStore } from '@store/authStore';
 import {
@@ -109,6 +110,12 @@ const meetingsRoute = createRoute({
   component: MeetingsPage,
 });
 
+const meetingDetailRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: EPageRoutes.SALESMAN_MEETINGS_DETAIL,
+  component: MeetingDetail,
+})
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -122,6 +129,7 @@ const routeTree = rootRoute.addChildren([
     ]),
     salesmenRoute,
     meetingsRoute,
+    meetingDetailRoute,
   ]),
 ]);
 

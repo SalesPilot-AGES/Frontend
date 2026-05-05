@@ -114,7 +114,7 @@ const meetingDetailRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: EPageRoutes.SALESMAN_MEETINGS_DETAIL,
   component: MeetingDetail,
-})
+});
 
 const routeTree = rootRoute.addChildren([
   indexRoute,

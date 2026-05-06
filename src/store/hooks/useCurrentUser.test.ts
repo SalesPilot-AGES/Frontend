@@ -1,5 +1,5 @@
 import { useAuthStore } from '@store/authStore';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -23,7 +23,9 @@ describe('useCurrentUser', () => {
   });
 
   it('returns user after login', () => {
-    loginAdmin();
+    act(() => {
+      loginAdmin();
+    });
     const { result } = renderHook(() => useCurrentUser());
     expect(result.current?.email).toBe('admin@example.com');
   });
@@ -36,7 +38,9 @@ describe('useCurrentUsername', () => {
   });
 
   it('returns user name after login', () => {
-    loginAdmin();
+    act(() => {
+      loginAdmin();
+    });
     const { result } = renderHook(() => useCurrentUsername());
     expect(result.current).toBe('Admin User');
   });
@@ -49,7 +53,9 @@ describe('useCurrentUserRole', () => {
   });
 
   it('returns admin role after admin login', () => {
-    loginAdmin();
+    act(() => {
+      loginAdmin();
+    });
     const { result } = renderHook(() => useCurrentUserRole());
     expect(result.current).toBe('admin');
   });
@@ -62,7 +68,9 @@ describe('useIsAuthenticated', () => {
   });
 
   it('returns true after login', () => {
-    loginAdmin();
+    act(() => {
+      loginAdmin();
+    });
     const { result } = renderHook(() => useIsAuthenticated());
     expect(result.current).toBe(true);
   });

@@ -33,6 +33,15 @@ export const SalesmanSchema = z.object({
 });
 
 /**
+ * @description Frontend shape for salesman create.
+ */
+export const CreateSalesmanSchema = SalesmanSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+/**
  * @description Frontend shape for salesman list rows in admin table.
  */
 export const SalesmanListItemSchema = z.object({
@@ -128,6 +137,7 @@ export const SalesmanFiltersSchema = z.object({
 });
 
 export type TSalesman = z.infer<typeof SalesmanSchema>;
+export type TCreateSalesman = z.infer<typeof CreateSalesmanSchema>;
 export type TSalesmanWithCompany = z.infer<typeof SalesmanListItemSchema>;
 export type TSalesmanCreateInput = z.infer<typeof SalesmanCreateInputSchema>;
 export type TSalesmanUpdateInput = z.infer<typeof SalesmanUpdateInputSchema>;

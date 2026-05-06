@@ -29,8 +29,10 @@ describe('useCompanyInformationEdit', () => {
       () => useCompanyInformationEdit({ draft, setDraft: vi.fn() }),
       { wrapper }
     );
-    expect(result.current.isValid).toBeDefined();
-    expect(result.current.isSubmitting).toBe(false);
+    act(() => {
+      expect(result.current.isValid).toBeDefined();
+      expect(result.current.isSubmitting).toBe(false);
+    });
   });
 
   it('returns palette, labelColor, valueColor', () => {
@@ -38,9 +40,11 @@ describe('useCompanyInformationEdit', () => {
       () => useCompanyInformationEdit({ draft, setDraft: vi.fn() }),
       { wrapper }
     );
-    expect(result.current.palette).toBeDefined();
-    expect(result.current.labelColor).toBeTypeOf('string');
-    expect(result.current.valueColor).toBeTypeOf('string');
+    act(() => {
+      expect(result.current.palette).toBeDefined();
+      expect(result.current.labelColor).toBeTypeOf('string');
+      expect(result.current.valueColor).toBeTypeOf('string');
+    });
   });
 
   it('calls onSaveSuccess after successful submit', async () => {
@@ -67,7 +71,9 @@ describe('useCompanyInformationEdit', () => {
       () => useCompanyInformationEdit({ draft, setDraft: vi.fn() }),
       { wrapper }
     );
-    expect(result.current.control).toBeDefined();
-    expect(result.current.handleSubmit).toBeTypeOf('function');
+    act(() => {
+      expect(result.current.control).toBeDefined();
+      expect(result.current.handleSubmit).toBeTypeOf('function');
+    });
   });
 });

@@ -67,11 +67,11 @@ describe('AppIcon Component', () => {
     ).toBeInTheDocument();
   });
 
-  it('returns SentimentSatisfiedAltIcon for sentimentHappy', () => {
+  it('returns SentimentSatisfiedIcon for sentimentHappy', () => {
     const icon = GetAppIcon('sentimentHappy');
     const { container } = render(icon);
     expect(
-      container.querySelector('[data-testid="SentimentSatisfiedAltIcon"]')
+      container.querySelector('[data-testid="SentimentSatisfiedIcon"]')
     ).toBeInTheDocument();
   });
 
@@ -83,11 +83,11 @@ describe('AppIcon Component', () => {
     ).toBeInTheDocument();
   });
 
-  it('returns SentimentVeryDissatisfiedIcon for sentimentSad', () => {
+  it('returns SentimentDissatisfiedIcon for sentimentSad', () => {
     const icon = GetAppIcon('sentimentSad');
     const { container } = render(icon);
     expect(
-      container.querySelector('[data-testid="SentimentVeryDissatisfiedIcon"]')
+      container.querySelector('[data-testid="SentimentDissatisfiedIcon"]')
     ).toBeInTheDocument();
   });
 });

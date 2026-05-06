@@ -11,6 +11,7 @@ export interface IStatCardProps {
   theme?: TColorThemeOptions;
   value: number | string;
   label: (typeof ECardLabel)[keyof typeof ECardLabel];
+  valueColor?: string;
   sx?: SxProps;
 }
 
@@ -19,6 +20,7 @@ export const StatCard = ({
   theme,
   value,
   label,
+  valueColor,
   sx,
 }: IStatCardProps): JSX.Element => {
   const { palette } = useTheme();
@@ -44,7 +46,7 @@ export const StatCard = ({
           fontSize="1.5rem"
           fontWeight="600"
           lineHeight="2rem"
-          color={palette.neutrals[900]}
+          color={valueColor ?? palette.neutrals[900]}
         >
           {value}
         </Typography>

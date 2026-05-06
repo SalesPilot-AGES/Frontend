@@ -10,6 +10,7 @@ import { MeetingsPage } from '@pages/MeetingsPage/MeetingsPage';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { RootComponent } from '@pages/RootComponent/RootComponent';
 import { MeetingDetail } from '@pages/salesman/MeetingsManagement/MeetingDetail/MeetingDetail';
+import { SalesmanDetail } from '@pages/SalesmenPage/SalesmanDetail/SalesmanDetail';
 import { SalesmenPage } from '@pages/SalesmenPage/SalesmenPage';
 import { useAuthStore } from '@store/authStore';
 import {
@@ -104,6 +105,13 @@ const salesmenRoute = createRoute({
   beforeLoad: requireAdminOrManager,
 });
 
+const salesmanDetailRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: EPageRoutes.SALESMAN_DETAIL,
+  component: SalesmanDetail,
+  beforeLoad: requireAdminOrManager,
+});
+
 const meetingsRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: EPageRoutes.MEETINGS,
@@ -128,6 +136,7 @@ const routeTree = rootRoute.addChildren([
       managerDetailRoute,
     ]),
     salesmenRoute,
+    salesmanDetailRoute,
     meetingsRoute,
     meetingDetailRoute,
   ]),

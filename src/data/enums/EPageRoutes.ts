@@ -6,6 +6,7 @@ export const EPageRoutes = {
   MANAGERS: '/gestores',
   MANAGER_DETAIL: '/gestores/$id',
   SALESMEN: '/vendedores',
+  SALESMAN_DETAIL: '/vendedores/$id',
   MEETINGS: '/reuniões',
 
   SALESMAN_MEETINGS_DETAIL: '/vendedores/reuniões/$meetingId',

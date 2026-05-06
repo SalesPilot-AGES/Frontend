@@ -169,8 +169,12 @@ export const AdminMeetingsPage = (): JSX.Element => {
           <StatCard
             iconName={sentimentConfig.iconName}
             theme={sentimentConfig.theme}
-            value={summary ? `${summary.success_rate}%` : '0%'}
-            label="Taxa de sucesso"
+            value={
+              summary
+                ? `${summary.success_rate.toFixed(1).replace('.', ',')}%`
+                : '0,0%'
+            }
+            label="Sentimento médio"
           />
         </Box>
 

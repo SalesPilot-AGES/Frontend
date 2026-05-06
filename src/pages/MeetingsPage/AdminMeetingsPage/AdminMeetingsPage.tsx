@@ -198,7 +198,7 @@ export const AdminMeetingsPage = (): JSX.Element => {
           toolbarTitle="Lista de reuniões"
           searchPlaceholder="Buscar reunião..."
           searchAriaLabel="Buscar reunião"
-          filterPlaceholder="Filtrar empresa"
+          filterPlaceholder="Filtrar"
           filterAriaLabel="Filtrar reuniões por empresa"
           filterOptions={companyFilterOptions}
         />

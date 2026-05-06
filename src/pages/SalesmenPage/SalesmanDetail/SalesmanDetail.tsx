@@ -1,6 +1,6 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import { ArrowBack, Business, Close, Email } from '@mui/icons-material';
+import { ArrowBack, Close, Save } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -10,14 +10,16 @@ import {
 } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { useGetSalesmanById } from '@services/queries/useSalesmen';
+import { useAdminSalesmenDetailsEdit } from '@store/hooks/useAdminSalesmenDetailsEdit';
 import { Link, useParams } from '@tanstack/react-router';
 import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import { IconBox } from '@UI/IconBox/IconBox';
-import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
-import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import { type JSX, useState } from 'react';
+
+import { SalesmanInformationEdit } from './SalesmanInformationEdit/SalesmanInformationEdit';
+import { SalesmanInformationView } from './SalesmanInformationView/SalesmanInformationView';
 
 export const SalesmanDetail = (): JSX.Element => {
   const { palette } = useTheme();
@@ -32,6 +34,19 @@ export const SalesmanDetail = (): JSX.Element => {
   const handleCancelEdit = (): void => {
     setIsEditing(false);
   };
+
+  const {
+    editForm,
+    isEditFormValid,
+    companyOptions,
+    handleSaveEdit,
+    handleFieldChange,
+    handleStatusChange,
+  } = useAdminSalesmenDetailsEdit(
+    salesman ?? null,
+    isEditing,
+    handleCancelEdit
+  );
 
   if (isLoading) {
     return (
@@ -93,53 +108,28 @@ export const SalesmanDetail = (): JSX.Element => {
                 >
                   Cancelar
                 </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<Save />}
+                  onClick={handleSaveEdit}
+                  disabled={!isEditFormValid}
+                >
+                  Salvar
+                </Button>
               </Box>
             ) : undefined
           }
         >
-          {isEditing ? (
-            <Box
-              sx={{
-                border: `1px dashed ${palette.neutrals[300]}`,
-                borderRadius: '0.75rem',
-                padding: '1rem',
-              }}
-            >
-              <Typography variant="body2" color="text.secondary">
-                Modo de edição iniciado. A edição completa será implementada na
-                FE-12.
-              </Typography>
-            </Box>
+          {isEditing && salesman && editForm ? (
+            <SalesmanInformationEdit
+              salesmanId={salesman.id}
+              editForm={editForm}
+              companyOptions={companyOptions}
+              onFieldChange={handleFieldChange}
+              onStatusChange={handleStatusChange}
+            />
           ) : (
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                gap: '2rem 4rem',
-              }}
-            >
-              <ItemDetail label="ID do usuário" value={salesman.id} />
-
-              <ItemDetail
-                label="Empresa"
-                value={salesman.company.name}
-                icon={<Business fontSize="small" />}
-              />
-
-              <ItemDetail label="Nome do usuário" value={salesman.name} />
-
-              <ItemDetail label="Status">
-                <Box sx={{ display: 'inline-flex', alignSelf: 'flex-start' }}>
-                  <StatusBadge active={salesman.active} />
-                </Box>
-              </ItemDetail>
-
-              <ItemDetail
-                label="Email de acesso"
-                value={salesman.email}
-                icon={<Email fontSize="small" />}
-              />
-            </Box>
+            <SalesmanInformationView salesman={salesman} />
           )}
         </EntityDetailsCard>
       </Box>

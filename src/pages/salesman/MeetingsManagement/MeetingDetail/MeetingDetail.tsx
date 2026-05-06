@@ -24,12 +24,12 @@ export const MeetingDetail = (): JSX.Element => {
 
   const { meetingId } = useParams({ strict: false }) as { meetingId: string };
   const search = useSearch({
-    from: '/protected/vendedores/reuniões/$meetingId',
+    from: '/protected/reuniões/$meetingId',
   });
 
   const currentTab = (search.tab || 'context') as TMeetingTab;
   const navigate = useNavigate({
-    from: '/vendedores/reuniões/$meetingId',
+    from: '/reuniões/$meetingId',
   });
 
   const {

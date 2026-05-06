@@ -19,7 +19,8 @@ export type TIconName =
   | 'save'
   | 'sentimentSad'
   | 'sentimentNeutral'
-  | 'sentimentHappy';
+  | 'sentimentHappy'
+  | 'real_estate_agent';
 
 export type TStatus = (typeof EStatus)[keyof typeof EStatus];
 export type TPlan = (typeof EPlan)[keyof typeof EPlan];

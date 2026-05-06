@@ -40,24 +40,8 @@ export const meetingApi = {
     };
   },
 
-  // getMeetingById: async (uuid: string): Promise<unknown> => {
-  //   const response = await apiClient.get<unknown>(`/api/meetings/${uuid}`);
-  //   return response.data;
-  // },
   getMeetingById: async (uuid: string): Promise<unknown> => {
-    return {
-      id: uuid,
-      title: 'Reunião de prospecção',
-      scheduled_for: '2024-06-10T14:00:00Z',
-      duration_seconds: 2520,
-      seller: {
-        name: 'Ana Silva Vendedora',
-      },
-      client: {
-        name: 'Carlos Lima',
-        client_company_name: 'Tech Solutions Ltda',
-        overall_sentiment: 79,
-      },
-    };
+    const response = await apiClient.get<unknown>(`/api/meetings/${uuid}`);
+    return response.data;
   },
 };

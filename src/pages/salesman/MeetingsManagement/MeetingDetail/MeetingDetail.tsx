@@ -1,15 +1,18 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
+import { getSentimentConfig } from '@hooks/useSentiment';
 import { ArrowBack } from '@mui/icons-material';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import {
   Box,
   CircularProgress,
+  type Color,
   IconButton,
   Link as MuiLink,
   Stack,
   Tab,
   Tabs,
   Typography,
+  useMediaQuery,
   useTheme,
 } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
@@ -23,26 +26,26 @@ import {
 } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { StatCard } from '@UI/StatCard/StatCard';
-import type { JSX } from 'react';
+import { type JSX } from 'react';
 import React from 'react';
 import { z } from 'zod';
 
+// Type adicional para o overall_sentiment, não sei se o adiciono diretamente no Schema de volta.
 type TMeetingDetail = z.infer<typeof MeetingListItemApiSchema> & {
   client: { overall_sentiment?: number };
 };
 
+// Placeholders
 const MeetingContext = (): JSX.Element => (
   <Box p={3}>
     <Typography>Conteúdo: Contexto da Reunião</Typography>
   </Box>
 );
-
 const MeetingInsights = (): JSX.Element => (
   <Box p={3}>
     <Typography>Conteúdo: Insights na Reunião</Typography>
   </Box>
 );
-
 const MeetingActionPlan = (): JSX.Element => (
   <Box p={3}>
     <Typography>Conteúdo: Plano de Ação</Typography>
@@ -50,7 +53,11 @@ const MeetingActionPlan = (): JSX.Element => (
 );
 
 export const MeetingDetail = (): JSX.Element => {
-  const { palette } = useTheme();
+  const { palette, breakpoints } = useTheme();
+  const isDesktop = useMediaQuery(breakpoints.up('lg'));
+
+  const themePalette = palette as typeof palette &
+    Record<string, Partial<Color>>;
 
   const { meetingId } = useParams({ strict: false }) as { meetingId: string };
   const search = useSearch({ strict: false }) as Record<string, string>;
@@ -65,6 +72,16 @@ export const MeetingDetail = (): JSX.Element => {
   } = useGetMeetingById(meetingId ?? null);
 
   const meeting = rawMeeting as TMeetingDetail | undefined;
+
+  const handleTabChange = (
+    _event: React.SyntheticEvent,
+    newValue: string
+  ): void => {
+    navigate({
+      search: (old: Record<string, string>) => ({ ...old, tab: newValue }),
+      replace: true,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -85,22 +102,19 @@ export const MeetingDetail = (): JSX.Element => {
     return <PageNotFound />;
   }
 
-  const handleTabChange = (
-    _event: React.SyntheticEvent,
-    newValue: string
-  ): void => {
-    navigate({
-      search: (old: Record<string, string>) => ({ ...old, tab: newValue }),
-      replace: true,
-    });
-  };
-
   const formattedDate = meeting.scheduled_for
     ? new Date(meeting.scheduled_for).toLocaleDateString('pt-BR')
     : '';
   const durationMinutes = meeting.duration_seconds
     ? Math.floor(meeting.duration_seconds / 60)
     : 0;
+
+  const responsiveValueFontSize = isDesktop
+    ? '1.25rem !important'
+    : '1rem !important';
+
+  const sentimentConfig = getSentimentConfig(meeting.client.overall_sentiment);
+  const sentimentPalette = themePalette[sentimentConfig.theme];
 
   return (
     <PageContainter>
@@ -125,15 +139,17 @@ export const MeetingDetail = (): JSX.Element => {
 
         <Stack direction="row" alignItems="center" spacing={2} flexWrap="wrap">
           <IconButton
-            aria-label="Detalhes da reunião"
             disableRipple
             sx={{
               width: 48,
               height: 48,
               p: 0,
               borderRadius: '0.75rem',
-              bgcolor: palette.primary[100],
-              color: palette.primary[500],
+              bgcolor: palette.meetings[200],
+              color: palette.meetings[500],
+              '&:hover': {
+                bgcolor: palette.meetings[100],
+              },
             }}
           >
             <EventNoteOutlinedIcon sx={{ fontSize: '1.5rem' }} />
@@ -161,32 +177,63 @@ export const MeetingDetail = (): JSX.Element => {
           sx={{ width: '100%', alignItems: 'stretch' }}
         >
           <StatCard
-            iconName="meeting"
-            theme="meetings"
+            iconName="real_estate_agent"
+            theme="primary"
             value={meeting.client.name}
             label="Nome do cliente"
-            sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
+            sx={{
+              flex: '1 1 0',
+              minWidth: { xs: '100%', sm: 160 },
+              '& .MuiTypography-root:nth-of-type(1)': {
+                fontSize: responsiveValueFontSize,
+              },
+            }}
           />
           <StatCard
             iconName="salesman"
             theme="salesmen"
             value={meeting.seller.name}
             label="Vendedor responsável"
-            sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
+            sx={{
+              flex: '1 1 0',
+              minWidth: { xs: '100%', sm: 160 },
+              '& .MuiTypography-root:nth-of-type(1)': {
+                fontSize: responsiveValueFontSize,
+              },
+            }}
           />
           <StatCard
             iconName="company"
             theme="companies"
             value={meeting.client.client_company_name}
             label="Empresa responsável"
-            sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
+            sx={{
+              flex: '1 1 0',
+              minWidth: { xs: '100%', sm: 160 },
+              '& .MuiTypography-root:nth-of-type(1)': {
+                fontSize: responsiveValueFontSize,
+              },
+            }}
           />
           <StatCard
-            iconName="dashboard"
-            theme="success"
+            iconName={sentimentConfig.iconName}
+            theme={sentimentConfig.theme}
             value={`${meeting.client.overall_sentiment ?? 0}%`}
             label="Sentimento da reunião"
-            sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
+            sx={{
+              flex: '1 1 0',
+              minWidth: { xs: '100%', sm: 160 },
+              '& .MuiTypography-root:nth-of-type(1)': {
+                fontSize: responsiveValueFontSize,
+              },
+              '& .MuiStack-root > :first-child': {
+                backgroundColor: sentimentPalette?.[100],
+                color: sentimentPalette?.[300],
+              },
+              '& .MuiStack-root > :first-child svg': {
+                color: sentimentPalette?.[300],
+              },
+            }}
           />
         </Stack>
 

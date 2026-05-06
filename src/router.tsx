@@ -9,6 +9,7 @@ import { ManagersPage } from '@pages/ManagersPage/ManagersPage';
 import { MeetingsPage } from '@pages/MeetingsPage/MeetingsPage';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { RootComponent } from '@pages/RootComponent/RootComponent';
+import { MeetingDetail } from '@pages/salesman/MeetingsManagement/MeetingDetail/MeetingDetail';
 import { SalesmanDetail } from '@pages/SalesmenPage/SalesmanDetail/SalesmanDetail';
 import { SalesmenPage } from '@pages/SalesmenPage/SalesmenPage';
 import { useAuthStore } from '@store/authStore';
@@ -18,6 +19,7 @@ import {
   redirect,
   Router,
 } from '@tanstack/react-router';
+import { z } from 'zod';
 
 const requireAuth = (): void => {
   const user = useAuthStore.getState().user;
@@ -117,6 +119,15 @@ const meetingsRoute = createRoute({
   component: MeetingsPage,
 });
 
+const meetingDetailRoute = createRoute({
+  getParentRoute: () => protectedRoute,
+  path: EPageRoutes.SALESMAN_MEETINGS_DETAIL,
+  validateSearch: z.object({
+    tab: z.enum(['context', 'insights', 'action-plan']).optional(),
+  }),
+  component: MeetingDetail,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -131,6 +142,7 @@ const routeTree = rootRoute.addChildren([
     salesmenRoute,
     salesmanDetailRoute,
     meetingsRoute,
+    meetingDetailRoute,
   ]),
 ]);
 

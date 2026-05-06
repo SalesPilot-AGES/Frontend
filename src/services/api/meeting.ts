@@ -1,9 +1,14 @@
 import {
   mapMeetingListItem,
+  MeetingContextMetadataSchema,
+  MeetingPostAnalysisSchema,
   MeetingsResponseSchema,
+  type TMeetingContextMetadata,
   type TMeetingListItem,
+  type TMeetingPostAnalysis,
   type TMeetingsResponse,
 } from '@services/models/MeetingSchema';
+import axios from 'axios';
 
 import apiClient from './apiClient';
 
@@ -40,8 +45,25 @@ export const meetingApi = {
     };
   },
 
-  getMeetingById: async (uuid: string): Promise<unknown> => {
+  getMeetingById: async (uuid: string): Promise<TMeetingContextMetadata> => {
     const response = await apiClient.get<unknown>(`/api/meetings/${uuid}`);
-    return response.data;
+    return MeetingContextMetadataSchema.parse(response.data);
+  },
+
+  getMeetingPostAnalysis: async (
+    uuid: string
+  ): Promise<TMeetingPostAnalysis | null> => {
+    try {
+      const response = await apiClient.get<unknown>(
+        `/api/meetings/${uuid}/post-analysis`
+      );
+      return MeetingPostAnalysisSchema.parse(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return null;
+      }
+
+      throw error;
+    }
   },
 };

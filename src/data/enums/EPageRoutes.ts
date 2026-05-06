@@ -8,4 +8,6 @@ export const EPageRoutes = {
   SALESMEN: '/vendedores',
   SALESMAN_DETAIL: '/vendedores/$id',
   MEETINGS: '/reuniões',
+
+  SALESMAN_MEETINGS_DETAIL: '/reuniões/$meetingId',
 } as const;

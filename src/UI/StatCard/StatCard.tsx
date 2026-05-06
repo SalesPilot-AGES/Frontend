@@ -1,13 +1,26 @@
-import type { IStatCardProps } from '@declarations/ui';
+import { ECardLabel } from '@data/enums/ECardLabel';
+import type { TColorThemeOptions } from '@declarations/hooks';
+import type { TIconName } from '@declarations/ui';
+import type { SxProps } from '@mui/material';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { IconBox } from '@UI/IconBox/IconBox';
 import type { JSX } from 'react';
+
+export interface IStatCardProps {
+  iconName: TIconName;
+  theme?: TColorThemeOptions;
+  value: number | string;
+  label: (typeof ECardLabel)[keyof typeof ECardLabel];
+  valueColor?: string;
+  sx?: SxProps;
+}
 
 export const StatCard = ({
   iconName,
   theme,
   value,
   label,
+  valueColor,
   sx,
 }: IStatCardProps): JSX.Element => {
   const { palette } = useTheme();
@@ -33,7 +46,7 @@ export const StatCard = ({
           fontSize="1.5rem"
           fontWeight="600"
           lineHeight="2rem"
-          color={palette.neutrals[900]}
+          color={valueColor ?? palette.neutrals[900]}
         >
           {value}
         </Typography>

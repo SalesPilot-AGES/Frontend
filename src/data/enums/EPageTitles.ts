@@ -7,5 +7,6 @@ export const EPageTitles = {
   MANAGERS: 'Gestores',
   MANAGER_INFORMATION: 'Informações do gestor',
   SALESMEN: 'Vendedores',
+  SALESMAN_INFORMATION: 'Informações do vendedor',
   MEETINGS: 'Reuniões',
 };

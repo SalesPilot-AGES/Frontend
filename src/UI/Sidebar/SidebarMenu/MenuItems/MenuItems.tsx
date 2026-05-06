@@ -1,35 +1,41 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
-import type { MenuItem } from '@declarations';
 import type { UserRole } from '@store/authStore';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
+import type { JSX } from 'react';
 
-export const getMenuItems = (userRole: UserRole): MenuItem[] => {
+export interface IMenuItem {
+  label: string;
+  path: string;
+  icon: JSX.Element;
+}
+
+export const getMenuItems = (userRole: UserRole): IMenuItem[] => {
   switch (userRole) {
     case 'admin':
       return [
         {
           label: 'Painel',
-          path: EPageRoutes.ADMIN_DASHBOARD,
+          path: EPageRoutes.DASHBOARD,
           icon: GetAppIcon('dashboard'),
         },
         {
           label: 'Empresas',
-          path: EPageRoutes.ADMIN_COMPANIES,
+          path: EPageRoutes.COMPANIES,
           icon: GetAppIcon('company'),
         },
         {
           label: 'Gestores',
-          path: EPageRoutes.ADMIN_MANAGERS,
+          path: EPageRoutes.MANAGERS,
           icon: GetAppIcon('manager'),
         },
         {
           label: 'Vendedores',
-          path: EPageRoutes.ADMIN_SALESMEN,
+          path: EPageRoutes.SALESMEN,
           icon: GetAppIcon('salesman'),
         },
         {
           label: 'Reuniões',
-          path: EPageRoutes.ADMIN_MEETINGS,
+          path: EPageRoutes.MEETINGS,
           icon: GetAppIcon('meeting'),
         },
       ];
@@ -38,17 +44,17 @@ export const getMenuItems = (userRole: UserRole): MenuItem[] => {
       return [
         {
           label: 'Painel',
-          path: EPageRoutes.MANAGER_DASHBOARD,
+          path: EPageRoutes.DASHBOARD,
           icon: GetAppIcon('dashboard'),
         },
         {
           label: 'Vendedores',
-          path: EPageRoutes.MANAGER_SALESMEN,
+          path: EPageRoutes.SALESMEN,
           icon: GetAppIcon('salesman'),
         },
         {
           label: 'Reuniões',
-          path: EPageRoutes.MANAGER_MEETINGS,
+          path: EPageRoutes.MEETINGS,
           icon: GetAppIcon('meeting'),
         },
       ];
@@ -57,12 +63,12 @@ export const getMenuItems = (userRole: UserRole): MenuItem[] => {
       return [
         {
           label: 'Painel',
-          path: EPageRoutes.SALESMAN_DASHBOARD,
+          path: EPageRoutes.DASHBOARD,
           icon: GetAppIcon('dashboard'),
         },
         {
           label: 'Reuniões',
-          path: EPageRoutes.SALESMAN_MEETINGS,
+          path: EPageRoutes.MEETINGS,
           icon: GetAppIcon('meeting'),
         },
       ];

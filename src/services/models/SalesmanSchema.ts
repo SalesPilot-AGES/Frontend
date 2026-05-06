@@ -1,37 +1,108 @@
-import { z } from 'zod/v4';
+import z from 'zod';
 
-import { PageableSchema } from './CompanySchema';
+import { PageableSchema } from './PageableSchema';
 
+export const SalesmanCompanySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+/**
+ * @description Zod schema for a single salesman entity returned by API.
+ */
 export const SalesmanSchema = z.object({
-  id: z.string().uuid(),
-  companyId: z.string().uuid(),
-  name: z.string(),
-  email: z.string().email(),
+  id: z.string(),
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  company: SalesmanCompanySchema,
   active: z.boolean(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-});
-
-export const SalesmanListItemApiSchema = z.object({
-  id: z.string().uuid(),
-  company_id: z.string().uuid(),
-  name: z.string(),
-  email: z.string().email(),
-  active: z.boolean(),
-  created_at: z.string(),
+  role: z.string().optional(),
+  phone: z.string().nullable().optional(),
+  average_feeling: z.number().min(0).max(100).nullable().optional(),
+  average_sentiment: z.number().min(0).max(100).nullable().optional(),
+  total_meetings: z.number().int().nonnegative().optional(),
+  preferences: z
+    .object({
+      theme: z.string().nullable(),
+      default_model: z.string().nullable(),
+    })
+    .nullable()
+    .optional(),
+  created_at: z.string().optional(),
   updated_at: z.string().optional(),
-  company: z.object({
-    id: z.string().uuid(),
-    name: z.string(),
-    tax_id: z.string().optional(),
-    plan: z.enum(['BASIC', 'PRO', 'ENTERPRISE']).optional(),
-    active: z.boolean().optional(),
-    created_at: z.string().optional(),
-  }),
 });
 
-export const SalesmenPagedResponseSchema = z.object({
-  content: z.array(SalesmanListItemApiSchema),
+/**
+ * @description Frontend shape for salesman create.
+ */
+export const CreateSalesmanSchema = SalesmanSchema.omit({
+  id: true,
+  created_at: true,
+  updated_at: true,
+});
+
+/**
+ * @description Frontend shape for salesman list rows in admin table.
+ */
+export const SalesmanListItemSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  company: SalesmanCompanySchema,
+  active: z.boolean(),
+  average_sentiment: z.number().min(0).max(100).nullable().optional(),
+  created_at: z.string().optional(),
+});
+
+/**
+ * @description Normalizes salesman API item to table shape.
+ */
+export const mapSalesmanListItemApiToTSalesmanWithCompany = (
+  payload: z.infer<typeof SalesmanSchema>
+): z.infer<typeof SalesmanListItemSchema> => ({
+  id: payload.id,
+  name: payload.name,
+  email: payload.email,
+  company: payload.company,
+  active: payload.active,
+  average_sentiment:
+    payload.average_sentiment ?? payload.average_feeling ?? null,
+  created_at: payload.created_at,
+});
+
+/**
+ * @description Zod schema for creating a new salesman.
+ */
+export const SalesmanCreateInputSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  company_id: z.string().min(1, 'Company is required'),
+  active: z.boolean(),
+  preferences: z
+    .object({
+      theme: z.string().nullable(),
+      default_model: z.string().nullable(),
+    })
+    .nullable()
+    .optional(),
+});
+
+/**
+ * @description Zod schema for updating an existing salesman.
+ */
+export const SalesmanUpdateInputSchema = SalesmanCreateInputSchema.pick({
+  name: true,
+  email: true,
+  company_id: true,
+  active: true,
+  preferences: true,
+}).partial();
+
+/**
+ * @description API schema for paginated salesman list responses.
+ */
+export const SalesmanListApiSchema = z.object({
+  content: z.array(SalesmanSchema),
   pageable: PageableSchema,
   total_elements: z.number().int().nonnegative(),
   total_pages: z.number().int().nonnegative(),
@@ -48,35 +119,27 @@ export const SalesmenPagedResponseSchema = z.object({
   }),
 });
 
-export const CreateSalesmanSchema = SalesmanSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
+/**
+ * @description Frontend schema for paginated salesman list responses.
+ */
+export const SalesmanListSchema = SalesmanListApiSchema.extend({
+  content: z.array(SalesmanListItemSchema),
 });
 
-export const UpdateSalesmanSchema = CreateSalesmanSchema.partial();
+/**
+ * @description Zod schema for salesman filtering options.
+ */
+export const SalesmanFiltersSchema = z.object({
+  companyId: z.string().optional(),
+  name: z.string().optional(),
+  email: z.string().optional(),
+  active: z.boolean().optional(),
+});
 
 export type TSalesman = z.infer<typeof SalesmanSchema>;
 export type TCreateSalesman = z.infer<typeof CreateSalesmanSchema>;
-export type TUpdateSalesman = z.infer<typeof UpdateSalesmanSchema>;
-
-export type TSalesmanWithCompany = z.infer<typeof SalesmanSchema> & {
-  company: { id: string; name: string };
-};
-
-export const mapSalesmanListItemApiToTSalesmanWithCompany = (
-  row: z.infer<typeof SalesmanListItemApiSchema>
-): TSalesmanWithCompany => {
-  const createdAt = new Date(row.created_at).toISOString();
-  const updatedAt = new Date(row.updated_at ?? row.created_at).toISOString();
-  return {
-    id: row.id,
-    companyId: row.company_id,
-    name: row.name,
-    email: row.email,
-    active: row.active,
-    createdAt,
-    updatedAt,
-    company: { id: row.company.id, name: row.company.name },
-  };
-};
+export type TSalesmanWithCompany = z.infer<typeof SalesmanListItemSchema>;
+export type TSalesmanCreateInput = z.infer<typeof SalesmanCreateInputSchema>;
+export type TSalesmanUpdateInput = z.infer<typeof SalesmanUpdateInputSchema>;
+export type TSalesmanList = z.infer<typeof SalesmanListSchema>;
+export type TSalesmanFilters = z.infer<typeof SalesmanFiltersSchema>;

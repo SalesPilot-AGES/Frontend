@@ -1,7 +1,12 @@
-import type { DemoAccountsInfoProps } from '@declarations';
 import LoginIcon from '@mui/icons-material/Login';
 import { Box, Button, Typography } from '@mui/material';
 import type { JSX } from 'react';
+import type { UseFormSetValue } from 'react-hook-form';
+
+export interface IDemoAccountsInfoProps {
+  setValue: UseFormSetValue<{ email: string; password: string }>;
+  onSubmit: () => void;
+}
 
 const demoAccounts = [
   { label: 'Admin', email: 'admin@example.com' },
@@ -14,7 +19,7 @@ const PASSWORD = 'password';
 export const DemoAccountsInfo = ({
   setValue,
   onSubmit,
-}: DemoAccountsInfoProps): JSX.Element => {
+}: IDemoAccountsInfoProps): JSX.Element => {
   const handleFillCredentials = (email: string): void => {
     setValue('email', email, { shouldDirty: true, shouldValidate: true });
     setValue('password', PASSWORD, { shouldDirty: true, shouldValidate: true });

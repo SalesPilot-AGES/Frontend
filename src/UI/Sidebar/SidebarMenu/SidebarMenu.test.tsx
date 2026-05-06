@@ -6,7 +6,7 @@ import { SidebarMenu } from './SidebarMenu';
 
 // Mock the user hook
 vi.mock('@store/hooks/useCurrentUser', () => ({
-  useRequireUser: vi.fn(() => ({
+  useCurrentUser: vi.fn(() => ({
     name: 'Test User',
     email: 'test@example.com',
     role: 'admin',

@@ -66,4 +66,28 @@ describe('AppIcon Component', () => {
       container.querySelector('[data-testid="LogoutIcon"]')
     ).toBeInTheDocument();
   });
+
+  it('returns SentimentSatisfiedAltIcon for sentimentHappy', () => {
+    const icon = GetAppIcon('sentimentHappy');
+    const { container } = render(icon);
+    expect(
+      container.querySelector('[data-testid="SentimentSatisfiedAltIcon"]')
+    ).toBeInTheDocument();
+  });
+
+  it('returns SentimentNeutralIcon for sentimentNeutral', () => {
+    const icon = GetAppIcon('sentimentNeutral');
+    const { container } = render(icon);
+    expect(
+      container.querySelector('[data-testid="SentimentNeutralIcon"]')
+    ).toBeInTheDocument();
+  });
+
+  it('returns SentimentVeryDissatisfiedIcon for sentimentSad', () => {
+    const icon = GetAppIcon('sentimentSad');
+    const { container } = render(icon);
+    expect(
+      container.querySelector('[data-testid="SentimentVeryDissatisfiedIcon"]')
+    ).toBeInTheDocument();
+  });
 });

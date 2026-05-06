@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { withLayout } from './LayoutWrapper';
 
 // Mock the Layout component
-vi.mock('@pages/Layout', () => ({
+vi.mock('@pages/Layout/Layout', () => ({
   Layout: ({ children }: { children: React.ReactNode }): JSX.Element => (
     <div data-testid="mock-layout">
       <div data-testid="layout-content">{children}</div>

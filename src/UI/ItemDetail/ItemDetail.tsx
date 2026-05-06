@@ -1,6 +1,14 @@
-import type { IItemDetailProps } from '@declarations/ui';
+import type { SxProps } from '@mui/material';
 import { Box, Typography } from '@mui/material';
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
+
+export interface IItemDetailProps {
+  label: string;
+  value?: string;
+  icon?: JSX.Element;
+  children?: ReactNode;
+  sx?: SxProps;
+}
 
 export const ItemDetail = ({
   label,

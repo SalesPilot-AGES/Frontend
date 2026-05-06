@@ -1,7 +1,12 @@
-import type { IEntityDetailsCardProps } from '@declarations/ui';
 import { Edit } from '@mui/icons-material';
 import { Box, Button, Paper, Typography } from '@mui/material';
 import type { JSX, ReactNode } from 'react';
+
+export interface IEntityDetailsCardProps {
+  title: string;
+  children: ReactNode;
+  onEdit?: () => void;
+}
 
 type TEntityDetailsCardProps = IEntityDetailsCardProps & {
   headerRight?: ReactNode;

@@ -5,15 +5,16 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { useRequireUser } from '@store/hooks/useCurrentUser';
+import { useCurrentUser } from '@store/hooks/useCurrentUser';
 import { Link, useLocation } from '@tanstack/react-router';
 import type { JSX } from 'react';
 
 import { getMenuItems } from './MenuItems/MenuItems';
 
-export const SidebarMenu = (): JSX.Element => {
-  const user = useRequireUser();
+export const SidebarMenu = (): JSX.Element | null => {
+  const user = useCurrentUser();
   const location = useLocation();
+  if (!user) return null;
   const menuItems = getMenuItems(user.role);
 
   return (

@@ -1,16 +1,16 @@
-import {
-  chipLookFromValue,
-  resolveBadgeColor,
-  resolveCellIconColor,
-  resolveCellValue,
-} from '@hooks/useDataTable';
 import { Box, Chip, Stack, Typography } from '@mui/material';
 import type { Palette } from '@mui/material/styles';
 import type { JSX, ReactNode } from 'react';
 
 import type { DataTableColumn } from '../../../types/ui';
+import {
+  chipLookFromValue,
+  resolveBadgeColor,
+  resolveCellIconColor,
+  resolveCellValue,
+} from '../useDataTable';
 
-export interface DataTableBodyCellProps<T> {
+export interface IDataTableBodyCellProps<T> {
   row: T;
   column: DataTableColumn<T>;
   palette: Palette;
@@ -22,7 +22,7 @@ export const DataTableBodyCell = <T,>({
   column,
   palette,
   bodyTextColor,
-}: DataTableBodyCellProps<T>): JSX.Element => {
+}: IDataTableBodyCellProps<T>): JSX.Element => {
   const value: ReactNode = resolveCellValue(row, column.accessor);
 
   if (column.render) {

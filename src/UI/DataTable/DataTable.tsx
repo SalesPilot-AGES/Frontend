@@ -1,4 +1,3 @@
-import { useDataTable } from '@hooks/useDataTable';
 import { Paper, Table, TableContainer } from '@mui/material';
 import type { JSX } from 'react';
 
@@ -6,6 +5,7 @@ import type { DataTableProps } from '../../types/ui';
 import { DataTableBody } from './DataTableBody/DataTableBody';
 import { DataTableHead } from './DataTableHead/DataTableHead';
 import { DataTableToolbar } from './DataTableToolbar/DataTableToolbar';
+import { useDataTable } from './useDataTable';
 
 export const DataTable = <T,>({
   columns,
@@ -26,12 +26,20 @@ export const DataTable = <T,>({
   filterOptions = [],
   filterPlaceholder = 'Filtrar',
   filterAriaLabel = 'Filtro',
+  companyFilterValue,
+  onCompanyFilterChange,
+  companyFilterOptions = [],
+  companyFilterPlaceholder = 'Filtrar por empresa',
+  companyFilterAriaLabel = 'Filtrar por empresa',
 }: DataTableProps<T>): JSX.Element => {
   const { palette, surfaceColors } = useDataTable();
 
   const showSearch = onSearchChange != null;
   const showFilter = onFilterChange != null && filterOptions.length > 0;
-  const showToolbar = Boolean(toolbarTitle) || showSearch || showFilter;
+  const showCompanyFilter =
+    onCompanyFilterChange != null && companyFilterOptions.length > 0;
+  const showToolbar =
+    Boolean(toolbarTitle) || showSearch || showFilter || showCompanyFilter;
 
   return (
     <Paper
@@ -62,6 +70,12 @@ export const DataTable = <T,>({
           filterOptions={filterOptions}
           filterPlaceholder={filterPlaceholder}
           filterAriaLabel={filterAriaLabel}
+          showCompanyFilter={showCompanyFilter}
+          companyFilterValue={companyFilterValue}
+          onCompanyFilterChange={onCompanyFilterChange}
+          companyFilterOptions={companyFilterOptions}
+          companyFilterPlaceholder={companyFilterPlaceholder}
+          companyFilterAriaLabel={companyFilterAriaLabel}
           surface={surfaceColors}
           palette={palette}
         />

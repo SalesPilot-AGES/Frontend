@@ -33,11 +33,11 @@ export const GetAppIcon = (name: TIconName): JSX.Element => {
     case 'duration':
       return <AccessTimeIcon />;
     case 'sentimentSad':
-      return <SentimentVeryDissatisfiedIcon />;
+      return <SentimentDissatisfiedIcon />;
     case 'sentimentNeutral':
       return <SentimentNeutralIcon />;
     case 'sentimentHappy':
-      return <SentimentSatisfiedAltIcon />;
+      return <SentimentSatisfiedIcon />;
     case 'login':
       return <LoginIcon />;
     case 'logout':
@@ -48,12 +48,6 @@ export const GetAppIcon = (name: TIconName): JSX.Element => {
       return <SaveIcon />;
     case 'real_estate_agent':
       return <RealEstateAgentIcon />;
-    case 'sentimentSad':
-      return <SentimentDissatisfiedIcon />;
-    case 'sentimentNeutral':
-      return <SentimentNeutralIcon />;
-    case 'sentimentHappy':
-      return <SentimentSatisfiedIcon />;
     default:
       return <ElectricBoltIcon />;
   }

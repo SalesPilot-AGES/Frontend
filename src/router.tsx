@@ -19,6 +19,7 @@ import {
   redirect,
   Router,
 } from '@tanstack/react-router';
+import { z } from 'zod';
 
 const requireAuth = (): void => {
   const user = useAuthStore.getState().user;
@@ -121,6 +122,9 @@ const meetingsRoute = createRoute({
 const meetingDetailRoute = createRoute({
   getParentRoute: () => protectedRoute,
   path: EPageRoutes.SALESMAN_MEETINGS_DETAIL,
+  validateSearch: z.object({
+    tab: z.enum(['context', 'insights', 'action-plan']).optional(),
+  }),
   component: MeetingDetail,
 });
 

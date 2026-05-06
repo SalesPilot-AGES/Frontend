@@ -2,6 +2,7 @@ import { salesmanApi } from '@services/api/salesman';
 import type {
   TCreateSalesman,
   TSalesman,
+  TSalesmanCreateInput,
   TSalesmanWithCompany,
 } from '@services/models/SalesmanSchema';
 import {
@@ -24,7 +25,10 @@ export const useGetSalesmen = (
 ): ReturnType<typeof useQuery<TSalesmanWithCompany[], Error>> => {
   return useQuery<TSalesmanWithCompany[], Error>({
     queryKey: salesmenQueryKeys.lists(),
-    queryFn: () => salesmanApi.getSalesmen(),
+    queryFn: async () => {
+      const response = await salesmanApi.getSalesmen();
+      return response.content;
+    },
     staleTime: 1000 * 60 * 5,
     ...options,
   });
@@ -35,7 +39,16 @@ export const useCreateSalesman = (
 ): ReturnType<typeof useMutation<TSalesman, Error, TCreateSalesman>> => {
   const queryClient = useQueryClient();
   return useMutation<TSalesman, Error, TCreateSalesman>({
-    mutationFn: (data: TCreateSalesman) => salesmanApi.createSalesman(data),
+    mutationFn: (data: TCreateSalesman) => {
+      const payload: TSalesmanCreateInput = {
+        name: data.name,
+        email: data.email,
+        company_id: data.company.id,
+        active: data.active,
+        preferences: data.preferences,
+      };
+      return salesmanApi.createSalesman(payload);
+    },
     ...options,
     onSuccess: (newSalesman: TSalesman, ...args) => {
       queryClient.invalidateQueries({ queryKey: salesmenQueryKeys.lists() });

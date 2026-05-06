@@ -5,6 +5,6 @@ export const EpageDescriptions = {
   SALESMAN_DASHBOARD: 'Visão geral de suas atividades e reuniões',
   COMPANIES: 'Gerencie as empresas cadastradas na plataforma',
   MANAGERS: 'Gerencie os gestores cadastrados na plataforma',
-  SALESMEN: 'Gerencie os vendedores cadastrados na plataforma',
+  SALESMEN: 'Gerencie os vendedores das empresas cadastradas',
   MEETINGS: 'Gerencie as reuniões realizadas com o apoio da plataforma',
 };

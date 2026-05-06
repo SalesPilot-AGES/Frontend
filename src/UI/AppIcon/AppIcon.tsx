@@ -10,9 +10,9 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import PersonIcon from '@mui/icons-material/Person';
 import SaveIcon from '@mui/icons-material/Save';
-import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied';
 import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
 import type { JSX } from 'react';
 
 export const GetAppIcon = (name: TIconName): JSX.Element => {
@@ -32,7 +32,7 @@ export const GetAppIcon = (name: TIconName): JSX.Element => {
     case 'duration':
       return <AccessTimeIcon />;
     case 'sentimentSad':
-      return <SentimentDissatisfiedIcon />;
+      return <SentimentVeryDissatisfiedIcon />;
     case 'sentimentNeutral':
       return <SentimentNeutralIcon />;
     case 'sentimentHappy':

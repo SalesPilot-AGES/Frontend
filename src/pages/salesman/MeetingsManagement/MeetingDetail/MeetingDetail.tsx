@@ -6,7 +6,10 @@ import {
   useTheme,
 } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
-import { useGetMeetingById } from '@services/queries/useMeetings';
+import {
+  useGetMeetingById,
+  useGetMeetingPostAnalysis,
+} from '@services/queries/useMeetings';
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { type JSX } from 'react';
@@ -37,6 +40,8 @@ export const MeetingDetail = (): JSX.Element => {
     isLoading,
     isError,
   } = useGetMeetingById(meetingId ?? null);
+  const { data: meetingPostAnalysis, isLoading: isMeetingPostAnalysisLoading } =
+    useGetMeetingPostAnalysis(meetingId ?? null);
 
   const meeting = rawMeeting as TMeetingDetail | undefined;
 
@@ -87,6 +92,9 @@ export const MeetingDetail = (): JSX.Element => {
         />
 
         <MeetingDetailTabsContent
+          meeting={meeting}
+          meetingSummary={meetingPostAnalysis?.summary || null}
+          isMeetingSummaryLoading={isMeetingPostAnalysisLoading}
           currentTab={currentTab}
           onTabChange={handleTabChange}
         />

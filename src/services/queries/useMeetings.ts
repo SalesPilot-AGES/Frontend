@@ -1,6 +1,8 @@
 import { meetingApi, type TMeetingFilters } from '@services/api/meeting';
 import type {
+  TMeetingContextMetadata,
   TMeetingListItem,
+  TMeetingPostAnalysis,
   TMeetingsResponse,
 } from '@services/models/MeetingSchema';
 import type { UseQueryOptions } from '@tanstack/react-query';
@@ -13,6 +15,8 @@ export const meetingsQueryKeys = {
     [...meetingsQueryKeys.lists(), { page, size, filters }] as const,
   details: () => [...meetingsQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...meetingsQueryKeys.details(), id] as const,
+  postAnalysis: (id: string) =>
+    [...meetingsQueryKeys.detail(id), 'post-analysis'] as const,
 };
 
 export type TMeetingsListResult = {
@@ -37,11 +41,24 @@ export const useGetMeetings = (
 
 export const useGetMeetingById = (
   uuid: string | null,
-  options?: UseQueryOptions<unknown>
-): ReturnType<typeof useQuery<unknown, Error>> => {
-  return useQuery<unknown, Error>({
+  options?: UseQueryOptions<TMeetingContextMetadata>
+): ReturnType<typeof useQuery<TMeetingContextMetadata, Error>> => {
+  return useQuery<TMeetingContextMetadata, Error>({
     queryKey: meetingsQueryKeys.detail(uuid || ''),
     queryFn: () => meetingApi.getMeetingById(uuid!),
+    enabled: !!uuid,
+    staleTime: 1000 * 60 * 5,
+    ...options,
+  });
+};
+
+export const useGetMeetingPostAnalysis = (
+  uuid: string | null,
+  options?: UseQueryOptions<TMeetingPostAnalysis | null>
+): ReturnType<typeof useQuery<TMeetingPostAnalysis | null, Error>> => {
+  return useQuery<TMeetingPostAnalysis | null, Error>({
+    queryKey: meetingsQueryKeys.postAnalysis(uuid || ''),
+    queryFn: () => meetingApi.getMeetingPostAnalysis(uuid!),
     enabled: !!uuid,
     staleTime: 1000 * 60 * 5,
     ...options,

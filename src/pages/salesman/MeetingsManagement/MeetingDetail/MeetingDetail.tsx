@@ -12,9 +12,9 @@ import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { type JSX } from 'react';
 import React from 'react';
 
-import { MeetingDetailHeaderStats } from './components/MeetingDetailHeaderStats';
-import { MeetingDetailTabsContent } from './components/MeetingDetailTabsContent';
 import type { TMeetingDetail, TMeetingTab } from './MeetingDetail.interface';
+import { MeetingDetailHeaderStats } from './MeetingDetailHeaderStats/MeetingDetailHeaderStats';
+import { MeetingDetailTabsContent } from './MeetingDetailTabsContent/MeetingDetailTabsContent';
 
 export const MeetingDetail = (): JSX.Element => {
   const { palette, breakpoints } = useTheme();

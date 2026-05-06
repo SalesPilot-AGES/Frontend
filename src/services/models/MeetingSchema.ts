@@ -46,6 +46,31 @@ const MeetingPreAnalysisSchema = z.object({
   created_at: z.string().optional(),
 });
 
+const MeetingInsightSchema = z.union([
+  z.string(),
+  z.object({
+    text: z.string().optional(),
+    insight: z.string().optional(),
+    category: z.string().nullable().optional(),
+    tag: z.string().nullable().optional(),
+    priority: z.string().nullable().optional(),
+  }),
+]);
+
+const MeetingActionItemSchema = z.union([
+  z.string(),
+  z.object({
+    text: z.string().optional(),
+    description: z.string().optional(),
+    done: z.boolean().optional(),
+    responsible: z.string().nullable().optional(),
+    owner: z.string().nullable().optional(),
+    due_date: z.string().nullable().optional(),
+    deadline: z.string().nullable().optional(),
+    due_in_days: z.number().nullable().optional(),
+  }),
+]);
+
 /**
  * Payload de detalhe/contexto da reunião
  */
@@ -75,14 +100,9 @@ export const MeetingPostAnalysisSchema = z.object({
   id: z.string(),
   meeting_id: z.string(),
   summary: z.string().optional(),
-  action_items: z
-    .array(
-      z.object({
-        text: z.string(),
-        done: z.boolean(),
-      })
-    )
-    .optional(),
+  insights: z.array(MeetingInsightSchema).optional(),
+  action_plan: z.array(MeetingActionItemSchema).optional(),
+  action_items: z.array(MeetingActionItemSchema).optional(),
   sentiment_analysis: z
     .object({
       overall: z.string(),
@@ -153,3 +173,5 @@ export type TMeetingContextMetadata = z.infer<
   typeof MeetingContextMetadataSchema
 >;
 export type TMeetingPostAnalysis = z.infer<typeof MeetingPostAnalysisSchema>;
+export type TMeetingInsight = z.infer<typeof MeetingInsightSchema>;
+export type TMeetingActionItem = z.infer<typeof MeetingActionItemSchema>;

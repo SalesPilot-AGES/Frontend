@@ -93,8 +93,8 @@ export const MeetingDetail = (): JSX.Element => {
 
         <MeetingDetailTabsContent
           meeting={meeting}
-          meetingSummary={meetingPostAnalysis?.summary || null}
-          isMeetingSummaryLoading={isMeetingPostAnalysisLoading}
+          meetingPostAnalysis={meetingPostAnalysis || null}
+          isMeetingPostAnalysisLoading={isMeetingPostAnalysisLoading}
           currentTab={currentTab}
           onTabChange={handleTabChange}
         />

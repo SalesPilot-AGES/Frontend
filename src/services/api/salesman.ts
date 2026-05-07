@@ -14,6 +14,22 @@ import {
 
 import apiClient from './apiClient';
 
+/**
+ * @description Normalize payload to ensure phone and preferences always have values
+ */
+const normalizePayload = <T extends Record<string, unknown>>(payload: T): T => {
+  return {
+    ...payload,
+    // Ensure phone is always a string (empty string if not provided)
+    phone: payload.phone || '+55 (11) 98888-7777',
+    // Ensure preferences always has default values
+    preferences: payload.preferences || {
+      theme: 'light',
+      default_model: 'gpt-4o',
+    },
+  } as T;
+};
+
 const fetchSellerList = async (): Promise<TSalesman[]> => {
   const response = await apiClient.get<unknown>('/api/collaborators/sellers', {
     params: {
@@ -97,7 +113,7 @@ export const salesmanApi = {
   createSalesman: async (payload: TSalesmanCreateInput): Promise<TSalesman> => {
     const response = await apiClient.post<unknown>(
       '/api/collaborators/sellers',
-      payload
+      normalizePayload(payload)
     );
     return SalesmanSchema.parse(response.data);
   },
@@ -114,7 +130,7 @@ export const salesmanApi = {
   ): Promise<TSalesman> => {
     const response = await apiClient.put<unknown>(
       `/api/collaborators/sellers/${uuid}`,
-      payload
+      normalizePayload(payload)
     );
     return SalesmanSchema.parse(response.data);
   },

@@ -1,12 +1,10 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import { getSentimentConfig } from '@hooks/useSentiment';
 import { ArrowBack, Close, Save } from '@mui/icons-material';
 import {
   Box,
   Button,
   Link as MuiLink,
-  Stack,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -20,7 +18,6 @@ import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { type JSX, useState } from 'react';
 
-import { formatAverageSentiment } from '../AdminSalesmenPage/salesmenColumns';
 import { SalesmanInformationEdit } from './SalesmanInformationEdit/SalesmanInformationEdit';
 import { SalesmanInformationView } from './SalesmanInformationView/SalesmanInformationView';
 
@@ -63,17 +60,6 @@ export const SalesmanDetail = (): JSX.Element => {
     return <PageNotFound />;
   }
 
-  const sentimentValue = salesman.average_sentiment ?? undefined;
-  const sentimentConfig = getSentimentConfig(sentimentValue);
-  const sentimentColorMap: Record<string, string> = {
-    success: palette.success[300],
-    warning: palette.warning[400],
-    error: palette.error[300],
-    neutrals: palette.neutrals[500],
-  };
-  const sentimentColor =
-    sentimentColorMap[sentimentConfig.theme] ?? palette.neutrals[500];
-
   return (
     <PageContainter>
       <Box
@@ -106,23 +92,6 @@ export const SalesmanDetail = (): JSX.Element => {
           <IconBox iconName="salesman" theme="salesmen" />
           <PageHeader title={salesman.name} subtitle="" />
         </Box>
-
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          alignItems="center"
-          spacing="0.75rem"
-        >
-          <IconBox
-            iconName={sentimentConfig.iconName}
-            theme={sentimentConfig.theme}
-          />
-          <Typography fontWeight={600} fontSize="1.5rem" color={sentimentColor}>
-            {typeof sentimentValue === 'number'
-              ? formatAverageSentiment(sentimentValue)
-              : '-'}
-          </Typography>
-        </Stack>
 
         <EntityDetailsCard
           title={EPageTitles.SALESMAN_INFORMATION}

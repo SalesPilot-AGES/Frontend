@@ -49,8 +49,9 @@ export const DataTable = <T,>({
         border: `1px solid ${surfaceColors.paperBorder}`,
         borderRadius: '0.75rem',
         boxShadow: 'none',
-        // overflow:hidden corta linhas extras dentro de flex/layout com altura limitada.
-        overflow: 'visible',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
         minWidth: 0,
         width: '100%',
         ...sx,
@@ -82,8 +83,9 @@ export const DataTable = <T,>({
       ) : null}
       <TableContainer
         sx={{
+          flex: 1,
           overflowX: 'auto',
-          overflowY: 'visible',
+          overflowY: 'auto',
           maxWidth: '100%',
         }}
       >

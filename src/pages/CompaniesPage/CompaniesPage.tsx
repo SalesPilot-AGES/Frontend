@@ -157,7 +157,7 @@ export const CompaniesPage = (): JSX.Element => {
         open={openAddModal}
         handleClose={() => setOpenAddModal(false)}
       />
-      <Stack spacing="2.5rem">
+      <Stack spacing="2.5rem" sx={{ height: '100%' }}>
         <Box
           display="flex"
           alignItems="flex-start"
@@ -205,7 +205,11 @@ export const CompaniesPage = (): JSX.Element => {
           columns={columns}
           getRowId={(row: CompanyWithStats) => row.id}
           loading={isLoading}
-          sx={{ border: `1px solid ${palette.neutrals[200]}` }}
+          sx={{
+            border: `1px solid ${palette.neutrals[200]}`,
+            flex: 1,
+            minHeight: 0,
+          }}
           onDetailsClick={(rowId) => {
             navigate({
               to: EPageRoutes.COMPANY_DETAIL,

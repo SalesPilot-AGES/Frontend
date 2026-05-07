@@ -39,6 +39,9 @@ export const MeetingDetailTabsContent = ({
         border: '1px solid',
         borderColor: 'divider',
         overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
       }}
     >
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -64,7 +67,7 @@ export const MeetingDetailTabsContent = ({
         </Tabs>
       </Box>
 
-      <Box minHeight="300px">
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
         {currentTab === 'context' && (
           <MeetingContext
             meeting={meeting}

@@ -17,6 +17,7 @@ import { StatCard } from '@UI/StatCard/StatCard';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 
+import { AddSalesmanModal } from '../AddSalesmanModal/AddSalesmanModal';
 import {
   buildSalesmenColumns,
   formatAverageSentiment,
@@ -27,6 +28,7 @@ export const AdminSalesmenPage = (): JSX.Element => {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
   const [filterValue, setFilterValue] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: salesmenData, isLoading } = useGetSalesmen(0, 20, {});
   const salesmen = useMemo(
     () => salesmenData?.content ?? [],
@@ -79,7 +81,7 @@ export const AdminSalesmenPage = (): JSX.Element => {
           <Button
             startIcon={<AddIcon />}
             variant="gradient"
-            onClick={() => undefined}
+            onClick={() => setIsModalOpen(true)}
           >
             Adicionar vendedor
           </Button>
@@ -137,6 +139,10 @@ export const AdminSalesmenPage = (): JSX.Element => {
           ]}
         />
       </Stack>
+      <AddSalesmanModal
+        open={isModalOpen}
+        handleClose={() => setIsModalOpen(false)}
+      />
     </PageContainter>
   );
 };

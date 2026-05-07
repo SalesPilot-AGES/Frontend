@@ -50,8 +50,6 @@ export const MeetingContext = ({
       spacing={3}
       sx={{
         p: 2,
-        height: '18.75rem',
-        overflowY: 'auto',
       }}
     >
       <Typography variant="body2" color="text.secondary">

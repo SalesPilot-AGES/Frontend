@@ -13,15 +13,10 @@ import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import type { JSX, ReactNode } from 'react';
 
 const formatSentimentPercentage = (value: number): string =>
-  `${Math.round(value)}%`;
+  `${Math.round(value * 100)}%`;
 
-export const formatAverageSentiment = (value: number): string => {
-  const formatter = new Intl.NumberFormat('pt-BR', {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
-  return `${formatter.format(value)}%`;
-};
+export const formatAverageSentiment = (value: number): string =>
+  `${Math.round(value * 100)}%`;
 
 const getSentimentIcon = (value: number): JSX.Element => {
   const config = getSentimentConfig(value);
@@ -89,7 +84,10 @@ export const buildSalesmenColumns = (
     render: (_value: ReactNode, row: TSalesmanWithCompany): JSX.Element => {
       const sentimentValue = row.average_sentiment;
       const hasSentiment = typeof sentimentValue === 'number';
-      const config = getSentimentConfig(sentimentValue ?? undefined);
+      const sentimentPercent = hasSentiment
+        ? Math.round(sentimentValue * 100)
+        : undefined;
+      const config = getSentimentConfig(sentimentPercent);
 
       return (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
@@ -102,7 +100,7 @@ export const buildSalesmenColumns = (
             }}
           >
             {hasSentiment ? (
-              getSentimentIcon(sentimentValue)
+              getSentimentIcon(sentimentPercent!)
             ) : (
               <SentimentNeutralRoundedIcon />
             )}

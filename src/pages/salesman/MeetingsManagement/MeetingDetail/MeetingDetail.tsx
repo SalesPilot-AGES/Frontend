@@ -89,6 +89,7 @@ export const MeetingDetail = (): JSX.Element => {
       <Stack spacing={3} sx={{ width: '100%', alignSelf: 'flex-start' }}>
         <MeetingDetailHeaderStats
           meeting={meeting}
+          sentimentScore={meetingPostAnalysis?.sentiment_analysis?.score}
           palette={palette}
           themePalette={themePalette}
           responsiveValueFontSize={responsiveValueFontSize}

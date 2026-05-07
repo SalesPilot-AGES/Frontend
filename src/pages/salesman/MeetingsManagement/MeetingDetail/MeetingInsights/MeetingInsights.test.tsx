@@ -10,14 +10,14 @@ describe('MeetingInsights', () => {
       {
         id: '1',
         type: 'KEY_POINT',
-        description: { text: 'Cliente pediu proposta acelerada' },
+        description: { text: 'Ponto-chave identificado' },
         content: 'Cliente pediu proposta acelerada',
         created_at: '2026-05-07T10:00:00Z',
       },
       {
         id: '2',
         type: 'ACTION_ITEM',
-        description: { text: 'Objeção sobre prazo de implementação' },
+        description: { text: 'Item de ação importante' },
         content: 'Objeção sobre prazo de implementação',
         created_at: '2026-05-07T10:05:00Z',
       },
@@ -31,7 +31,8 @@ describe('MeetingInsights', () => {
     expect(
       screen.getByText('Objeção sobre prazo de implementação')
     ).toBeInTheDocument();
-    expect(screen.queryByText('Prioridade alta')).not.toBeInTheDocument();
+    expect(screen.getByText('Ponto-chave identificado')).toBeInTheDocument();
+    expect(screen.getByText('Item de ação importante')).toBeInTheDocument();
   });
 
   it('renders empty state', () => {

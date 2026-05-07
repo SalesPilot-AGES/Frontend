@@ -20,6 +20,7 @@ type TMeetingDetailTabsContentProps = {
   isMeetingPostAnalysisLoading: boolean;
   meetingInsights: TMeetingRealtimeInsight[];
   isMeetingInsightsLoading: boolean;
+  isMeetingInsightsError: boolean;
   currentTab: TMeetingTab;
   onTabChange: (_event: React.SyntheticEvent, newValue: string) => void;
 };
@@ -30,6 +31,7 @@ export const MeetingDetailTabsContent = ({
   isMeetingPostAnalysisLoading,
   meetingInsights,
   isMeetingInsightsLoading,
+  isMeetingInsightsError,
   currentTab,
   onTabChange,
 }: TMeetingDetailTabsContentProps): JSX.Element => {
@@ -86,6 +88,7 @@ export const MeetingDetailTabsContent = ({
           <MeetingInsights
             insights={meetingInsights}
             isLoading={isMeetingInsightsLoading}
+            hasError={isMeetingInsightsError}
           />
         )}
 

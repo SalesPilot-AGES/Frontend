@@ -76,7 +76,8 @@ export const useGetMeetingInsights = (
     queryKey: meetingsQueryKeys.insights(uuid || ''),
     queryFn: () => meetingApi.getMeetingInsights(uuid!),
     enabled: !!uuid,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    refetchOnMount: true,
     ...options,
   });
 };

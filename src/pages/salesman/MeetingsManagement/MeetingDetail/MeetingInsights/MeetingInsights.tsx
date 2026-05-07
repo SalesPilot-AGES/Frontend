@@ -14,6 +14,7 @@ import type { JSX } from 'react';
 type TMeetingInsightsProps = {
   insights: TMeetingRealtimeInsight[];
   isLoading: boolean;
+  hasError: boolean;
 };
 
 const TYPE_LABELS: Record<TMeetingRealtimeInsight['type'], string> = {
@@ -24,8 +25,11 @@ const TYPE_LABELS: Record<TMeetingRealtimeInsight['type'], string> = {
 export const MeetingInsights = ({
   insights,
   isLoading,
+  hasError,
 }: TMeetingInsightsProps): JSX.Element => {
   const { palette } = useTheme();
+  const resolveTypeLabel = (type: TMeetingRealtimeInsight['type']): string =>
+    TYPE_LABELS[type] ?? type.replaceAll('_', ' ');
 
   return (
     <Stack
@@ -51,6 +55,10 @@ export const MeetingInsights = ({
         >
           <CircularProgress size={24} />
         </Box>
+      ) : hasError ? (
+        <Typography variant="body2" color="error.main">
+          Não foi possível carregar os insights da reunião.
+        </Typography>
       ) : insights.length > 0 ? (
         <Stack spacing={2}>
           {insights.map((insight) => (
@@ -90,7 +98,7 @@ export const MeetingInsights = ({
               <Stack spacing={0.5} flex={1}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Chip
-                    label={TYPE_LABELS[insight.type]}
+                    label={resolveTypeLabel(insight.type)}
                     size="small"
                     sx={{
                       bgcolor: palette.salesmen[200],
@@ -101,7 +109,7 @@ export const MeetingInsights = ({
                     }}
                   />
                   <Typography variant="caption" color="text.secondary">
-                    {insight.description.text}
+                    {insight.description.text ?? 'Sem descrição adicional'}
                   </Typography>
                 </Box>
                 <Typography

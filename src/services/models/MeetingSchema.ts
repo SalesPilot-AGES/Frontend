@@ -139,8 +139,12 @@ export const MeetingsResponseSchema = z.object({
  */
 export const MeetingRealtimeInsightSchema = z.object({
   id: z.string(),
-  type: z.enum(['KEY_POINT', 'ACTION_ITEM']),
-  description: z.object({ text: z.string() }),
+  type: z.string(),
+  description: z
+    .object({
+      text: z.string().nullable().optional(),
+    })
+    .catchall(z.unknown()),
   content: z.string(),
   created_at: z.string(),
 });

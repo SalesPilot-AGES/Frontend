@@ -8,6 +8,7 @@ import {
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import {
   useGetMeetingById,
+  useGetMeetingInsights,
   useGetMeetingPostAnalysis,
 } from '@services/queries/useMeetings';
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
@@ -42,6 +43,8 @@ export const MeetingDetail = (): JSX.Element => {
   } = useGetMeetingById(meetingId ?? null);
   const { data: meetingPostAnalysis, isLoading: isMeetingPostAnalysisLoading } =
     useGetMeetingPostAnalysis(meetingId ?? null);
+  const { data: meetingInsights = [], isLoading: isMeetingInsightsLoading } =
+    useGetMeetingInsights(meetingId ?? null);
 
   const meeting = rawMeeting as TMeetingDetail | undefined;
 
@@ -95,6 +98,8 @@ export const MeetingDetail = (): JSX.Element => {
           meeting={meeting}
           meetingPostAnalysis={meetingPostAnalysis || null}
           isMeetingPostAnalysisLoading={isMeetingPostAnalysisLoading}
+          meetingInsights={meetingInsights}
+          isMeetingInsightsLoading={isMeetingInsightsLoading}
           currentTab={currentTab}
           onTabChange={handleTabChange}
         />

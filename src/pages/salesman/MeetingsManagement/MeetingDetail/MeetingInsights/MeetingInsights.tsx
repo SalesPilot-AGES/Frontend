@@ -1,45 +1,24 @@
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
+import PlaylistAddCheckCircleOutlinedIcon from '@mui/icons-material/PlaylistAddCheckCircleOutlined';
 import {
   Box,
+  Chip,
   CircularProgress,
   Stack,
   Typography,
   useTheme,
 } from '@mui/material';
-import type { TMeetingInsight } from '@services/models/MeetingSchema';
+import type { TMeetingRealtimeInsight } from '@services/models/MeetingSchema';
 import type { JSX } from 'react';
 
 type TMeetingInsightsProps = {
-  insights: TMeetingInsight[];
+  insights: TMeetingRealtimeInsight[];
   isLoading: boolean;
 };
 
-type TNormalizedInsight = {
-  id: string;
-  text: string;
-};
-
-const normalizeInsight = (
-  insight: TMeetingInsight,
-  index: number
-): TNormalizedInsight | null => {
-  if (typeof insight === 'string') {
-    const normalizedText = insight.trim();
-    if (!normalizedText) return null;
-
-    return {
-      id: `insight-${index}`,
-      text: normalizedText,
-    };
-  }
-
-  const text = (insight.text ?? insight.insight ?? '').trim();
-  if (!text) return null;
-
-  return {
-    id: `insight-${index}`,
-    text,
-  };
+const TYPE_LABELS: Record<TMeetingRealtimeInsight['type'], string> = {
+  KEY_POINT: 'Ponto-chave',
+  ACTION_ITEM: 'Ação',
 };
 
 export const MeetingInsights = ({
@@ -47,10 +26,6 @@ export const MeetingInsights = ({
   isLoading,
 }: TMeetingInsightsProps): JSX.Element => {
   const { palette } = useTheme();
-
-  const normalizedInsights = insights
-    .map((insight, index) => normalizeInsight(insight, index))
-    .filter((item): item is TNormalizedInsight => item !== null);
 
   return (
     <Stack
@@ -76,36 +51,66 @@ export const MeetingInsights = ({
         >
           <CircularProgress size={24} />
         </Box>
-      ) : normalizedInsights.length > 0 ? (
+      ) : insights.length > 0 ? (
         <Stack spacing={2}>
-          {normalizedInsights.map((insight) => (
+          {insights.map((insight) => (
             <Box
               key={insight.id}
               sx={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: 1,
+                alignItems: 'flex-start',
+                gap: 1.5,
                 p: '21px',
                 borderRadius: '0.6rem',
                 bgcolor: palette.salesmen[100],
                 border: `1px solid ${palette.salesmen[200]}`,
               }}
             >
-              <AutoAwesomeRoundedIcon
-                sx={{
-                  color: palette.salesmen[500],
-                  width: '24px',
-                  height: '24px',
-                  fontSize: '24px',
-                  flexShrink: 0,
-                }}
-              />
-              <Typography
-                variant="body2"
-                sx={{ color: palette.neutrals[700], lineHeight: 1.5 }}
-              >
-                {insight.text}
-              </Typography>
+              {insight.type === 'ACTION_ITEM' ? (
+                <PlaylistAddCheckCircleOutlinedIcon
+                  sx={{
+                    color: palette.salesmen[500],
+                    width: '24px',
+                    height: '24px',
+                    flexShrink: 0,
+                    mt: '2px',
+                  }}
+                />
+              ) : (
+                <AutoAwesomeRoundedIcon
+                  sx={{
+                    color: palette.salesmen[500],
+                    width: '24px',
+                    height: '24px',
+                    flexShrink: 0,
+                    mt: '2px',
+                  }}
+                />
+              )}
+              <Stack spacing={0.5} flex={1}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip
+                    label={TYPE_LABELS[insight.type]}
+                    size="small"
+                    sx={{
+                      bgcolor: palette.salesmen[200],
+                      color: palette.salesmen[700],
+                      fontWeight: 600,
+                      fontSize: '0.7rem',
+                      height: '20px',
+                    }}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    {insight.description.text}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="body2"
+                  sx={{ color: palette.neutrals[700], lineHeight: 1.5 }}
+                >
+                  {insight.content}
+                </Typography>
+              </Stack>
             </Box>
           ))}
         </Stack>

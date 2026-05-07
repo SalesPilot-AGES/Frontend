@@ -2,10 +2,12 @@ import {
   mapMeetingListItem,
   MeetingContextMetadataSchema,
   MeetingPostAnalysisSchema,
+  MeetingRealtimeInsightsSchema,
   MeetingsResponseSchema,
   type TMeetingContextMetadata,
   type TMeetingListItem,
   type TMeetingPostAnalysis,
+  type TMeetingRealtimeInsight,
   type TMeetingsResponse,
 } from '@services/models/MeetingSchema';
 import axios from 'axios';
@@ -65,5 +67,14 @@ export const meetingApi = {
 
       throw error;
     }
+  },
+
+  getMeetingInsights: async (
+    uuid: string
+  ): Promise<TMeetingRealtimeInsight[]> => {
+    const response = await apiClient.get<unknown>(
+      `/api/meetings/${uuid}/insights`
+    );
+    return MeetingRealtimeInsightsSchema.parse(response.data);
   },
 };

@@ -83,7 +83,7 @@ export const MeetingDetail = (): JSX.Element => {
 
   return (
     <PageContainter>
-      <Stack spacing={3} sx={{ width: '100%', alignSelf: 'flex-start' }}>
+      <Stack spacing={3} sx={{ width: '100%', height: '100%' }}>
         <MeetingDetailHeaderStats
           meeting={meeting}
           palette={palette}
@@ -91,13 +91,22 @@ export const MeetingDetail = (): JSX.Element => {
           responsiveValueFontSize={responsiveValueFontSize}
         />
 
-        <MeetingDetailTabsContent
-          meeting={meeting}
-          meetingPostAnalysis={meetingPostAnalysis || null}
-          isMeetingPostAnalysisLoading={isMeetingPostAnalysisLoading}
-          currentTab={currentTab}
-          onTabChange={handleTabChange}
-        />
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+          }}
+        >
+          <MeetingDetailTabsContent
+            meeting={meeting}
+            meetingPostAnalysis={meetingPostAnalysis || null}
+            isMeetingPostAnalysisLoading={isMeetingPostAnalysisLoading}
+            currentTab={currentTab}
+            onTabChange={handleTabChange}
+          />
+        </Box>
       </Stack>
     </PageContainter>
   );

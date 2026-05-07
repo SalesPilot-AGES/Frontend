@@ -67,7 +67,7 @@ export const AdminSalesmenPage = (): JSX.Element => {
 
   return (
     <PageContainter>
-      <Stack spacing="2.5rem">
+      <Stack spacing="2.5rem" sx={{ height: '100%' }}>
         <Box
           display="flex"
           alignItems="flex-start"
@@ -116,7 +116,11 @@ export const AdminSalesmenPage = (): JSX.Element => {
           columns={columns}
           getRowId={(row: TSalesmanWithCompany) => row.id}
           loading={isLoading}
-          sx={{ border: `1px solid ${palette.neutrals[200]}` }}
+          sx={{
+            border: `1px solid ${palette.neutrals[200]}`,
+            flex: 1,
+            minHeight: 0,
+          }}
           onDetailsClick={(rowId) => {
             navigate({
               to: EPageRoutes.SALESMAN_DETAIL,

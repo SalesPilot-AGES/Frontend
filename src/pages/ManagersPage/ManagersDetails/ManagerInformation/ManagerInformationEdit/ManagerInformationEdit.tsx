@@ -71,7 +71,6 @@ export const ManagerInformationEdit = ({
                 : ''
             }
           >
-            <MenuItem value="">Selecione uma empresa</MenuItem>
             {companyOptions.map((option) => (
               <MenuItem key={option.id} value={option.id}>
                 {option.name}

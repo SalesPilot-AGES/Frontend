@@ -141,7 +141,7 @@ export const AdminMeetingsPage = (): JSX.Element => {
 
   return (
     <PageContainter>
-      <Stack spacing="2.5rem">
+      <Stack spacing="2.5rem" sx={{ height: '100%' }}>
         <PageHeader
           title={EPageTitles.MEETINGS}
           subtitle="Gerencie todas reuniões da plataforma"
@@ -183,7 +183,11 @@ export const AdminMeetingsPage = (): JSX.Element => {
           columns={columns}
           getRowId={(row: TMeetingListItem) => row.id}
           loading={isLoading}
-          sx={{ border: `1px solid ${palette.neutrals[200]}` }}
+          sx={{
+            border: `1px solid ${palette.neutrals[200]}`,
+            flex: 1,
+            minHeight: 0,
+          }}
           onDetailsClick={(rowId) => {
             navigate({
               to: EPageRoutes.SALESMAN_MEETINGS_DETAIL,

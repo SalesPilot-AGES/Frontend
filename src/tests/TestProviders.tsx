@@ -13,6 +13,9 @@ import type { JSX, PropsWithChildren } from 'react';
  * - QueryClientProvider: For React Query
  * - ThemeProvider: For Material-UI theme
  * - CssBaseline: For consistent styling
+ *
+ * Note: For tests that require routing, wrap the test with the actual router
+ * or mock the router hooks/context as needed.
  */
 export function TestProviders({ children }: PropsWithChildren): JSX.Element {
   return (

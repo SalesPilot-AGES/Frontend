@@ -134,6 +134,28 @@ export const MeetingsResponseSchema = z.object({
 /**
  * Tipo final usado no front (mapeado)
  */
+/**
+ * Insights em tempo real da reunião (GET /api/meetings/{id}/insights)
+ */
+export const MeetingRealtimeInsightSchema = z.object({
+  id: z.string(),
+  type: z.enum(['KEY_POINT', 'ACTION_ITEM']),
+  description: z.object({ text: z.string() }),
+  content: z.string(),
+  created_at: z.string(),
+});
+
+export const MeetingRealtimeInsightsSchema = z.array(
+  MeetingRealtimeInsightSchema
+);
+
+export type TMeetingRealtimeInsight = z.infer<
+  typeof MeetingRealtimeInsightSchema
+>;
+
+/**
+ * Tipo final usado no front (mapeado)
+ */
 export type TMeetingListItem = {
   id: string;
   title: string;

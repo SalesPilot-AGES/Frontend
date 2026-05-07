@@ -12,6 +12,7 @@ import type { TMeetingDetail } from '../MeetingDetail.interface';
 
 type TMeetingDetailHeaderStatsProps = {
   meeting: TMeetingDetail;
+  sentimentScore?: number;
   palette: Theme['palette'];
   themePalette: Theme['palette'];
   responsiveValueFontSize: string;
@@ -19,6 +20,7 @@ type TMeetingDetailHeaderStatsProps = {
 
 export const MeetingDetailHeaderStats = ({
   meeting,
+  sentimentScore,
   palette,
   themePalette,
   responsiveValueFontSize,
@@ -30,7 +32,9 @@ export const MeetingDetailHeaderStats = ({
     ? Math.floor(meeting.duration_seconds / 60)
     : 0;
 
-  const sentimentConfig = getSentimentConfig(meeting.client.overall_sentiment);
+  const sentimentPercent =
+    sentimentScore != null ? Math.round(sentimentScore * 100) : undefined;
+  const sentimentConfig = getSentimentConfig(sentimentPercent);
   const sentimentPalette = themePalette[
     sentimentConfig.theme as keyof Theme['palette']
   ] as Record<number, string> | undefined;
@@ -135,7 +139,7 @@ export const MeetingDetailHeaderStats = ({
         <StatCard
           iconName={sentimentConfig.iconName}
           theme={sentimentConfig.theme}
-          value={`${meeting.client.overall_sentiment ?? 0}%`}
+          value={`${sentimentPercent ?? 0}%`}
           label="Sentimento da reunião"
           sx={{
             flex: '1 1 0',

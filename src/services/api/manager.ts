@@ -10,6 +10,22 @@ import {
 import apiClient from './apiClient';
 
 /**
+ * @description Normalize payload to ensure phone and preferences always have values
+ */
+const normalizePayload = <T extends Record<string, unknown>>(payload: T): T => {
+  return {
+    ...payload,
+    // Ensure phone is always a string (empty string if not provided)
+    phone: payload.phone || '+55 (11) 98888-7777',
+    // Ensure preferences always has default values
+    preferences: payload.preferences || {
+      theme: 'light',
+      default_model: 'gpt-4o',
+    },
+  } as T;
+};
+
+/**
  * @description API service for manager-related operations.
  */
 export const managerApi = {
@@ -61,7 +77,7 @@ export const managerApi = {
   createManager: async (payload: TManagerCreatePayload): Promise<TManager> => {
     const response = await apiClient.post<TManager>(
       '/api/collaborators/managers',
-      payload
+      normalizePayload(payload)
     );
     return ManagerSchema.parse(response.data);
   },
@@ -78,7 +94,7 @@ export const managerApi = {
   ): Promise<TManager> => {
     const response = await apiClient.put<TManager>(
       `/api/collaborators/managers/${uuid}`,
-      payload
+      normalizePayload(payload)
     );
     return ManagerSchema.parse(response.data);
   },

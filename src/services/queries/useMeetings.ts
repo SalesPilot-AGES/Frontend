@@ -3,6 +3,7 @@ import type {
   TMeetingContextMetadata,
   TMeetingListItem,
   TMeetingPostAnalysis,
+  TMeetingRealtimeInsight,
   TMeetingsResponse,
 } from '@services/models/MeetingSchema';
 import type { UseQueryOptions } from '@tanstack/react-query';
@@ -17,6 +18,8 @@ export const meetingsQueryKeys = {
   detail: (id: string) => [...meetingsQueryKeys.details(), id] as const,
   postAnalysis: (id: string) =>
     [...meetingsQueryKeys.detail(id), 'post-analysis'] as const,
+  insights: (id: string) =>
+    [...meetingsQueryKeys.detail(id), 'insights'] as const,
 };
 
 export type TMeetingsListResult = {
@@ -59,6 +62,19 @@ export const useGetMeetingPostAnalysis = (
   return useQuery<TMeetingPostAnalysis | null, Error>({
     queryKey: meetingsQueryKeys.postAnalysis(uuid || ''),
     queryFn: () => meetingApi.getMeetingPostAnalysis(uuid!),
+    enabled: !!uuid,
+    staleTime: 1000 * 60 * 5,
+    ...options,
+  });
+};
+
+export const useGetMeetingInsights = (
+  uuid: string | null,
+  options?: UseQueryOptions<TMeetingRealtimeInsight[]>
+): ReturnType<typeof useQuery<TMeetingRealtimeInsight[], Error>> => {
+  return useQuery<TMeetingRealtimeInsight[], Error>({
+    queryKey: meetingsQueryKeys.insights(uuid || ''),
+    queryFn: () => meetingApi.getMeetingInsights(uuid!),
     enabled: !!uuid,
     staleTime: 1000 * 60 * 5,
     ...options,

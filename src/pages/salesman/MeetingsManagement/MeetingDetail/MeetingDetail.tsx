@@ -86,6 +86,7 @@ export const MeetingDetail = (): JSX.Element => {
       <Stack spacing={3} sx={{ width: '100%', height: '100%' }}>
         <MeetingDetailHeaderStats
           meeting={meeting}
+          sentimentScore={meetingPostAnalysis?.sentiment_analysis?.score}
           palette={palette}
           themePalette={themePalette}
           responsiveValueFontSize={responsiveValueFontSize}
@@ -105,6 +106,8 @@ export const MeetingDetail = (): JSX.Element => {
             isMeetingPostAnalysisLoading={isMeetingPostAnalysisLoading}
             currentTab={currentTab}
             onTabChange={handleTabChange}
+            meetingInsights={[]}
+            isMeetingInsightsLoading={false}
           />
         </Box>
       </Stack>

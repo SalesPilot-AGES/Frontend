@@ -2,7 +2,10 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import PlaylistAddCheckCircleOutlinedIcon from '@mui/icons-material/PlaylistAddCheckCircleOutlined';
 import { Box, Tab, Tabs } from '@mui/material';
-import type { TMeetingPostAnalysis } from '@services/models/MeetingSchema';
+import type {
+  TMeetingPostAnalysis,
+  TMeetingRealtimeInsight,
+} from '@services/models/MeetingSchema';
 import type { JSX } from 'react';
 import React from 'react';
 
@@ -15,6 +18,8 @@ type TMeetingDetailTabsContentProps = {
   meeting: TMeetingDetail;
   meetingPostAnalysis: TMeetingPostAnalysis | null;
   isMeetingPostAnalysisLoading: boolean;
+  meetingInsights: TMeetingRealtimeInsight[];
+  isMeetingInsightsLoading: boolean;
   currentTab: TMeetingTab;
   onTabChange: (_event: React.SyntheticEvent, newValue: string) => void;
 };
@@ -23,10 +28,11 @@ export const MeetingDetailTabsContent = ({
   meeting,
   meetingPostAnalysis,
   isMeetingPostAnalysisLoading,
+  meetingInsights,
+  isMeetingInsightsLoading,
   currentTab,
   onTabChange,
 }: TMeetingDetailTabsContentProps): JSX.Element => {
-  const insightsToRender = meetingPostAnalysis?.insights ?? [];
   const actionItemsFromApi =
     meetingPostAnalysis?.action_plan ?? meetingPostAnalysis?.action_items;
   const actionItemsToRender = actionItemsFromApi ?? [];
@@ -78,8 +84,8 @@ export const MeetingDetailTabsContent = ({
 
         {currentTab === 'insights' && (
           <MeetingInsights
-            insights={insightsToRender}
-            isLoading={isMeetingPostAnalysisLoading}
+            insights={meetingInsights}
+            isLoading={isMeetingInsightsLoading}
           />
         )}
 

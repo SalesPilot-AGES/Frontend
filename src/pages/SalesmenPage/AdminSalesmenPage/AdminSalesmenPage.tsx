@@ -63,7 +63,11 @@ export const AdminSalesmenPage = (): JSX.Element => {
         sentimentSamples.length
       : 0;
 
-  const averageSentimentConfig = getSentimentConfig(averageSentiment);
+  const averageSentimentPercent =
+    sentimentSamples.length > 0
+      ? Math.round(averageSentiment * 100)
+      : undefined;
+  const averageSentimentConfig = getSentimentConfig(averageSentimentPercent);
 
   return (
     <PageContainter>

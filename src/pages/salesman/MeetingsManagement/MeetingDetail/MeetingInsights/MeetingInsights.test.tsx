@@ -1,4 +1,4 @@
-import type { TMeetingInsight } from '@services/models/MeetingSchema';
+import type { TMeetingRealtimeInsight } from '@services/models/MeetingSchema';
 import { render, screen } from '@tests/testUtils';
 import { describe, expect, it } from 'vitest';
 
@@ -6,12 +6,21 @@ import { MeetingInsights } from './MeetingInsights';
 
 describe('MeetingInsights', () => {
   it('renders insights as single text rows', () => {
-    const insights: TMeetingInsight[] = [
+    const insights: TMeetingRealtimeInsight[] = [
       {
-        text: 'Cliente pediu proposta acelerada',
-        category: 'Prioridade alta',
+        id: '1',
+        type: 'KEY_POINT',
+        description: { text: 'Ponto-chave identificado' },
+        content: 'Cliente pediu proposta acelerada',
+        created_at: '2026-05-07T10:00:00Z',
       },
-      'Objeção sobre prazo de implementação',
+      {
+        id: '2',
+        type: 'ACTION_ITEM',
+        description: { text: 'Item de ação importante' },
+        content: 'Objeção sobre prazo de implementação',
+        created_at: '2026-05-07T10:05:00Z',
+      },
     ];
 
     render(<MeetingInsights insights={insights} isLoading={false} />);
@@ -22,7 +31,8 @@ describe('MeetingInsights', () => {
     expect(
       screen.getByText('Objeção sobre prazo de implementação')
     ).toBeInTheDocument();
-    expect(screen.queryByText('Prioridade alta')).not.toBeInTheDocument();
+    expect(screen.getByText('Ponto-chave identificado')).toBeInTheDocument();
+    expect(screen.getByText('Item de ação importante')).toBeInTheDocument();
   });
 
   it('renders empty state', () => {

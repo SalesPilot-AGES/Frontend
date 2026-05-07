@@ -69,7 +69,9 @@ export const AdminMeetingsPage = (): JSX.Element => {
     ];
   }, [companiesPage]);
 
-  const sentimentConfig = getSentimentConfig(summary?.success_rate);
+  const successRatePercent =
+    summary != null ? Math.round(summary.success_rate * 100) : undefined;
+  const sentimentConfig = getSentimentConfig(successRatePercent);
 
   const columns: DataTableProps<TMeetingListItem>['columns'] = [
     {
@@ -169,11 +171,7 @@ export const AdminMeetingsPage = (): JSX.Element => {
           <StatCard
             iconName={sentimentConfig.iconName}
             theme={sentimentConfig.theme}
-            value={
-              summary
-                ? `${summary.success_rate.toFixed(1).replace('.', ',')}%`
-                : '0,0%'
-            }
+            value={successRatePercent != null ? `${successRatePercent}%` : '0%'}
             label="Sentimento médio"
           />
         </Box>

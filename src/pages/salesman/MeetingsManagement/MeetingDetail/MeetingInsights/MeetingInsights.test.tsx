@@ -1,4 +1,4 @@
-import type { TMeetingInsight } from '@services/models/MeetingSchema';
+import type { TMeetingRealtimeInsight } from '@services/models/MeetingSchema';
 import { render, screen } from '@tests/testUtils';
 import { describe, expect, it } from 'vitest';
 
@@ -6,12 +6,21 @@ import { MeetingInsights } from './MeetingInsights';
 
 describe('MeetingInsights', () => {
   it('renders insights as single text rows', () => {
-    const insights: TMeetingInsight[] = [
+    const insights: TMeetingRealtimeInsight[] = [
       {
-        text: 'Cliente pediu proposta acelerada',
-        category: 'Prioridade alta',
+        id: '1',
+        type: 'KEY_POINT',
+        description: { text: 'Cliente pediu proposta acelerada' },
+        content: 'Cliente pediu proposta acelerada',
+        created_at: '2026-05-07T10:00:00Z',
       },
-      'Objeção sobre prazo de implementação',
+      {
+        id: '2',
+        type: 'ACTION_ITEM',
+        description: { text: 'Objeção sobre prazo de implementação' },
+        content: 'Objeção sobre prazo de implementação',
+        created_at: '2026-05-07T10:05:00Z',
+      },
     ];
 
     render(<MeetingInsights insights={insights} isLoading={false} />);

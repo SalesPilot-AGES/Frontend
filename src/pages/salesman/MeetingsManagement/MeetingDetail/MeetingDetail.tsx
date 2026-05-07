@@ -8,7 +8,6 @@ import {
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import {
   useGetMeetingById,
-  useGetMeetingInsights,
   useGetMeetingPostAnalysis,
 } from '@services/queries/useMeetings';
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router';
@@ -43,8 +42,6 @@ export const MeetingDetail = (): JSX.Element => {
   } = useGetMeetingById(meetingId ?? null);
   const { data: meetingPostAnalysis, isLoading: isMeetingPostAnalysisLoading } =
     useGetMeetingPostAnalysis(meetingId ?? null);
-  const { data: meetingInsights = [], isLoading: isMeetingInsightsLoading } =
-    useGetMeetingInsights(meetingId ?? null);
 
   const meeting = rawMeeting as TMeetingDetail | undefined;
 
@@ -86,7 +83,7 @@ export const MeetingDetail = (): JSX.Element => {
 
   return (
     <PageContainter>
-      <Stack spacing={3} sx={{ width: '100%', alignSelf: 'flex-start' }}>
+      <Stack spacing={3} sx={{ width: '100%', height: '100%' }}>
         <MeetingDetailHeaderStats
           meeting={meeting}
           sentimentScore={meetingPostAnalysis?.sentiment_analysis?.score}
@@ -95,15 +92,24 @@ export const MeetingDetail = (): JSX.Element => {
           responsiveValueFontSize={responsiveValueFontSize}
         />
 
-        <MeetingDetailTabsContent
-          meeting={meeting}
-          meetingPostAnalysis={meetingPostAnalysis || null}
-          isMeetingPostAnalysisLoading={isMeetingPostAnalysisLoading}
-          meetingInsights={meetingInsights}
-          isMeetingInsightsLoading={isMeetingInsightsLoading}
-          currentTab={currentTab}
-          onTabChange={handleTabChange}
-        />
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+          }}
+        >
+          <MeetingDetailTabsContent
+            meeting={meeting}
+            meetingPostAnalysis={meetingPostAnalysis || null}
+            isMeetingPostAnalysisLoading={isMeetingPostAnalysisLoading}
+            currentTab={currentTab}
+            onTabChange={handleTabChange}
+            meetingInsights={[]}
+            isMeetingInsightsLoading={false}
+          />
+        </Box>
       </Stack>
     </PageContainter>
   );

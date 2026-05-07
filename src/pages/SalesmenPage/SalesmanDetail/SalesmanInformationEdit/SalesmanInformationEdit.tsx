@@ -65,7 +65,6 @@ export const SalesmanInformationEdit = ({
             onChange={(e) => onFieldChange('companyId', e.target.value)}
             fullWidth
           >
-            <MenuItem value="">Selecione uma empresa</MenuItem>
             {companyOptions.map((option) => (
               <MenuItem key={option.id} value={option.id}>
                 {option.name}

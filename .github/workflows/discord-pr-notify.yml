@@ -25,6 +25,9 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GH_TOKEN: ${{ github.token }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          REVIEW_BODY: ${{ github.event.review.body }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
           EVENT="${{ github.event_name }}"
           PR_NUMBER="${{ github.event.pull_request.number }}"
@@ -34,7 +37,7 @@ jobs:
             ASSIGNEES=$(echo '${{ toJson(github.event.pull_request.assignees) }}' | jq -r '[.[].login] | if length == 0 then "Nenhum" else join(", ") end')
             REVIEWERS=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}' | jq -r '[.[].login] | if length == 0 then "Nenhum" else join(", ") end')
 
-            BODY="${{ github.event.pull_request.body }}"
+            BODY="$PR_BODY"
             if [ -z "$BODY" ]; then BODY="Sem descrição."; fi
             TRUNCATED_BODY=$(echo "$BODY" | cut -c1-1000)
             if [ $(echo "$BODY" | wc -m) -gt 1000 ]; then TRUNCATED_BODY="${TRUNCATED_BODY}..."; fi
@@ -109,10 +112,10 @@ jobs:
               EMBED_TITLE="Review: PR #${PR_NUMBER} — ${{ github.event.pull_request.title }}"
               EMBED_TITLE=$(echo "$EMBED_TITLE" | cut -c1-256)
 
-              REVIEW_BODY="${{ github.event.review.body }}"
-              if [ -z "$REVIEW_BODY" ]; then REVIEW_BODY="Sem comentário."; fi
-              TRUNCATED_BODY=$(echo "$REVIEW_BODY" | cut -c1-1000)
-              if [ $(echo "$REVIEW_BODY" | wc -m) -gt 1000 ]; then TRUNCATED_BODY="${TRUNCATED_BODY}..."; fi
+              REVIEW_BODY_TEXT="$REVIEW_BODY"
+              if [ -z "$REVIEW_BODY_TEXT" ]; then REVIEW_BODY_TEXT="Sem comentário."; fi
+              TRUNCATED_BODY=$(echo "$REVIEW_BODY_TEXT" | cut -c1-1000)
+              if [ $(echo "$REVIEW_BODY_TEXT" | wc -m) -gt 1000 ]; then TRUNCATED_BODY="${TRUNCATED_BODY}..."; fi
 
               PAYLOAD=$(jq -n \
                 --arg title "$EMBED_TITLE" \
@@ -139,7 +142,6 @@ jobs:
               EMBED_TITLE="Comentário: PR #${PR_NUMBER} — ${{ github.event.pull_request.title }}"
               EMBED_TITLE=$(echo "$EMBED_TITLE" | cut -c1-256)
 
-              COMMENT_BODY="${{ github.event.comment.body }}"
               TRUNCATED_BODY=$(echo "$COMMENT_BODY" | cut -c1-1000)
               if [ $(echo "$COMMENT_BODY" | wc -m) -gt 1000 ]; then TRUNCATED_BODY="${TRUNCATED_BODY}..."; fi
 

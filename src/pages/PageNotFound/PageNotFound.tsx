@@ -1,4 +1,4 @@
-import { Home as HomeIcon } from '@mui/icons-material';
+import HomeIcon from '@mui/icons-material/Home';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { useNavigate } from '@tanstack/react-router';
 import type { JSX } from 'react';

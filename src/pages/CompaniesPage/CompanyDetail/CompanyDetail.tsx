@@ -1,7 +1,7 @@
 import { ECardLabel } from '@data/enums/ECardLabel';
 import { EPageRoutes } from '@data/enums/EPageRoutes';
-import { ArrowBack } from '@mui/icons-material';
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   IconButton,
   Link as MuiLink,
@@ -68,7 +68,7 @@ export const CompanyDetail = (): JSX.Element => {
             fontSize: '0.875rem',
           }}
         >
-          <ArrowBack sx={{ fontSize: '0.875rem' }} />
+          <ArrowBackIcon sx={{ fontSize: '0.875rem' }} />
           Voltar para empresas
         </MuiLink>
 

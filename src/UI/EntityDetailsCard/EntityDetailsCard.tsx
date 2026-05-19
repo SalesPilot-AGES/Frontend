@@ -1,4 +1,4 @@
-import { Edit } from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
 import { Box, Button, Paper, Typography } from '@mui/material';
 import type { JSX, ReactNode } from 'react';
 
@@ -45,7 +45,11 @@ export const EntityDetailsCard = ({
 
         {headerRight ??
           (onEdit && (
-            <Button variant="contained" startIcon={<Edit />} onClick={onEdit}>
+            <Button
+              variant="contained"
+              startIcon={<EditIcon />}
+              onClick={onEdit}
+            >
               Editar
             </Button>
           ))}

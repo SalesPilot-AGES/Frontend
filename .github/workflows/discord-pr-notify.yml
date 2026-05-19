@@ -39,11 +39,11 @@ jobs:
 
             BODY="$PR_BODY"
             if [ -z "$BODY" ]; then BODY="Sem descrição."; fi
-            TRUNCATED_BODY=$(echo "$BODY" | cut -c1-1000)
-            if [ $(echo "$BODY" | wc -m) -gt 1000 ]; then TRUNCATED_BODY="${TRUNCATED_BODY}..."; fi
+            TRUNCATED_BODY="${BODY:0:1000}"
+            [ "${#BODY}" -gt 1000 ] && TRUNCATED_BODY="${TRUNCATED_BODY}..."
 
             THREAD_NAME="PR #${PR_NUMBER} — ${{ github.event.pull_request.title }}"
-            THREAD_NAME=$(echo "$THREAD_NAME" | cut -c1-100)
+            THREAD_NAME="${THREAD_NAME:0:100}"
 
             PAYLOAD=$(jq -n \
               --arg thread_name "$THREAD_NAME" \
@@ -119,12 +119,11 @@ jobs:
               esac
 
               EMBED_TITLE="Review: PR #${PR_NUMBER} — ${{ github.event.pull_request.title }}"
-              EMBED_TITLE=$(echo "$EMBED_TITLE" | cut -c1-256)
+              EMBED_TITLE="${EMBED_TITLE:0:256}"
 
-              REVIEW_BODY_TEXT="$REVIEW_BODY"
-              if [ -z "$REVIEW_BODY_TEXT" ]; then REVIEW_BODY_TEXT="Sem comentário."; fi
-              TRUNCATED_BODY=$(echo "$REVIEW_BODY_TEXT" | cut -c1-1000)
-              if [ $(echo "$REVIEW_BODY_TEXT" | wc -m) -gt 1000 ]; then TRUNCATED_BODY="${TRUNCATED_BODY}..."; fi
+              if [ -z "$REVIEW_BODY" ]; then REVIEW_BODY="Sem comentário."; fi
+              TRUNCATED_BODY="${REVIEW_BODY:0:1000}"
+              [ "${#REVIEW_BODY}" -gt 1000 ] && TRUNCATED_BODY="${TRUNCATED_BODY}..."
 
               PAYLOAD=$(jq -n \
                 --arg title "$EMBED_TITLE" \
@@ -149,10 +148,10 @@ jobs:
 
             elif [ "$EVENT" = "pull_request_review_comment" ]; then
               EMBED_TITLE="Comentário: PR #${PR_NUMBER} — ${{ github.event.pull_request.title }}"
-              EMBED_TITLE=$(echo "$EMBED_TITLE" | cut -c1-256)
+              EMBED_TITLE="${EMBED_TITLE:0:256}"
 
-              TRUNCATED_BODY=$(echo "$COMMENT_BODY" | cut -c1-1000)
-              if [ $(echo "$COMMENT_BODY" | wc -m) -gt 1000 ]; then TRUNCATED_BODY="${TRUNCATED_BODY}..."; fi
+              TRUNCATED_BODY="${COMMENT_BODY:0:1000}"
+              [ "${#COMMENT_BODY}" -gt 1000 ] && TRUNCATED_BODY="${TRUNCATED_BODY}..."
 
               PAYLOAD=$(jq -n \
                 --arg title "$EMBED_TITLE" \

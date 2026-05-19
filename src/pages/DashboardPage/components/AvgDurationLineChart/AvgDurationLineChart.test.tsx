@@ -1,3 +1,5 @@
+import { EAvgDurationLineChart } from '@data/enums/EAvgDurationLineChart';
+import { ECardLabel } from '@data/enums/ECardLabel';
 import { render, screen } from '@tests/testUtils';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -51,7 +53,7 @@ describe('AvgDurationLineChart', () => {
     render(<AvgDurationLineChart />);
 
     expect(
-      screen.getByText('Sem dados de duração média no momento')
+      screen.getByText(EAvgDurationLineChart.EMPTY_TITLE)
     ).toBeInTheDocument();
   });
 
@@ -65,7 +67,7 @@ describe('AvgDurationLineChart', () => {
     render(<AvgDurationLineChart />);
 
     expect(
-      screen.getByText('Não foi possível carregar o gráfico')
+      screen.getByText(EAvgDurationLineChart.ERROR_TITLE)
     ).toBeInTheDocument();
   });
 
@@ -81,7 +83,9 @@ describe('AvgDurationLineChart', () => {
 
     render(<AvgDurationLineChart />);
 
-    expect(screen.getByText('Duração média das reuniões')).toBeInTheDocument();
+    expect(
+      screen.getByText(ECardLabel.AVERAGE_MEETINGS_DURATION)
+    ).toBeInTheDocument();
     expect(
       document.querySelector('[data-series-id="avg-duration"]')
     ).toBeTruthy();

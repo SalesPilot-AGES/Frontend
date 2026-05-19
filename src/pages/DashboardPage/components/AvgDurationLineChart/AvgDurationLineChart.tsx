@@ -1,3 +1,5 @@
+import { EAvgDurationLineChart } from '@data/enums/EAvgDurationLineChart';
+import { ECardLabel } from '@data/enums/ECardLabel';
 import ShowChartOutlinedIcon from '@mui/icons-material/ShowChartOutlined';
 import {
   Box,
@@ -7,38 +9,16 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { LineChart } from '@mui/x-charts/LineChart';
 import { useDashboardAvgDuration } from '@store/hooks/useDashboardAvgDuration';
 import type { JSX } from 'react';
 import { useMemo } from 'react';
 
+import { StyledLineChart } from './AvgDurationLineChart.style';
 import { formatDuration, formatMonthLabel } from './AvgDurationLineChart.utils';
-
-type TChartYBounds = {
-  min: number;
-  max: number;
-};
-
-const resolveYBounds = (values: number[]): TChartYBounds => {
-  const minValue = Math.min(...values);
-  const maxValue = Math.max(...values);
-
-  if (minValue === maxValue) {
-    const padding = Math.max(1, minValue * 0.2);
-    return {
-      min: Math.max(0, Number((minValue - padding).toFixed(1))),
-      max: Number((maxValue + padding).toFixed(1)),
-    };
-  }
-
-  const range = maxValue - minValue;
-  const padding = range * 0.15;
-
-  return {
-    min: Math.max(0, Number((minValue - padding).toFixed(1))),
-    max: Number((maxValue + padding).toFixed(1)),
-  };
-};
+import {
+  resolveYBounds,
+  type TChartYBounds,
+} from './AvgDurationLineChart.yBounds.utils';
 
 export const AvgDurationLineChart = (): JSX.Element => {
   const { palette } = useTheme();
@@ -72,7 +52,9 @@ export const AvgDurationLineChart = (): JSX.Element => {
     >
       <Stack spacing={2}>
         <Stack spacing={0.5}>
-          <Typography variant="h4">Duração média das reuniões</Typography>
+          <Typography variant="h4">
+            {ECardLabel.AVERAGE_MEETINGS_DURATION}
+          </Typography>
         </Stack>
 
         {isLoading ? (
@@ -94,14 +76,14 @@ export const AvgDurationLineChart = (): JSX.Element => {
             sx={{ minHeight: '18rem' }}
           >
             <Typography variant="subtitle1" fontWeight={700}>
-              Não foi possível carregar o gráfico
+              {EAvgDurationLineChart.ERROR_TITLE}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
               textAlign="center"
             >
-              Tente novamente em instantes.
+              {EAvgDurationLineChart.ERROR_DESCRIPTION}
             </Typography>
           </Stack>
         ) : chartData.length === 0 ? (
@@ -126,19 +108,19 @@ export const AvgDurationLineChart = (): JSX.Element => {
               <ShowChartOutlinedIcon />
             </Box>
             <Typography variant="subtitle1" fontWeight={700}>
-              Sem dados de duração média no momento
+              {EAvgDurationLineChart.EMPTY_TITLE}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
               textAlign="center"
             >
-              Assim que houver reuniões consolidadas, o gráfico será exibido
-              aqui.
+              {EAvgDurationLineChart.EMPTY_DESCRIPTION}
             </Typography>
           </Stack>
         ) : (
-          <LineChart
+          <StyledLineChart
+            lineColor={palette.meetings[500]}
             height={320}
             margin={{ top: 24, right: 24, bottom: 24, left: 50 }}
             grid={{ horizontal: true }}
@@ -180,18 +162,6 @@ export const AvgDurationLineChart = (): JSX.Element => {
                   value == null ? '' : formatDuration(value),
               },
             ]}
-            sx={{
-              '.MuiMarkElement-root': {
-                stroke: palette.meetings[500],
-                strokeWidth: 2,
-                fill: palette.meetings[500],
-              },
-              '.MuiMarkElement-root[data-highlighted="true"]': {
-                stroke: palette.meetings[500],
-                fill: palette.meetings[500],
-                strokeWidth: 3,
-              },
-            }}
           />
         )}
       </Stack>

@@ -1,5 +1,5 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
-import { ArrowBack } from '@mui/icons-material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Box, Link as MuiLink, Typography, useTheme } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { useGetManagerById } from '@services/queries/useManagers';
@@ -52,7 +52,7 @@ export const ManagersDetails = (): JSX.Element => {
             fontSize: '0.875rem',
           }}
         >
-          <ArrowBack sx={{ fontSize: '0.875rem' }} />
+          <ArrowBackIcon sx={{ fontSize: '0.875rem' }} />
           Voltar para gestores
         </MuiLink>
 

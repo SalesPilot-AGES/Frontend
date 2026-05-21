@@ -1,5 +1,7 @@
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
+import { Stack } from '@mui/material';
+import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import type { JSX } from 'react';
@@ -7,10 +9,13 @@ import type { JSX } from 'react';
 export const ManagerDashboard = (): JSX.Element => {
   return (
     <PageContainter>
-      <PageHeader
-        title={EPageTitles.MANAGER_DASHBOARD}
-        subtitle={EpageDescriptions.MANAGER_DASHBOARD}
-      />
+      <Stack spacing={4} sx={{ width: '100%' }}>
+        <PageHeader
+          title={EPageTitles.MANAGER_DASHBOARD}
+          subtitle={EpageDescriptions.MANAGER_DASHBOARD}
+        />
+        <AvgDurationLineChart />
+      </Stack>
     </PageContainter>
   );
 };

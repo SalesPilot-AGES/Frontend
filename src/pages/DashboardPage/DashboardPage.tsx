@@ -4,10 +4,26 @@ import { SalesmanDashboard } from '@pages/DashboardPage/SalesmanDashboard/Salesm
 import { useCurrentUserRole } from '@store/hooks/useCurrentUser';
 import type { JSX } from 'react';
 
+import { DashboardFilterProvider } from './DashboardFilterProvider';
+
 export const DashboardPage = (): JSX.Element => {
   const role = useCurrentUserRole();
 
-  if (role === 'admin') return <AdminDashboard />;
-  if (role === 'manager') return <ManagerDashboard />;
-  return <SalesmanDashboard />;
+  if (role === 'admin')
+    return (
+      <DashboardFilterProvider>
+        <AdminDashboard />
+      </DashboardFilterProvider>
+    );
+  if (role === 'manager')
+    return (
+      <DashboardFilterProvider>
+        <ManagerDashboard />
+      </DashboardFilterProvider>
+    );
+  return (
+    <DashboardFilterProvider>
+      <SalesmanDashboard />
+    </DashboardFilterProvider>
+  );
 };

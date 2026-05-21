@@ -1,6 +1,6 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { getSentimentConfig } from '@hooks/useSentiment';
-import { ArrowBack } from '@mui/icons-material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import { IconButton, Link as MuiLink, Stack, Typography } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
@@ -55,7 +55,7 @@ export const MeetingDetailHeaderStats = ({
           fontSize: '0.875rem',
         }}
       >
-        <ArrowBack sx={{ fontSize: '0.875rem' }} />
+        <ArrowBackIcon sx={{ fontSize: '0.875rem' }} />
         Voltar para reuniões
       </MuiLink>
 

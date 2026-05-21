@@ -43,7 +43,9 @@ export const AddSalesmanModal = ({
   });
 
   const { data: companiesPage } = useGetCompanies();
-  const companyOptions: TCompany[] = companiesPage?.content ?? [];
+  const companyOptions: TCompany[] = (companiesPage?.content ?? []).filter(
+    (c) => c.active
+  );
 
   useEffect(() => {
     if (!open) {

@@ -1,6 +1,8 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import { ArrowBack, Close, Save } from '@mui/icons-material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
 import {
   Box,
   Button,
@@ -84,7 +86,7 @@ export const SalesmanDetail = (): JSX.Element => {
             fontSize: '0.875rem',
           }}
         >
-          <ArrowBack sx={{ fontSize: '0.875rem' }} />
+          <ArrowBackIcon sx={{ fontSize: '0.875rem' }} />
           Voltar para vendedores
         </MuiLink>
 
@@ -103,14 +105,14 @@ export const SalesmanDetail = (): JSX.Element => {
               >
                 <Button
                   variant="outlined"
-                  startIcon={<Close />}
+                  startIcon={<CloseIcon />}
                   onClick={handleCancelEdit}
                 >
                   Cancelar
                 </Button>
                 <Button
                   variant="contained"
-                  startIcon={<Save />}
+                  startIcon={<SaveIcon />}
                   onClick={handleSaveEdit}
                   disabled={!isEditFormValid}
                 >

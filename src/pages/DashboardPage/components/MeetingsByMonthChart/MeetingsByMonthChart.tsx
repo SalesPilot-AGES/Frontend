@@ -6,7 +6,7 @@ import { EmptyState } from '@UI/EmptyState/EmptyState';
 import type { JSX } from 'react';
 import { useMemo } from 'react';
 
-import { useDashboardFilterContext } from '../useDashboardFilterContext';
+import { useDashboardFilterContext } from '../../useDashboardFilterContext';
 
 const EMPTY_STATE_TITLE = 'Nenhuma reunião encontrada';
 const EMPTY_STATE_DESCRIPTION =

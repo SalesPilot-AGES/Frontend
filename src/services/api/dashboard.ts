@@ -1,4 +1,4 @@
-import { meetingsByMonthMock } from '@data/mocks/DashboardMeetingsByMonth';
+import { dashboardMeetingsByMonthMock } from '@data/mocks/DashboardMeetingsByMonth';
 import {
   MeetingsByMonthResponseSchema,
   type TDashboardPeriodParams,
@@ -49,7 +49,7 @@ export const dashboardApi = {
       return MeetingsByMonthResponseSchema.parse(response.data);
     } catch (error) {
       if (shouldUseMockFallback(error)) {
-        return meetingsByMonthMock;
+        return dashboardMeetingsByMonthMock;
       }
 
       throw error;

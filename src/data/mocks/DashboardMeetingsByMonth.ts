@@ -1,6 +1,6 @@
 import type { TMeetingsByMonth } from '@services/models/DashboardSchema';
 
-export const meetingsByMonthMock: TMeetingsByMonth = [
+export const dashboardMeetingsByMonthMock: TMeetingsByMonth = [
   { month: '2026-01-01', monthLabel: 'Jan', total: 48 },
   { month: '2026-02-01', monthLabel: 'Fev', total: 83 },
   { month: '2026-03-01', monthLabel: 'Mar', total: 112 },

@@ -9,21 +9,15 @@ import { DashboardFilterProvider } from './DashboardFilterProvider';
 export const DashboardPage = (): JSX.Element => {
   const role = useCurrentUserRole();
 
-  if (role === 'admin')
-    return (
-      <DashboardFilterProvider>
-        <AdminDashboard />
-      </DashboardFilterProvider>
-    );
-  if (role === 'manager')
-    return (
-      <DashboardFilterProvider>
-        <ManagerDashboard />
-      </DashboardFilterProvider>
-    );
   return (
     <DashboardFilterProvider>
-      <SalesmanDashboard />
+      {role === 'admin' ? (
+        <AdminDashboard />
+      ) : role === 'manager' ? (
+        <ManagerDashboard />
+      ) : (
+        <SalesmanDashboard />
+      )}
     </DashboardFilterProvider>
   );
 };

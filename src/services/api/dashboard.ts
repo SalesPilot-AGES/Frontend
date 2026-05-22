@@ -1,17 +1,12 @@
-import { meetingsByMonthMock } from '@data/mocks/MeetingsByMonth';
+import { meetingsByMonthMock } from '@data/mocks/DashboardMeetingsByMonth';
 import {
   MeetingsByMonthResponseSchema,
+  type TDashboardPeriodParams,
   type TMeetingsByMonth,
 } from '@services/models/DashboardSchema';
 import axios from 'axios';
 
 import apiClient from './apiClient';
-
-export type TDashboardPeriodParams = {
-  period: '30d' | '90d' | 'custom';
-  startDate?: string;
-  endDate?: string;
-};
 
 const isFallbackEnvironment = import.meta.env.MODE !== 'production';
 

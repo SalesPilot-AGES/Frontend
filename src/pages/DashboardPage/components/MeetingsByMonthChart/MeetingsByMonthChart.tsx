@@ -36,6 +36,7 @@ export const MeetingsByMonthChart = (): JSX.Element => {
       elevation={0}
       sx={{
         width: '100%',
+        height: '100%',
         borderRadius: '1rem',
         border: '1px solid',
         borderColor: palette.neutrals[200],
@@ -50,7 +51,7 @@ export const MeetingsByMonthChart = (): JSX.Element => {
         Total de reuniões
       </Typography>
 
-      <Box sx={{ width: '100%', height: '18rem', overflow: 'hidden' }}>
+      <Box sx={{ width: '100%', height: '20rem', overflow: 'hidden' }}>
         {isLoading ? (
           <Box
             sx={{
@@ -71,7 +72,7 @@ export const MeetingsByMonthChart = (): JSX.Element => {
           />
         ) : (
           <BarChart
-            height={288}
+            height={320}
             margin={{ top: 10, right: 16, bottom: 32, left: 52 }}
             grid={{ horizontal: true }}
             xAxis={[
@@ -105,11 +106,7 @@ export const MeetingsByMonthChart = (): JSX.Element => {
                 },
               },
             ]}
-            slotProps={{
-              legend: {
-                hidden: true,
-              },
-            }}
+            slots={{ legend: () => null }}
           />
         )}
       </Box>

@@ -1,4 +1,4 @@
-import type { TDashboardPeriodParams } from '@services/api/dashboard';
+import type { TDashboardPeriodParams } from '@services/models/DashboardSchema';
 import { type JSX, type PropsWithChildren, useMemo, useState } from 'react';
 
 import {

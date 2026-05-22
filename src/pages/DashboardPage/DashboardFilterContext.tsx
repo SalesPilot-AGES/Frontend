@@ -1,4 +1,4 @@
-import type { TDashboardPeriodParams } from '@services/api/dashboard';
+import type { TDashboardPeriodParams } from '@services/models/DashboardSchema';
 import { createContext, type Dispatch, type SetStateAction } from 'react';
 
 export type TDashboardFilterContextValue = {

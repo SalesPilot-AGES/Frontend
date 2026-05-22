@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+export type TDashboardPeriodParams = {
+  period: '30d' | '90d' | 'custom';
+  startDate?: string;
+  endDate?: string;
+};
+
 const MeetingsByMonthApiItemSchema = z
   .object({
     monthLabel: z.string().optional(),

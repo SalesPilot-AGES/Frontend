@@ -1,8 +1,8 @@
-import {
-  dashboardApi,
-  type TDashboardPeriodParams,
-} from '@services/api/dashboard';
-import type { TMeetingsByMonth } from '@services/models/DashboardSchema';
+import { dashboardApi } from '@services/api/dashboard';
+import type {
+  TDashboardPeriodParams,
+  TMeetingsByMonth,
+} from '@services/models/DashboardSchema';
 import { useQuery } from '@tanstack/react-query';
 
 export const dashboardQueryKeys = {

@@ -131,8 +131,8 @@ export const CompanyDetail = (): JSX.Element => {
             sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}
           />
           <StatCard
-            iconName="meeting"
-            theme="meetings"
+            iconName="duration"
+            theme="neutrals"
             value={'30 min'}
             label={ECardLabel.AVERAGE_MEETINGS_DURATION}
             sx={{ flex: '1 1 0', minWidth: { xs: '100%', sm: 160 } }}

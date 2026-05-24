@@ -1,13 +1,13 @@
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
-import { DashboardFilterProvider } from '@pages/DashboardPage/context/DashboardFilterProvider';
+import { MeetingsByMonthChart } from '@pages/DashboardPage/components/MeetingsByMonthChart/MeetingsByMonthChart';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import type { JSX } from 'react';
 
-import { MeetingsByCompanyChart } from './components/MeetingsByCompanyChart';
+import { MeetingsByCompanyChart } from '../components/MeetingsByCompanyChart/MeetingsByCompanyChart';
 
 export const AdminDashboard = (): JSX.Element => {
   return (
@@ -17,11 +17,19 @@ export const AdminDashboard = (): JSX.Element => {
           title={EPageTitles.ADMIN_DASHBOARD}
           subtitle={EpageDescriptions.ADMIN_DASHBOARD}
         />
-
-        <DashboardFilterProvider>
-          <MeetingsByCompanyChart />
-        </DashboardFilterProvider>
-        <AvgDurationLineChart />
+        <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+            <MeetingsByMonthChart />
+          </Box>
+        </Stack>
+        <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+            <MeetingsByCompanyChart />
+          </Box>
+          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+            <AvgDurationLineChart />
+          </Box>
+        </Stack>
       </Stack>
     </PageContainter>
   );

@@ -4,6 +4,7 @@ import type {
   TDashboardPeriodParams,
   TMeetingsByCompany,
   TMeetingsByMonth,
+  TMeetingsBySalesman,
 } from '@services/models/DashboardSchema';
 import type { UseQueryOptions } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
@@ -14,6 +15,8 @@ export const dashboardQueryKeys = {
     [...dashboardQueryKeys.all, 'meetings-by-company', filters] as const,
   meetingsByMonth: (period: TDashboardPeriodParams) =>
     [...dashboardQueryKeys.all, 'meetings-by-month', period] as const,
+  meetingsBySalesman: (filters?: TDashboardFilters) =>
+    [...dashboardQueryKeys.all, 'meetings-by-salesman', filters] as const,
 };
 
 export const useGetMeetingsByCompany = (
@@ -36,3 +39,15 @@ export const useGetMeetingsByMonth = (
     queryFn: () => dashboardApi.getMeetingsByMonth(period),
     staleTime: 0,
   });
+
+export const useGetMeetingsBySalesman = (
+  filters?: TDashboardFilters,
+  options?: UseQueryOptions<TMeetingsBySalesman>
+): ReturnType<typeof useQuery<TMeetingsBySalesman, Error>> => {
+  return useQuery<TMeetingsBySalesman, Error>({
+    queryKey: dashboardQueryKeys.meetingsBySalesman(filters),
+    queryFn: () => dashboardApi.getMeetingsBySalesman(filters),
+    staleTime: 0,
+    ...options,
+  });
+};

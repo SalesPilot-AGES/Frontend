@@ -27,29 +27,34 @@ export const CompanyDetail = (): JSX.Element => {
   const { companyId } = useParams({ strict: false }) as { companyId: string };
   const { data: company, isLoading } = useGetCompanyById(companyId);
   const [editMode, setEditMode] = React.useState(false);
+  const companyValues = React.useMemo(
+    () => (company ? pickCompanyValues(company) : undefined),
+    [company]
+  );
   const [draft, setDraft] = React.useState<
     CompanyInformationValues | undefined
-  >(company ? pickCompanyValues(company) : undefined);
-
-  React.useEffect(() => {
-    if (company) {
-      setDraft(pickCompanyValues(company));
-    }
-  }, [company]);
+  >(companyValues);
 
   const setDraftForEdit = React.useCallback(
     (action: SetStateAction<CompanyInformationValues>) => {
       setDraft((prev) => {
-        if (!company) {
+        if (!companyValues) {
           return prev;
         }
-        const base: CompanyInformationValues =
-          prev ?? pickCompanyValues(company);
+        const base: CompanyInformationValues = prev ?? companyValues;
         return typeof action === 'function' ? action(base) : action;
       });
     },
-    [company]
+    [companyValues]
   );
+
+  const handleStartEdit = React.useCallback(() => {
+    if (!companyValues) {
+      return;
+    }
+    setDraft(companyValues);
+    setEditMode(true);
+  }, [companyValues]);
 
   return (
     <PageContainter>
@@ -143,12 +148,12 @@ export const CompanyDetail = (): JSX.Element => {
           <Typography>Carregando informações da empresa...</Typography>
         ) : company && !editMode ? (
           <CompanyInformation
-            viewValues={draft ?? pickCompanyValues(company)}
-            onEdit={() => setEditMode(true)}
+            viewValues={draft ?? companyValues ?? pickCompanyValues(company)}
+            onEdit={handleStartEdit}
           />
         ) : company ? (
           <CompanyInformationEdit
-            draft={draft ?? pickCompanyValues(company)}
+            draft={draft ?? companyValues ?? pickCompanyValues(company)}
             setDraft={setDraftForEdit}
             onSaveSuccess={() => setEditMode(false)}
             onCancel={() => setEditMode(false)}

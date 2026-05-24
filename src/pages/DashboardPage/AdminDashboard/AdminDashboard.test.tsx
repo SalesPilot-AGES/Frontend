@@ -6,11 +6,26 @@ import { AdminDashboard } from './AdminDashboard';
 
 vi.mock('@services/queries/useDashboard', () => ({
   useGetMeetingsByCompany: vi.fn(),
+  useGetMeetingsByMonth: vi.fn(),
 }));
 
-import { useGetMeetingsByCompany } from '@services/queries/useDashboard';
+vi.mock('@pages/DashboardPage/context/DashboardFilterContext', () => ({
+  useDashboardFilterContext: () => ({
+    filters: {
+      period: '30d',
+    },
+  }),
+}));
+
+import {
+  useGetMeetingsByCompany,
+  useGetMeetingsByMonth,
+} from '@services/queries/useDashboard';
 
 const mockUseGetMeetingsByCompany = useGetMeetingsByCompany as ReturnType<
+  typeof vi.fn
+>;
+const mockUseGetMeetingsByMonth = useGetMeetingsByMonth as ReturnType<
   typeof vi.fn
 >;
 
@@ -19,6 +34,10 @@ describe('AdminDashboard', () => {
     mockUseGetMeetingsByCompany.mockReturnValue({
       data: [],
       isError: false,
+      isLoading: false,
+    });
+    mockUseGetMeetingsByMonth.mockReturnValue({
+      data: [],
       isLoading: false,
     });
   });

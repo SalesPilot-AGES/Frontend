@@ -14,6 +14,11 @@ export type TDashboardPeriodParams = {
   endDate?: string;
 };
 
+export type TRankedBarChartItem = {
+  label: string;
+  value: number;
+};
+
 const MeetingsByCompanyItemApiSchema = z.object({
   company_name: z.string().trim().min(1),
   total_meetings: z.number().int().nonnegative().optional(),

@@ -2,14 +2,12 @@ import type { TDashboardFilters } from '@services/models/DashboardSchema';
 import type { Dispatch, SetStateAction } from 'react';
 import { createContext, useContext } from 'react';
 
-export type TDashboardFilterParams = TDashboardFilters;
-
 export type TDashboardFilterContextValue = {
-  filters: TDashboardFilterParams;
-  setFilters: Dispatch<SetStateAction<TDashboardFilterParams>>;
+  filters: TDashboardFilters;
+  setFilters: Dispatch<SetStateAction<TDashboardFilters>>;
 };
 
-export const defaultDashboardFilters: TDashboardFilterParams = {
+export const defaultDashboardFilters: TDashboardFilters = {
   period: '30d',
 };
 

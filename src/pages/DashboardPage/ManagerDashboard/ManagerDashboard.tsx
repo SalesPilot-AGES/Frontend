@@ -5,6 +5,7 @@ import { Box, Stack, useTheme } from '@mui/material';
 import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
 import { MeetingsByChart } from '@pages/DashboardPage/components/MeetingsByChart/MeetingsByChart';
 import { MeetingsByMonthChart } from '@pages/DashboardPage/components/MeetingsByMonthChart/MeetingsByMonthChart';
+import { SalesmenStatusChart } from '@pages/DashboardPage/components/SalesmenStatusChart/SalesmenStatusChart';
 import { useDashboardFilterContext } from '@pages/DashboardPage/context/DashboardFilterContext';
 import { useGetMeetingsBySalesman } from '@services/queries/useDashboard';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
@@ -34,6 +35,9 @@ export const ManagerDashboard = (): JSX.Element => {
           subtitle={EpageDescriptions.MANAGER_DASHBOARD}
         />
         <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+            <SalesmenStatusChart />
+          </Box>
           <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
             <MeetingsByMonthChart />
           </Box>

@@ -2,13 +2,17 @@ import {
   mockMeetingsByCompany,
   mockMeetingsBySalesman,
 } from '@data/mocks/Dashboard';
+import { dashboardCompaniesStatusMock } from '@data/mocks/DashboardCompaniesStatus';
 import { dashboardMeetingsByMonthMock } from '@data/mocks/DashboardMeetingsByMonth';
+import { dashboardSalesmenStatusMock } from '@data/mocks/DashboardSalesmenStatus';
 import {
   MeetingsByCompanySchema,
   MeetingsByMonthResponseSchema,
   MeetingsBySalesmanSchema,
+  StatusCountResponseSchema,
   type TDashboardFilters,
   type TDashboardPeriodParams,
+  type TDashboardStatusCount,
   type TMeetingsByCompany,
   type TMeetingsByMonth,
   type TMeetingsBySalesman,
@@ -17,7 +21,7 @@ import axios from 'axios';
 
 import apiClient from './apiClient';
 
-const isFallbackEnvironment = import.meta.env.MODE !== 'production';
+const isFallbackEnvironment = import.meta.env.DEV;
 
 const shouldUseMockFallback = (error: unknown): boolean => {
   if (!isFallbackEnvironment) {
@@ -72,6 +76,7 @@ export const dashboardApi = {
       throw error;
     }
   },
+
   getMeetingsByMonth: async (
     period: TDashboardPeriodParams
   ): Promise<TMeetingsByMonth> => {
@@ -98,6 +103,7 @@ export const dashboardApi = {
       throw error;
     }
   },
+
   getMeetingsBySalesman: async (
     filters?: TDashboardFilters
   ): Promise<TMeetingsBySalesman> => {
@@ -113,6 +119,38 @@ export const dashboardApi = {
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         return MeetingsBySalesmanSchema.parse(mockMeetingsBySalesman);
+      }
+
+      throw error;
+    }
+  },
+
+  getCompaniesStatus: async (): Promise<TDashboardStatusCount> => {
+    try {
+      const response = await apiClient.get<unknown>(
+        '/api/dashboard/companies-status'
+      );
+
+      return StatusCountResponseSchema.parse(response.data);
+    } catch (error) {
+      if (shouldUseMockFallback(error)) {
+        return dashboardCompaniesStatusMock;
+      }
+
+      throw error;
+    }
+  },
+
+  getSalesmenStatus: async (): Promise<TDashboardStatusCount> => {
+    try {
+      const response = await apiClient.get<unknown>(
+        '/api/dashboard/salesmen-status'
+      );
+
+      return StatusCountResponseSchema.parse(response.data);
+    } catch (error) {
+      if (shouldUseMockFallback(error)) {
+        return dashboardSalesmenStatusMock;
       }
 
       throw error;

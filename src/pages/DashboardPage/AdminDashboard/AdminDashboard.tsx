@@ -3,6 +3,7 @@ import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import { Box, Stack, useTheme } from '@mui/material';
 import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
+import { CompaniesStatusChart } from '@pages/DashboardPage/components/CompaniesStatusChart/CompaniesStatusChart';
 import { MeetingsByChart } from '@pages/DashboardPage/components/MeetingsByChart/MeetingsByChart';
 import { MeetingsByMonthChart } from '@pages/DashboardPage/components/MeetingsByMonthChart/MeetingsByMonthChart';
 import { useDashboardFilterContext } from '@pages/DashboardPage/context/DashboardFilterContext';
@@ -34,6 +35,9 @@ export const AdminDashboard = (): JSX.Element => {
           subtitle={EpageDescriptions.ADMIN_DASHBOARD}
         />
         <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+            <CompaniesStatusChart />
+          </Box>
           <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
             <MeetingsByMonthChart />
           </Box>

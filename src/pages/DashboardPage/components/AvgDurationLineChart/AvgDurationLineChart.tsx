@@ -13,6 +13,7 @@ import { useDashboardAvgDuration } from '@store/hooks/useDashboardAvgDuration';
 import type { JSX } from 'react';
 import { useMemo } from 'react';
 
+import { useDashboardFilterContext } from '../../useDashboardFilterContext';
 import { StyledLineChart } from './AvgDurationLineChart.style';
 import { formatDuration, formatMonthLabel } from './AvgDurationLineChart.utils';
 import {
@@ -22,7 +23,8 @@ import {
 
 export const AvgDurationLineChart = (): JSX.Element => {
   const { palette } = useTheme();
-  const { data = [], isLoading, isError } = useDashboardAvgDuration();
+  const { period } = useDashboardFilterContext();
+  const { data = [], isLoading, isError } = useDashboardAvgDuration(period);
 
   const chartData = useMemo(
     () =>

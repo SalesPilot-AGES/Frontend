@@ -8,7 +8,7 @@ export type TDashboardFilterContextValue = {
 
 const buildDefaultPeriod = (): TDashboardPeriodParams => {
   return {
-    period: '90d',
+    period: '30d',
   };
 };
 

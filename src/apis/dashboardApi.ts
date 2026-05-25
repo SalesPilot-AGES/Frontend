@@ -1,5 +1,6 @@
 import { mockDashboardAvgDurationData } from '@data/mocks/DashboardAvgDuration';
 import apiClient from '@services/api/apiClient';
+import type { TDashboardPeriodParams } from '@services/models/DashboardSchema';
 import { z } from 'zod';
 
 const DashboardAvgDurationPointSchema = z.object({
@@ -36,7 +37,9 @@ const mapAvgDurationPoint = (
 };
 
 export const dashboardApi = {
-  getAvgDuration: async (): Promise<TDashboardAvgDurationPoint[]> => {
+  getAvgDuration: async (
+    period: TDashboardPeriodParams
+  ): Promise<TDashboardAvgDurationPoint[]> => {
     if (USE_MOCK_AVG_DURATION_DATA) {
       const parsedMockResponse = DashboardAvgDurationResponseSchema.parse({
         data: mockDashboardAvgDurationData,
@@ -45,7 +48,16 @@ export const dashboardApi = {
     }
 
     const response = await apiClient.get<unknown>(
-      '/api/dashboard/avg-duration'
+      '/api/dashboard/avg-duration',
+      {
+        params: {
+          period: period.period,
+          ...(period.period === 'custom' &&
+            period.startDate && { start_date: period.startDate }),
+          ...(period.period === 'custom' &&
+            period.endDate && { end_date: period.endDate }),
+        },
+      }
     );
 
     const parsedResponse = DashboardAvgDurationResponseSchema.parse(

@@ -8,6 +8,7 @@ import type { JSX } from 'react';
 import { useMemo } from 'react';
 
 import { useDashboardFilterContext } from '../../context/DashboardFilterContext';
+import { formatMonthLabel } from '../AvgDurationLineChart/AvgDurationLineChart.utils';
 
 const EMPTY_STATE_TITLE = 'Nenhuma reunião encontrada';
 const EMPTY_STATE_DESCRIPTION =
@@ -84,6 +85,10 @@ export const MeetingsByMonthChart = (): JSX.Element => {
               {
                 scaleType: 'band',
                 data: chartData.map((item) => item.monthLabel),
+                valueFormatter: (value, context) =>
+                  context.location === 'tooltip'
+                    ? formatMonthLabel(value)
+                    : value,
                 tickLabelStyle: {
                   fontSize: 12,
                   fill: palette.neutrals[500],
@@ -105,12 +110,18 @@ export const MeetingsByMonthChart = (): JSX.Element => {
               {
                 data: chartData.map((item) => item.totalMeetings),
                 color: palette.meetings[500],
-                valueFormatter: (value, context): string => {
-                  const month = chartData[context.dataIndex]?.monthLabel ?? '';
-                  return `${month}: ${value ?? 0} reuniões`;
-                },
+                valueFormatter: (value): string => `${value ?? 0} reuniões`,
               },
             ]}
+            slotProps={{
+              tooltip: {
+                sx: {
+                  '& .MuiChartsTooltip-table caption': {
+                    textAlign: 'right',
+                  },
+                },
+              },
+            }}
             slots={{ legend: () => null }}
           />
         )}

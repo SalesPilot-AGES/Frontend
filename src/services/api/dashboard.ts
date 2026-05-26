@@ -1,8 +1,17 @@
+import {
+  mockMeetingsByCompany,
+  mockMeetingsBySalesman,
+} from '@data/mocks/Dashboard';
 import { dashboardMeetingsByMonthMock } from '@data/mocks/DashboardMeetingsByMonth';
 import {
+  MeetingsByCompanySchema,
   MeetingsByMonthResponseSchema,
+  MeetingsBySalesmanSchema,
+  type TDashboardFilters,
   type TDashboardPeriodParams,
+  type TMeetingsByCompany,
   type TMeetingsByMonth,
+  type TMeetingsBySalesman,
 } from '@services/models/DashboardSchema';
 import axios from 'axios';
 
@@ -28,7 +37,41 @@ const shouldUseMockFallback = (error: unknown): boolean => {
   return !error.response;
 };
 
+const getDashboardPeriodParams = (
+  filters?: TDashboardFilters
+): Record<string, string> => {
+  if (!filters) {
+    return {};
+  }
+
+  return {
+    period: filters.period,
+    ...(filters.startDate ? { start_date: filters.startDate } : {}),
+    ...(filters.endDate ? { end_date: filters.endDate } : {}),
+  };
+};
+
 export const dashboardApi = {
+  getMeetingsByCompany: async (
+    filters?: TDashboardFilters
+  ): Promise<TMeetingsByCompany> => {
+    try {
+      const response = await apiClient.get<unknown>(
+        '/api/painel/reunioes-por-empresa',
+        {
+          params: getDashboardPeriodParams(filters),
+        }
+      );
+
+      return MeetingsByCompanySchema.parse(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return MeetingsByCompanySchema.parse(mockMeetingsByCompany);
+      }
+
+      throw error;
+    }
+  },
   getMeetingsByMonth: async (
     period: TDashboardPeriodParams
   ): Promise<TMeetingsByMonth> => {
@@ -50,6 +93,26 @@ export const dashboardApi = {
     } catch (error) {
       if (shouldUseMockFallback(error)) {
         return dashboardMeetingsByMonthMock;
+      }
+
+      throw error;
+    }
+  },
+  getMeetingsBySalesman: async (
+    filters?: TDashboardFilters
+  ): Promise<TMeetingsBySalesman> => {
+    try {
+      const response = await apiClient.get<unknown>(
+        '/api/painel/reunioes-por-vendedor',
+        {
+          params: getDashboardPeriodParams(filters),
+        }
+      );
+
+      return MeetingsBySalesmanSchema.parse(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        return MeetingsBySalesmanSchema.parse(mockMeetingsBySalesman);
       }
 
       throw error;

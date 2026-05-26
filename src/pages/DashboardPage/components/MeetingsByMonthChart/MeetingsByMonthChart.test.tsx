@@ -11,10 +11,10 @@ vi.mock('@services/queries/useDashboard', () => ({
   useGetMeetingsByMonth: mockUseGetMeetingsByMonth,
 }));
 
-vi.mock('../../useDashboardFilterContext', () => ({
+vi.mock('../../context/DashboardFilterContext', () => ({
   useDashboardFilterContext: () => ({
-    period: {
-      period: '90d',
+    filters: {
+      period: '30d',
     },
   }),
 }));

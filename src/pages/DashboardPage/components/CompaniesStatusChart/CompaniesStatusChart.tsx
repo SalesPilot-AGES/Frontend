@@ -17,7 +17,7 @@ export const CompaniesStatusChart = (): JSX.Element => {
   const { data, isLoading } = useGetCompaniesStatus();
 
   const activeColor = palette.success[300];
-  const inactiveColor = '#9CA3AF';
+  const inactiveColor = palette.neutrals[400];
 
   const total = useMemo(
     () => (data?.active ?? 0) + (data?.inactive ?? 0),

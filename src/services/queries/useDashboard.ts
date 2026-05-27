@@ -18,8 +18,8 @@ export const dashboardQueryKeys = {
     [...dashboardQueryKeys.all, 'meetings-by-month', period] as const,
   meetingsBySalesman: (filters?: TDashboardFilters) =>
     [...dashboardQueryKeys.all, 'meetings-by-salesman', filters] as const,
-  companiesStatus: [...dashboardQueryKeys.all, 'companies-status'] as const,
-  salesmenStatus: [...dashboardQueryKeys.all, 'salesmen-status'] as const,
+  companiesStatus: ['dashboard', 'companies-status'] as const,
+  salesmenStatus: ['dashboard', 'salesmen-status'] as const,
 };
 
 export const useGetMeetingsByCompany = (

@@ -4,7 +4,7 @@ import { SalesmanDashboard } from '@pages/DashboardPage/SalesmanDashboard/Salesm
 import { useCurrentUserRole } from '@store/hooks/useCurrentUser';
 import type { JSX } from 'react';
 
-import { DashboardFilterProvider } from './DashboardFilterProvider';
+import { DashboardFilterProvider } from './context/DashboardFilterProvider';
 
 export const DashboardPage = (): JSX.Element => {
   const role = useCurrentUserRole();

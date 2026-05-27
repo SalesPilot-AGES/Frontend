@@ -1,9 +1,18 @@
 import { z } from 'zod';
 
-export type TDashboardPeriodParams = {
-  period: 'all' | '7d' | '30d' | '90d' | 'custom';
+export type TDashboardPeriod = 'all' | '7d' | '30d' | 'custom';
+
+export type TDashboardFilters = {
+  period: TDashboardPeriod;
   startDate?: string;
   endDate?: string;
+};
+
+export type TDashboardPeriodParams = TDashboardFilters;
+
+export type TRankedBarChartItem = {
+  label: string;
+  value: number;
 };
 
 export const DashboardMetricTrendSchema = z.enum(['up', 'down', 'neutral']);
@@ -73,6 +82,34 @@ export const DashboardMetricsSchema = z.object({
 export type TDashboardMetric = z.infer<typeof DashboardMetricApiSchema>;
 export type TDashboardMetrics = z.infer<typeof DashboardMetricsSchema>;
 
+const MeetingsByCompanyItemApiSchema = z.object({
+  company_name: z.string().trim().min(1),
+  total_meetings: z.number().int().nonnegative().optional(),
+  meetings_total: z.number().int().nonnegative().optional(),
+  meetings_count: z.number().int().nonnegative().optional(),
+  total: z.number().int().nonnegative().optional(),
+});
+
+const getTotalMeetings = (
+  row: z.infer<typeof MeetingsByCompanyItemApiSchema>
+): number =>
+  row.total_meetings ??
+  row.meetings_total ??
+  row.meetings_count ??
+  row.total ??
+  0;
+
+export const MeetingsByCompanySchema = z
+  .array(MeetingsByCompanyItemApiSchema)
+  .transform((rows) =>
+    rows.map((row) => ({
+      company_name: row.company_name,
+      total_meetings: getTotalMeetings(row),
+    }))
+  );
+
+export type TMeetingsByCompany = z.infer<typeof MeetingsByCompanySchema>;
+
 const MeetingsByMonthApiItemSchema = z
   .object({
     monthLabel: z.string().optional(),
@@ -97,3 +134,51 @@ export const MeetingsByMonthResponseSchema = z
 export const MeetingsByMonthSchema = z.array(MeetingsByMonthApiItemSchema);
 
 export type TMeetingsByMonth = z.infer<typeof MeetingsByMonthSchema>;
+
+const MeetingsBySalesmanItemApiSchema = z.object({
+  salesman_name: z.string().trim().min(1),
+  total_meetings: z.number().int().nonnegative().optional(),
+  meetings_total: z.number().int().nonnegative().optional(),
+  meetings_count: z.number().int().nonnegative().optional(),
+  total: z.number().int().nonnegative().optional(),
+});
+
+const getTotalMeetingsSalesman = (
+  row: z.infer<typeof MeetingsBySalesmanItemApiSchema>
+): number =>
+  row.total_meetings ??
+  row.meetings_total ??
+  row.meetings_count ??
+  row.total ??
+  0;
+
+export const MeetingsBySalesmanSchema = z
+  .array(MeetingsBySalesmanItemApiSchema)
+  .transform((rows) =>
+    rows.map((row) => ({
+      salesman_name: row.salesman_name,
+      total_meetings: getTotalMeetingsSalesman(row),
+    }))
+  );
+
+export type TMeetingsBySalesman = z.infer<typeof MeetingsBySalesmanSchema>;
+
+const DashboardAvgDurationPointApiSchema = z.object({
+  month: z.string(),
+  month_label: z.string(),
+  avg_minutes: z.number(),
+});
+
+export const DashboardAvgDurationResponseSchema = z.object({
+  data: z.array(DashboardAvgDurationPointApiSchema),
+});
+
+export type TDashboardAvgDurationApiPoint = z.infer<
+  typeof DashboardAvgDurationPointApiSchema
+>;
+
+export type TDashboardAvgDurationPoint = {
+  month: string;
+  monthLabel: string;
+  avgMinutes: number;
+};

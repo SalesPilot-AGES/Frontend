@@ -84,4 +84,32 @@ describe('dashboardApi', () => {
       },
     });
   });
+
+  it('sends custom range params when fetching avg duration', async () => {
+    mockedGet.mockResolvedValue({
+      data: {
+        data: [
+          {
+            month: '2026-05-01',
+            month_label: 'Mai',
+            avg_minutes: 42,
+          },
+        ],
+      },
+    });
+
+    await dashboardApi.getAvgDuration({
+      period: 'custom',
+      startDate: '2026-05-01',
+      endDate: '2026-05-20',
+    });
+
+    expect(mockedGet).toHaveBeenCalledWith('/api/dashboard/avg-duration', {
+      params: {
+        period: 'custom',
+        start_date: '2026-05-01',
+        end_date: '2026-05-20',
+      },
+    });
+  });
 });

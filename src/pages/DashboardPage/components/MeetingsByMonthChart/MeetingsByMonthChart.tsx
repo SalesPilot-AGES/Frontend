@@ -6,7 +6,7 @@ import { EmptyState } from '@UI/EmptyState/EmptyState';
 import type { JSX } from 'react';
 import { useMemo } from 'react';
 
-import { useDashboardFilterContext } from '../../useDashboardFilterContext';
+import { useDashboardFilterContext } from '../../context/DashboardFilterContext';
 
 const EMPTY_STATE_TITLE = 'Nenhuma reunião encontrada';
 const EMPTY_STATE_DESCRIPTION =
@@ -14,8 +14,8 @@ const EMPTY_STATE_DESCRIPTION =
 
 export const MeetingsByMonthChart = (): JSX.Element => {
   const { palette } = useTheme();
-  const { period } = useDashboardFilterContext();
-  const { data = [], isLoading } = useGetMeetingsByMonth(period);
+  const { filters } = useDashboardFilterContext();
+  const { data = [], isLoading } = useGetMeetingsByMonth(filters);
 
   const chartData = useMemo(
     () =>

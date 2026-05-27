@@ -12,6 +12,14 @@ vi.mock('@store/hooks/useDashboardAvgDuration', () => ({
   useDashboardAvgDuration: () => mockUseDashboardAvgDuration(),
 }));
 
+vi.mock('../../context/DashboardFilterContext', () => ({
+  useDashboardFilterContext: () => ({
+    filters: {
+      period: '30d',
+    },
+  }),
+}));
+
 describe('AvgDurationLineChart', () => {
   it('formats month labels to full month names in portuguese', () => {
     expect(formatMonthLabel('Jan')).toBe('Janeiro');

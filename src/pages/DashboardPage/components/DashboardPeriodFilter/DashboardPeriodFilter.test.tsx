@@ -3,20 +3,20 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { DashboardPeriodFilter } from './DashboardPeriodFilter';
 
-const { mockSetPeriod, mockUseDashboardFilterContext } = vi.hoisted(() => ({
-  mockSetPeriod: vi.fn(),
+const { mockSetFilters, mockUseDashboardFilterContext } = vi.hoisted(() => ({
+  mockSetFilters: vi.fn(),
   mockUseDashboardFilterContext: vi.fn(),
 }));
 
-vi.mock('../../useDashboardFilterContext', () => ({
+vi.mock('../../context/DashboardFilterContext', () => ({
   useDashboardFilterContext: mockUseDashboardFilterContext,
 }));
 
 describe('DashboardPeriodFilter', () => {
   it('renders quick period options', () => {
     mockUseDashboardFilterContext.mockReturnValue({
-      period: { period: '30d' },
-      setPeriod: mockSetPeriod,
+      filters: { period: '30d' },
+      setFilters: mockSetFilters,
     });
 
     render(<DashboardPeriodFilter />);
@@ -31,21 +31,21 @@ describe('DashboardPeriodFilter', () => {
 
   it('updates period when quick option is clicked', () => {
     mockUseDashboardFilterContext.mockReturnValue({
-      period: { period: '30d' },
-      setPeriod: mockSetPeriod,
+      filters: { period: '30d' },
+      setFilters: mockSetFilters,
     });
 
     render(<DashboardPeriodFilter />);
 
     fireEvent.click(screen.getByRole('button', { name: '7 dias' }));
 
-    expect(mockSetPeriod).toHaveBeenCalledWith({ period: '7d' });
+    expect(mockSetFilters).toHaveBeenCalledWith({ period: '7d' });
   });
 
   it('applies custom period with start and end dates', () => {
     mockUseDashboardFilterContext.mockReturnValue({
-      period: { period: '30d' },
-      setPeriod: mockSetPeriod,
+      filters: { period: '30d' },
+      setFilters: mockSetFilters,
     });
 
     render(<DashboardPeriodFilter />);
@@ -60,7 +60,7 @@ describe('DashboardPeriodFilter', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Aplicar' }));
 
-    expect(mockSetPeriod).toHaveBeenCalledWith({
+    expect(mockSetFilters).toHaveBeenCalledWith({
       period: 'custom',
       startDate: '2026-05-01',
       endDate: '2026-05-20',

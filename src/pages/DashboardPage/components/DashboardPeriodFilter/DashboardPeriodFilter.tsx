@@ -11,16 +11,13 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import type { TDashboardPeriodParams } from '@services/models/DashboardSchema';
+import type { TDashboardFilters } from '@services/models/DashboardSchema';
 import type { JSX, MouseEvent } from 'react';
 import { useMemo, useState } from 'react';
 
-import { useDashboardFilterContext } from '../../useDashboardFilterContext';
+import { useDashboardFilterContext } from '../../context/DashboardFilterContext';
 
-type TQuickPeriod = Extract<
-  TDashboardPeriodParams['period'],
-  'all' | '7d' | '30d'
->;
+type TQuickPeriod = Extract<TDashboardFilters['period'], 'all' | '7d' | '30d'>;
 
 type TQuickPeriodOption = {
   label: string;
@@ -62,16 +59,16 @@ const clampCustomDateRange = (
 
 export const DashboardPeriodFilter = (): JSX.Element => {
   const { palette } = useTheme();
-  const { period, setPeriod } = useDashboardFilterContext();
+  const { filters, setFilters } = useDashboardFilterContext();
   const [customMenuAnchor, setCustomMenuAnchor] = useState<HTMLElement | null>(
     null
   );
   const [customStartDate, setCustomStartDate] = useState(
-    period.startDate ?? ''
+    filters.startDate ?? ''
   );
-  const [customEndDate, setCustomEndDate] = useState(period.endDate ?? '');
+  const [customEndDate, setCustomEndDate] = useState(filters.endDate ?? '');
 
-  const isCustomSelected = period.period === 'custom';
+  const isCustomSelected = filters.period === 'custom';
 
   const canApplyCustomRange = useMemo(
     () => customStartDate.trim() !== '' && customEndDate.trim() !== '',
@@ -79,12 +76,12 @@ export const DashboardPeriodFilter = (): JSX.Element => {
   );
 
   const handleSelectQuickPeriod = (selectedPeriod: TQuickPeriod): void => {
-    setPeriod({ period: selectedPeriod });
+    setFilters({ period: selectedPeriod });
   };
 
   const handleOpenCustomMenu = (event: MouseEvent<HTMLButtonElement>): void => {
-    setCustomStartDate(period.startDate ?? '');
-    setCustomEndDate(period.endDate ?? '');
+    setCustomStartDate(filters.startDate ?? '');
+    setCustomEndDate(filters.endDate ?? '');
     setCustomMenuAnchor(event.currentTarget);
   };
 
@@ -102,7 +99,7 @@ export const DashboardPeriodFilter = (): JSX.Element => {
       customEndDate
     );
 
-    setPeriod({
+    setFilters({
       period: 'custom',
       startDate: normalizedRange.startDate,
       endDate: normalizedRange.endDate,
@@ -120,7 +117,7 @@ export const DashboardPeriodFilter = (): JSX.Element => {
         sx={{ width: 'fit-content' }}
       >
         {quickPeriodOptions.map((option) => {
-          const isActive = period.period === option.value;
+          const isActive = filters.period === option.value;
 
           return (
             <Button
@@ -167,12 +164,12 @@ export const DashboardPeriodFilter = (): JSX.Element => {
         <Box sx={{ p: 2 }}>
           <Stack spacing={1.5}>
             <Typography variant="subtitle2" color={palette.neutrals[700]}>
-              PerÃ­odo personalizado
+              Periodo personalizado
             </Typography>
             <TextField
               size="small"
               type="date"
-              label="InÃ­cio"
+              label="Inicio"
               value={customStartDate}
               onChange={(event) => setCustomStartDate(event.target.value)}
               InputLabelProps={{ shrink: true }}

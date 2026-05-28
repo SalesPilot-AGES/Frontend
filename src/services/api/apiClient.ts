@@ -10,6 +10,7 @@ const normalizedBaseUrl = API_URL.replace(/\/+$/, '').replace(/\/api$/, '');
 const apiClient: AxiosInstance = axios.create({
   baseURL: normalizedBaseUrl,
   timeout: 10000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -72,6 +73,12 @@ apiClient.interceptors.response.use(
           `${normalizedBaseUrl}/api/auth/refresh`,
           {
             refreshToken: tokens.refreshToken,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json',
+            },
           }
         );
 

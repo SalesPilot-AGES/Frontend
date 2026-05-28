@@ -14,7 +14,7 @@ export const authApi = {
 
   refresh: async (refreshToken: string): Promise<TAuthTokens> => {
     const response = await apiClient.post('/api/auth/refresh', {
-      refresh_token: refreshToken,
+      refreshToken: refreshToken,
     });
     return AuthTokensSchema.parse(response.data);
   },

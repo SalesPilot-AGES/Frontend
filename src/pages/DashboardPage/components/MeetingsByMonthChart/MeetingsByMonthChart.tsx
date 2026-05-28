@@ -1,7 +1,6 @@
 import { Box, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { BarChart } from '@mui/x-charts/BarChart';
-import type { TDashboardPeriodParams } from '@services/models/DashboardSchema';
 import { useGetMeetingsByMonth } from '@services/queries/useDashboard';
 import { EmptyState } from '@UI/EmptyState/EmptyState';
 import type { JSX } from 'react';
@@ -17,11 +16,7 @@ const EMPTY_STATE_DESCRIPTION =
 export const MeetingsByMonthChart = (): JSX.Element => {
   const { palette } = useTheme();
   const { filters } = useDashboardFilterContext();
-  const { data = [], isLoading } = useGetMeetingsByMonth({
-    period: filters.period as TDashboardPeriodParams['period'],
-    startDate: filters.startDate,
-    endDate: filters.endDate,
-  });
+  const { data = [], isLoading } = useGetMeetingsByMonth(filters);
 
   const chartData = useMemo(
     () =>

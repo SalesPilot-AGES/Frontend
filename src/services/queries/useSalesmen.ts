@@ -1,3 +1,5 @@
+import { getErrorMessage } from '@services/api/errorHandler';
+import { type ApiMutationResponse } from '@services/api/responseMessage';
 import { salesmanApi } from '@services/api/salesman';
 import type {
   TSalesman,
@@ -11,6 +13,7 @@ import type {
   UseQueryOptions,
 } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@UI/Toast/useToast';
 
 /**
  * @description Query keys for salesmen.
@@ -73,20 +76,43 @@ export const useGetSalesmanById = (
  * @description Mutation to create a new salesman.
  */
 export const useCreateSalesman = (
-  options?: UseMutationOptions<TSalesman, Error, TSalesmanCreateInput>
-): ReturnType<typeof useMutation<TSalesman, Error, TSalesmanCreateInput>> => {
+  options?: UseMutationOptions<
+    ApiMutationResponse<TSalesman>,
+    Error,
+    TSalesmanCreateInput
+  >
+): ReturnType<
+  typeof useMutation<
+    ApiMutationResponse<TSalesman>,
+    Error,
+    TSalesmanCreateInput
+  >
+> => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
-  return useMutation<TSalesman, Error, TSalesmanCreateInput>({
+  return useMutation<
+    ApiMutationResponse<TSalesman>,
+    Error,
+    TSalesmanCreateInput
+  >({
     ...options,
     mutationFn: salesmanApi.createSalesman,
     onSuccess: (newSalesman, variables, onMutateResult, context) => {
       queryClient.invalidateQueries({ queryKey: salesmenQueryKeys.lists() });
       queryClient.setQueryData(
-        salesmenQueryKeys.detail(newSalesman.id),
-        newSalesman
+        salesmenQueryKeys.detail(newSalesman.content.id),
+        newSalesman.content
+      );
+      showToast(
+        newSalesman.message ?? 'Vendedor criado com sucesso',
+        'success'
       );
       options?.onSuccess?.(newSalesman, variables, onMutateResult, context);
+    },
+    onError: (error, variables, onMutateResult, context) => {
+      showToast(getErrorMessage(error), 'error');
+      options?.onError?.(error, variables, onMutateResult, context);
     },
   });
 };
@@ -96,21 +122,22 @@ export const useCreateSalesman = (
  */
 export const useUpdateSalesman = (
   options?: UseMutationOptions<
-    TSalesman,
+    ApiMutationResponse<TSalesman>,
     Error,
     { uuid: string; data: TSalesmanUpdateInput }
   >
 ): ReturnType<
   typeof useMutation<
-    TSalesman,
+    ApiMutationResponse<TSalesman>,
     Error,
     { uuid: string; data: TSalesmanUpdateInput }
   >
 > => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   return useMutation<
-    TSalesman,
+    ApiMutationResponse<TSalesman>,
     Error,
     { uuid: string; data: TSalesmanUpdateInput }
   >({
@@ -118,11 +145,19 @@ export const useUpdateSalesman = (
     mutationFn: ({ uuid, data }) => salesmanApi.updateSalesman(uuid, data),
     onSuccess: (updatedSalesman, variables, onMutateResult, context) => {
       queryClient.setQueryData(
-        salesmenQueryKeys.detail(updatedSalesman.id),
-        updatedSalesman
+        salesmenQueryKeys.detail(updatedSalesman.content.id),
+        updatedSalesman.content
       );
       queryClient.invalidateQueries({ queryKey: salesmenQueryKeys.lists() });
+      showToast(
+        updatedSalesman.message ?? 'Vendedor atualizado com sucesso',
+        'success'
+      );
       options?.onSuccess?.(updatedSalesman, variables, onMutateResult, context);
+    },
+    onError: (error, variables, onMutateResult, context) => {
+      showToast(getErrorMessage(error), 'error');
+      options?.onError?.(error, variables, onMutateResult, context);
     },
   });
 };

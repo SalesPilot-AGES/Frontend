@@ -13,6 +13,10 @@ import {
 } from '@services/models/SalesmanSchema';
 
 import apiClient, { unwrapContent } from './apiClient';
+import {
+  type ApiMutationResponse,
+  getResponseMessage,
+} from './responseMessage';
 
 /**
  * @description Normalize payload to ensure phone and preferences always have values
@@ -114,12 +118,17 @@ export const salesmanApi = {
    * @param {TSalesmanCreateInput} payload - The data for the new salesman.
    * @returns {Promise<TSalesman>} A promise that resolves to the created salesman data.
    */
-  createSalesman: async (payload: TSalesmanCreateInput): Promise<TSalesman> => {
+  createSalesman: async (
+    payload: TSalesmanCreateInput
+  ): Promise<ApiMutationResponse<TSalesman>> => {
     const response = await apiClient.post<unknown>(
       '/api/collaborators/sellers',
       normalizePayload(payload)
     );
-    return SalesmanSchema.parse(unwrapContent(response.data));
+    return {
+      content: SalesmanSchema.parse(unwrapContent(response.data)),
+      message: getResponseMessage(response.data),
+    };
   },
 
   /**
@@ -131,11 +140,14 @@ export const salesmanApi = {
   updateSalesman: async (
     uuid: string,
     payload: TSalesmanUpdateInput
-  ): Promise<TSalesman> => {
+  ): Promise<ApiMutationResponse<TSalesman>> => {
     const response = await apiClient.put<unknown>(
       `/api/collaborators/sellers/${uuid}`,
       normalizePayload(payload)
     );
-    return SalesmanSchema.parse(unwrapContent(response.data));
+    return {
+      content: SalesmanSchema.parse(unwrapContent(response.data)),
+      message: getResponseMessage(response.data),
+    };
   },
 };

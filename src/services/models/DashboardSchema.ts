@@ -8,16 +8,79 @@ export type TDashboardFilters = {
   endDate?: string;
 };
 
-export type TDashboardPeriodParams = {
-  period: '30d' | '90d' | 'custom';
-  startDate?: string;
-  endDate?: string;
-};
+export type TDashboardPeriodParams = TDashboardFilters;
 
 export type TRankedBarChartItem = {
   label: string;
   value: number;
 };
+
+export const DashboardMetricTrendSchema = z.enum(['up', 'down', 'neutral']);
+
+export const DashboardMetricKeySchema = z.enum([
+  'active_companies',
+  'inactive_companies',
+  'total_meetings',
+  'salesmen',
+]);
+
+export type TDashboardMetricTrend = z.infer<typeof DashboardMetricTrendSchema>;
+export type TDashboardMetricKey = z.infer<typeof DashboardMetricKeySchema>;
+
+const DashboardMetricApiSchema = z
+  .object({
+    value: z.number().optional(),
+    total: z.number().optional(),
+    count: z.number().optional(),
+    variation: z.number().optional(),
+    variation_pct: z.number().optional(),
+    variationPct: z.number().optional(),
+    percentage: z.number().optional(),
+    trend: DashboardMetricTrendSchema.optional(),
+  })
+  .transform((metric) => {
+    const variationPercentage =
+      metric.variation ??
+      metric.variation_pct ??
+      metric.variationPct ??
+      metric.percentage ??
+      0;
+
+    const trend =
+      metric.trend ??
+      (variationPercentage > 0
+        ? 'up'
+        : variationPercentage < 0
+          ? 'down'
+          : 'neutral');
+
+    return {
+      value: metric.value ?? metric.total ?? metric.count ?? 0,
+      variationPercentage,
+      trend,
+    };
+  });
+
+export const DashboardMetricsResponseSchema = z
+  .object({
+    data: z.object({
+      active_companies: DashboardMetricApiSchema,
+      inactive_companies: DashboardMetricApiSchema,
+      total_meetings: DashboardMetricApiSchema,
+      salesmen: DashboardMetricApiSchema,
+    }),
+  })
+  .transform((response) => response.data);
+
+export const DashboardMetricsSchema = z.object({
+  active_companies: DashboardMetricApiSchema,
+  inactive_companies: DashboardMetricApiSchema,
+  total_meetings: DashboardMetricApiSchema,
+  salesmen: DashboardMetricApiSchema,
+});
+
+export type TDashboardMetric = z.infer<typeof DashboardMetricApiSchema>;
+export type TDashboardMetrics = z.infer<typeof DashboardMetricsSchema>;
 
 const MeetingsByCompanyItemApiSchema = z.object({
   company_name: z.string().trim().min(1),
@@ -29,15 +92,12 @@ const MeetingsByCompanyItemApiSchema = z.object({
 
 const getTotalMeetings = (
   row: z.infer<typeof MeetingsByCompanyItemApiSchema>
-): number => {
-  return (
-    row.total_meetings ??
-    row.meetings_total ??
-    row.meetings_count ??
-    row.total ??
-    0
-  );
-};
+): number =>
+  row.total_meetings ??
+  row.meetings_total ??
+  row.meetings_count ??
+  row.total ??
+  0;
 
 export const MeetingsByCompanySchema = z
   .array(MeetingsByCompanyItemApiSchema)
@@ -85,15 +145,12 @@ const MeetingsBySalesmanItemApiSchema = z.object({
 
 const getTotalMeetingsSalesman = (
   row: z.infer<typeof MeetingsBySalesmanItemApiSchema>
-): number => {
-  return (
-    row.total_meetings ??
-    row.meetings_total ??
-    row.meetings_count ??
-    row.total ??
-    0
-  );
-};
+): number =>
+  row.total_meetings ??
+  row.meetings_total ??
+  row.meetings_count ??
+  row.total ??
+  0;
 
 export const MeetingsBySalesmanSchema = z
   .array(MeetingsBySalesmanItemApiSchema)
@@ -124,3 +181,23 @@ export const StatusCountResponseSchema = z
   .or(StatusCountApiSchema);
 
 export type TDashboardStatusCount = { active: number; inactive: number };
+
+const DashboardAvgDurationPointApiSchema = z.object({
+  month: z.string(),
+  month_label: z.string(),
+  avg_minutes: z.number(),
+});
+
+export const DashboardAvgDurationResponseSchema = z.object({
+  data: z.array(DashboardAvgDurationPointApiSchema),
+});
+
+export type TDashboardAvgDurationApiPoint = z.infer<
+  typeof DashboardAvgDurationPointApiSchema
+>;
+
+export type TDashboardAvgDurationPoint = {
+  month: string;
+  monthLabel: string;
+  avgMinutes: number;
+};

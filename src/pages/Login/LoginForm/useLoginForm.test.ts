@@ -47,6 +47,8 @@ describe('useLoginForm', () => {
     vi.mocked(authApi.login).mockResolvedValue({
       access_token: fakeToken,
       refresh_token: 'refresh',
+      token_type: 'Bearer',
+      expires_in_seconds: 3600,
     });
 
     const { result } = renderHook(() => useLoginForm());

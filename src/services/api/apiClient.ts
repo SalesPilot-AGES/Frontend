@@ -52,7 +52,8 @@ apiClient.interceptors.response.use(
           refreshQueue.push((newToken: string) => {
             if (originalRequest && 'headers' in originalRequest) {
               (originalRequest as Record<string, unknown>).headers = {
-                ...(originalRequest as Record<string, unknown>).headers,
+                ...((originalRequest as Record<string, unknown>)
+                  .headers as Record<string, unknown>),
                 Authorization: `Bearer ${newToken}`,
               };
             }
@@ -88,7 +89,10 @@ apiClient.interceptors.response.use(
 
         if (originalRequest && 'headers' in originalRequest) {
           (originalRequest as Record<string, unknown>).headers = {
-            ...(originalRequest as Record<string, unknown>).headers,
+            ...((originalRequest as Record<string, unknown>).headers as Record<
+              string,
+              unknown
+            >),
             Authorization: `Bearer ${newTokens.access_token}`,
           };
         }

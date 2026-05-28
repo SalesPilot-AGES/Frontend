@@ -177,13 +177,13 @@ export const StatusCountResponseSchema = z
     active:
       data.find(
         (item) =>
-          item.label.toLowerCase().includes('ativa') ||
+          item.label.toLowerCase() === 'ativas' ||
           item.label.toLowerCase() === 'active'
       )?.value ?? 0,
     inactive:
       data.find(
         (item) =>
-          item.label.toLowerCase().includes('inativa') ||
+          item.label.toLowerCase() === 'inativas' ||
           item.label.toLowerCase() === 'inactive'
       )?.value ?? 0,
   }));

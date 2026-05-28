@@ -47,7 +47,7 @@ const metricCardConfig: readonly TMetricCardConfig[] = [
     key: 'salesmen',
     iconName: 'salesman',
     iconTheme: 'salesmen',
-    label: ECardLabel.SALESMAN,
+    label: ECardLabel.ACTIVE_SALESMAN,
   },
   {
     key: 'total_meetings',

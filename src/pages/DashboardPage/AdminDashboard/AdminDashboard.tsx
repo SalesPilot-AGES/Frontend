@@ -5,7 +5,6 @@ import { EPageTitles } from '@data/enums/EPageTitles';
 import { Box, Stack, useTheme } from '@mui/material';
 import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
 import { CompaniesStatusChart } from '@pages/DashboardPage/components/CompaniesStatusChart/CompaniesStatusChart';
-import { DashboardPeriodFilter } from '@pages/DashboardPage/components/DashboardPeriodFilter/DashboardPeriodFilter';
 import { InsightChip } from '@pages/DashboardPage/components/InsightChip/InsightChip';
 import { MeetingsByChart } from '@pages/DashboardPage/components/MeetingsByChart/MeetingsByChart';
 import { MeetingsByMonthChart } from '@pages/DashboardPage/components/MeetingsByMonthChart/MeetingsByMonthChart';
@@ -85,19 +84,11 @@ export const AdminDashboard = (): JSX.Element => {
 
   return (
     <PageContainter>
-      <Stack spacing={4} sx={{ width: '100%' }}>
-        <Stack
-          direction={{ xs: 'column', lg: 'row' }}
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', lg: 'center' }}
-          spacing={2}
-        >
-          <PageHeader
-            title={EPageTitles.ADMIN_DASHBOARD}
-            subtitle={EpageDescriptions.ADMIN_DASHBOARD}
-          />
-          <DashboardPeriodFilter />
-        </Stack>
+      <Stack spacing={2} sx={{ width: '100%' }}>
+        <PageHeader
+          title={EPageTitles.ADMIN_DASHBOARD}
+          subtitle={EpageDescriptions.ADMIN_DASHBOARD}
+        />
 
         <Box
           sx={{
@@ -140,16 +131,16 @@ export const AdminDashboard = (): JSX.Element => {
         </Box>
 
         <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
-          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <CompaniesStatusChart />
           </Box>
-          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <MeetingsByMonthChart />
           </Box>
         </Stack>
 
         <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
-          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <MeetingsByChart
               title={EMeetingsByTitle.MEETINGS_BY_COMPANY}
               data={chartData}
@@ -160,7 +151,7 @@ export const AdminDashboard = (): JSX.Element => {
               emptyStateIconColor={palette.companies[600]}
             />
           </Box>
-          <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <AvgDurationLineChart />
           </Box>
         </Stack>

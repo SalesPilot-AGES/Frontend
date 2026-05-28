@@ -33,6 +33,7 @@ const DashboardMetricApiSchema = z
     total: z.number().optional(),
     count: z.number().optional(),
     variation: z.number().optional(),
+    variation_percent: z.number().optional(),
     variation_pct: z.number().optional(),
     variationPct: z.number().optional(),
     percentage: z.number().optional(),
@@ -41,6 +42,7 @@ const DashboardMetricApiSchema = z
   .transform((metric) => {
     const variationPercentage =
       metric.variation ??
+      metric.variation_percent ??
       metric.variation_pct ??
       metric.variationPct ??
       metric.percentage ??
@@ -63,14 +65,17 @@ const DashboardMetricApiSchema = z
 
 export const DashboardMetricsResponseSchema = z
   .object({
-    data: z.object({
-      active_companies: DashboardMetricApiSchema,
-      inactive_companies: DashboardMetricApiSchema,
-      total_meetings: DashboardMetricApiSchema,
-      salesmen: DashboardMetricApiSchema,
-    }),
+    active_companies: DashboardMetricApiSchema,
+    inactive_companies: DashboardMetricApiSchema,
+    total_meetings: DashboardMetricApiSchema,
+    active_sellers: DashboardMetricApiSchema,
   })
-  .transform((response) => response.data);
+  .transform((r) => ({
+    active_companies: r.active_companies,
+    inactive_companies: r.inactive_companies,
+    total_meetings: r.total_meetings,
+    salesmen: r.active_sellers,
+  }));
 
 export const DashboardMetricsSchema = z.object({
   active_companies: DashboardMetricApiSchema,
@@ -163,22 +168,25 @@ export const MeetingsBySalesmanSchema = z
 
 export type TMeetingsBySalesman = z.infer<typeof MeetingsBySalesmanSchema>;
 
-const StatusCountApiSchema = z
-  .object({
-    active: z.number().optional(),
-    inactive: z.number().optional(),
-    ativo: z.number().optional(),
-    inativo: z.number().optional(),
-  })
-  .transform((item) => ({
-    active: item.active ?? item.ativo ?? 0,
-    inactive: item.inactive ?? item.inativo ?? 0,
-  }));
-
 export const StatusCountResponseSchema = z
-  .object({ data: StatusCountApiSchema })
-  .transform((r) => r.data)
-  .or(StatusCountApiSchema);
+  .object({
+    data: z.array(z.object({ label: z.string(), value: z.number() })),
+    total: z.number().optional(),
+  })
+  .transform(({ data }) => ({
+    active:
+      data.find(
+        (item) =>
+          item.label.toLowerCase().includes('ativa') ||
+          item.label.toLowerCase() === 'active'
+      )?.value ?? 0,
+    inactive:
+      data.find(
+        (item) =>
+          item.label.toLowerCase().includes('inativa') ||
+          item.label.toLowerCase() === 'inactive'
+      )?.value ?? 0,
+  }));
 
 export type TDashboardStatusCount = { active: number; inactive: number };
 

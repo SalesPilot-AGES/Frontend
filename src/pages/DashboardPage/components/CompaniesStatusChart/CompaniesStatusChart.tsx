@@ -46,7 +46,7 @@ export const CompaniesStatusChart = (): JSX.Element => {
         {CHART_TITLE}
       </Typography>
 
-      <Box sx={{ width: '100%', height: '20rem', overflow: 'hidden' }}>
+      <Box sx={{ width: '100%', height: '15rem', overflow: 'hidden' }}>
         {isLoading ? (
           <Box
             sx={{
@@ -69,7 +69,7 @@ export const CompaniesStatusChart = (): JSX.Element => {
           <Stack alignItems="center" sx={{ height: '100%' }}>
             <Box sx={{ width: '100%' }}>
               <PieChart
-                height={264}
+                height={200}
                 series={[
                   {
                     data: [
@@ -86,8 +86,8 @@ export const CompaniesStatusChart = (): JSX.Element => {
                         color: inactiveColor,
                       },
                     ],
-                    innerRadius: 60,
-                    outerRadius: 110,
+                    innerRadius: 48,
+                    outerRadius: 80,
                     valueFormatter: (item): string => {
                       const percentage =
                         total > 0 ? Math.round((item.value / total) * 100) : 0;

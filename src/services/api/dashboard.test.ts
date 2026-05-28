@@ -78,7 +78,7 @@ describe('dashboardApi', () => {
 
     await dashboardApi.getMetrics({ period: '30d' });
 
-    expect(mockedGet).toHaveBeenCalledWith('/api/painel/metricas', {
+    expect(mockedGet).toHaveBeenCalledWith('/api/dashboard/metrics', {
       params: {
         period: '30d',
       },

@@ -20,7 +20,7 @@ describe('DemoAccountsInfo', () => {
 
     expect(setValue).toHaveBeenCalledWith(
       'email',
-      'admin@example.com',
+      'ana@digitalsales.com',
       expect.any(Object)
     );
     expect(setValue).toHaveBeenCalledWith(
@@ -37,7 +37,7 @@ describe('DemoAccountsInfo', () => {
     fireEvent.click(screen.getByRole('button', { name: /manager/i }));
     expect(setValue).toHaveBeenCalledWith(
       'email',
-      'manager@example.com',
+      'gabriel@digitalsales.com',
       expect.any(Object)
     );
   });
@@ -48,7 +48,7 @@ describe('DemoAccountsInfo', () => {
     fireEvent.click(screen.getByRole('button', { name: /salesmen/i }));
     expect(setValue).toHaveBeenCalledWith(
       'email',
-      'salesmen@example.com',
+      'saulo@digitalsales.com',
       expect.any(Object)
     );
   });

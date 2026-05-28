@@ -14,7 +14,12 @@ afterEach(() => {
 });
 
 const loginAdmin = () =>
-  useAuthStore.getState().loginUser('admin@example.com', 'password');
+  useAuthStore.getState().setUser({
+    id: '1',
+    name: 'Admin User',
+    email: 'admin@example.com',
+    role: 'admin',
+  });
 
 describe('useCurrentUser', () => {
   it('returns null when not logged in', () => {

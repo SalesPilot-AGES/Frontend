@@ -124,12 +124,21 @@ export const MeetingSummarySchema = z.object({
 /**
  * Response paginada de reuniões
  */
-export const MeetingsResponseSchema = z.object({
-  content: z.array(MeetingListItemApiSchema),
-  total_elements: z.number(),
-  total_pages: z.number(),
-  summary: MeetingSummarySchema,
-});
+export const MeetingsResponseSchema = z
+  .object({
+    content: z.array(MeetingListItemApiSchema),
+    totalElements: z.number().optional(),
+    total_elements: z.number().optional(),
+    totalPages: z.number().optional(),
+    total_pages: z.number().optional(),
+    summary: MeetingSummarySchema,
+  })
+  .transform((data) => ({
+    content: data.content,
+    total_elements: data.totalElements ?? data.total_elements ?? 0,
+    total_pages: data.totalPages ?? data.total_pages ?? 0,
+    summary: data.summary,
+  }));
 
 /**
  * Tipo final usado no front (mapeado)

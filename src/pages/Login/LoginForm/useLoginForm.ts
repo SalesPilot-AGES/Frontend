@@ -26,15 +26,12 @@ export const useLoginForm = (): UseLoginFormReturn => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormData): void => {
+  const onSubmit = async (data: LoginFormData): Promise<void> => {
     clearErrors('root');
-    const user = loginUser(data.email, data.password);
+    const user = await loginUser(data.email, data.password);
 
     if (user) {
-      // Navigate to role-specific dashboard
-      const dashboardRoute = EPageRoutes.DASHBOARD;
-
-      navigate({ to: dashboardRoute });
+      navigate({ to: EPageRoutes.DASHBOARD });
     } else {
       setError('root', {
         message: 'Invalid email or password',

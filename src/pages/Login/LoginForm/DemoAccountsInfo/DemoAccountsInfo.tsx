@@ -9,9 +9,9 @@ export interface IDemoAccountsInfoProps {
 }
 
 const demoAccounts = [
-  { label: 'Admin', email: 'admin@example.com' },
-  { label: 'Manager', email: 'manager@example.com' },
-  { label: 'Salesmen', email: 'salesmen@example.com' },
+  { label: 'Admin', email: 'ana@digitalsales.com' },
+  { label: 'Manager', email: 'gabriel@digitalsales.com' },
+  { label: 'Salesmen', email: 'saulo@digitalsales.com' },
 ];
 
 const PASSWORD = 'password';

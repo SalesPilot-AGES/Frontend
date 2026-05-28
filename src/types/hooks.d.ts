@@ -31,6 +31,6 @@ export type UseLoginFormReturn = {
   register: UseFormRegister<LoginFormData>;
   handleSubmit: UseFormHandleSubmit<LoginFormData>;
   errors: FieldErrors<LoginFormData>;
-  onSubmit: (data: LoginFormData) => void;
+  onSubmit: (data: LoginFormData) => Promise<void>;
   setValue: UseFormSetValue<LoginFormData>;
 };

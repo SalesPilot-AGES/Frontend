@@ -24,7 +24,12 @@ describe('useUserProfile', () => {
   });
 
   it('clears auth state on logout', () => {
-    useAuthStore.getState().loginUser('admin@example.com', 'password');
+    useAuthStore.getState().setUser({
+      id: '1',
+      name: 'Admin',
+      email: 'admin@example.com',
+      role: 'admin',
+    });
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
 
     const { result } = renderHook(() => useUserProfile());

@@ -12,7 +12,7 @@ import {
 } from '@services/models/MeetingSchema';
 import axios from 'axios';
 
-import apiClient from './apiClient';
+import apiClient, { unwrapContent } from './apiClient';
 
 export type TMeetingFilters = {
   search?: string;
@@ -38,7 +38,9 @@ export const meetingApi = {
       },
     });
 
-    const parsedResponse = MeetingsResponseSchema.parse(response.data);
+    const parsedResponse = MeetingsResponseSchema.parse(
+      unwrapContent(response.data)
+    );
 
     return {
       content: parsedResponse.content.map(mapMeetingListItem),
@@ -49,7 +51,7 @@ export const meetingApi = {
 
   getMeetingById: async (uuid: string): Promise<TMeetingContextMetadata> => {
     const response = await apiClient.get<unknown>(`/api/meetings/${uuid}`);
-    return MeetingContextMetadataSchema.parse(response.data);
+    return MeetingContextMetadataSchema.parse(unwrapContent(response.data));
   },
 
   getMeetingPostAnalysis: async (
@@ -59,7 +61,7 @@ export const meetingApi = {
       const response = await apiClient.get<unknown>(
         `/api/meetings/${uuid}/post-analysis`
       );
-      return MeetingPostAnalysisSchema.parse(response.data);
+      return MeetingPostAnalysisSchema.parse(unwrapContent(response.data));
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         return null;
@@ -75,6 +77,6 @@ export const meetingApi = {
     const response = await apiClient.get<unknown>(
       `/api/meetings/${uuid}/insights`
     );
-    return MeetingRealtimeInsightsSchema.parse(response.data);
+    return MeetingRealtimeInsightsSchema.parse(unwrapContent(response.data));
   },
 };

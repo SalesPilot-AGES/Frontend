@@ -52,7 +52,7 @@ export const MeetingsByMonthChart = (): JSX.Element => {
         Total de reuniões
       </Typography>
 
-      <Box sx={{ width: '100%', height: '20rem', overflow: 'hidden' }}>
+      <Box sx={{ width: '100%', height: '15rem', overflow: 'hidden' }}>
         {isLoading ? (
           <Box
             sx={{
@@ -73,7 +73,7 @@ export const MeetingsByMonthChart = (): JSX.Element => {
           />
         ) : (
           <BarChart
-            height={320}
+            height={240}
             margin={{ top: 10, right: 16, bottom: 32, left: 52 }}
             grid={{ horizontal: true }}
             xAxis={[

@@ -78,13 +78,14 @@ export const dashboardApi = {
   ): Promise<TMeetingsByCompany> => {
     try {
       const response = await apiClient.get<unknown>(
-        '/api/painel/reunioes-por-empresa',
+        '/api/dashboard/meetings-by-company',
         {
           params: getDashboardPeriodParams(filters),
         }
       );
 
-      return MeetingsByCompanySchema.parse(response.data);
+      const raw = (response.data as { data?: unknown }).data ?? response.data;
+      return MeetingsByCompanySchema.parse(raw);
     } catch (error) {
       if (shouldUseMockFallback(error)) {
         return MeetingsByCompanySchema.parse(mockMeetingsByCompany);
@@ -123,7 +124,7 @@ export const dashboardApi = {
     filters?: TDashboardFilters
   ): Promise<TDashboardMetrics> => {
     try {
-      const response = await apiClient.get<unknown>('/api/painel/metricas', {
+      const response = await apiClient.get<unknown>('/api/dashboard/metrics', {
         params: getDashboardPeriodParams(filters),
       });
 

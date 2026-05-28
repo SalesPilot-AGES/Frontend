@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@tests/testUtils';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DashboardPeriodFilter } from './DashboardPeriodFilter';
 
@@ -13,9 +13,14 @@ vi.mock('../../context/DashboardFilterContext', () => ({
 }));
 
 describe('DashboardPeriodFilter', () => {
+  beforeEach(() => {
+    mockSetFilters.mockReset();
+    mockUseDashboardFilterContext.mockReset();
+  });
+
   it('renders quick period options', () => {
     mockUseDashboardFilterContext.mockReturnValue({
-      filters: { period: '30d' },
+      filters: { period: 'all' },
       setFilters: mockSetFilters,
     });
 
@@ -31,7 +36,7 @@ describe('DashboardPeriodFilter', () => {
 
   it('updates period when quick option is clicked', () => {
     mockUseDashboardFilterContext.mockReturnValue({
-      filters: { period: '30d' },
+      filters: { period: 'all' },
       setFilters: mockSetFilters,
     });
 
@@ -44,7 +49,7 @@ describe('DashboardPeriodFilter', () => {
 
   it('applies custom period with start and end dates', () => {
     mockUseDashboardFilterContext.mockReturnValue({
-      filters: { period: '30d' },
+      filters: { period: 'all' },
       setFilters: mockSetFilters,
     });
 

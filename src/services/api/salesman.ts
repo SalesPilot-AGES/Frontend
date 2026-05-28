@@ -12,7 +12,7 @@ import {
   SalesmanSchema,
 } from '@services/models/SalesmanSchema';
 
-import apiClient from './apiClient';
+import apiClient, { unwrapContent } from './apiClient';
 
 /**
  * @description Normalize payload to ensure phone and preferences always have values
@@ -38,7 +38,9 @@ const fetchSellerList = async (): Promise<TSalesman[]> => {
     },
   });
 
-  const parsed = SalesmanListApiSchema.parse(response.data);
+  const page =
+    (response.data as { content?: unknown }).content ?? response.data;
+  const parsed = SalesmanListApiSchema.parse(page);
   return parsed.content;
 };
 
@@ -72,7 +74,9 @@ export const salesmanApi = {
       }
     );
 
-    const parsedResponse = SalesmanListApiSchema.parse(response.data);
+    const pageData =
+      (response.data as { content?: unknown }).content ?? response.data;
+    const parsedResponse = SalesmanListApiSchema.parse(pageData);
 
     return SalesmanListSchema.parse({
       ...parsedResponse,
@@ -92,7 +96,7 @@ export const salesmanApi = {
       const response = await apiClient.get<unknown>(
         `/api/collaborators/sellers/${uuid}`
       );
-      return SalesmanSchema.parse(response.data);
+      return SalesmanSchema.parse(unwrapContent(response.data));
     } catch {
       const sellers = await fetchSellerList();
       const seller = sellers.find((row) => row.id === uuid);
@@ -115,7 +119,7 @@ export const salesmanApi = {
       '/api/collaborators/sellers',
       normalizePayload(payload)
     );
-    return SalesmanSchema.parse(response.data);
+    return SalesmanSchema.parse(unwrapContent(response.data));
   },
 
   /**
@@ -132,6 +136,6 @@ export const salesmanApi = {
       `/api/collaborators/sellers/${uuid}`,
       normalizePayload(payload)
     );
-    return SalesmanSchema.parse(response.data);
+    return SalesmanSchema.parse(unwrapContent(response.data));
   },
 };

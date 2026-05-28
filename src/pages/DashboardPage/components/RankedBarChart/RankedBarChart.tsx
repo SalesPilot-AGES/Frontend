@@ -12,7 +12,7 @@ import type { TRankedBarChartItem } from '@services/models/DashboardSchema';
 import { EmptyState } from '@UI/EmptyState/EmptyState';
 import { type JSX, useMemo } from 'react';
 
-const CHART_HEIGHT = 300;
+const CHART_HEIGHT = 240;
 const X_AXIS_STEP = 25;
 
 const roundUpToStep = (value: number, step: number): number =>

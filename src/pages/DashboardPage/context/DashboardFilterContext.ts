@@ -8,7 +8,9 @@ export type TDashboardFilterContextValue = {
 };
 
 export const defaultDashboardFilters: TDashboardFilters = {
-  period: '30d',
+  period: 'custom',
+  startDate: '2026-01-01',
+  endDate: new Date().toISOString().split('T')[0],
 };
 
 export const DashboardFilterContext = createContext<

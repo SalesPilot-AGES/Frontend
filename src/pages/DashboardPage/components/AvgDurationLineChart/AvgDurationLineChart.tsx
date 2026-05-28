@@ -62,7 +62,7 @@ export const AvgDurationLineChart = (): JSX.Element => {
         {isLoading ? (
           <Box
             sx={{
-              minHeight: '18rem',
+              minHeight: '12rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -75,7 +75,7 @@ export const AvgDurationLineChart = (): JSX.Element => {
             spacing={1}
             alignItems="center"
             justifyContent="center"
-            sx={{ minHeight: '18rem' }}
+            sx={{ minHeight: '12rem' }}
           >
             <Typography variant="subtitle1" fontWeight={700}>
               {EAvgDurationLineChart.ERROR_TITLE}
@@ -93,7 +93,7 @@ export const AvgDurationLineChart = (): JSX.Element => {
             spacing={1}
             alignItems="center"
             justifyContent="center"
-            sx={{ minHeight: '18rem' }}
+            sx={{ minHeight: '12rem' }}
           >
             <Box
               sx={{
@@ -123,7 +123,7 @@ export const AvgDurationLineChart = (): JSX.Element => {
         ) : (
           <StyledLineChart
             lineColor={palette.meetings[500]}
-            height={320}
+            height={240}
             margin={{ top: 24, right: 24, bottom: 24, left: 50 }}
             grid={{ horizontal: true }}
             slotProps={{

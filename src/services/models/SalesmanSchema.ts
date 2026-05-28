@@ -101,9 +101,48 @@ export const SalesmanUpdateInputSchema = SalesmanCreateInputSchema.pick({
 /**
  * @description API schema for paginated salesman list responses.
  */
-export const SalesmanListApiSchema = z.object({
-  content: z.array(SalesmanSchema),
-  pageable: PageableSchema,
+export const SalesmanListApiSchema = z
+  .object({
+    content: z.array(SalesmanSchema),
+    pageable: PageableSchema.optional(),
+    totalElements: z.number().int().nonnegative().optional(),
+    total_elements: z.number().int().nonnegative().optional(),
+    totalPages: z.number().int().nonnegative().optional(),
+    total_pages: z.number().int().nonnegative().optional(),
+    last: z.boolean(),
+    size: z.number().int().positive(),
+    number: z.number().int().nonnegative(),
+    numberOfElements: z.number().int().nonnegative().optional(),
+    number_of_elements: z.number().int().nonnegative().optional(),
+    first: z.boolean(),
+    empty: z.boolean(),
+    sort: z
+      .object({
+        empty: z.boolean(),
+        sorted: z.boolean(),
+        unsorted: z.boolean(),
+      })
+      .optional(),
+  })
+  .transform((data) => ({
+    content: data.content,
+    pageable: data.pageable,
+    total_elements: data.totalElements ?? data.total_elements ?? 0,
+    total_pages: data.totalPages ?? data.total_pages ?? 0,
+    last: data.last,
+    size: data.size,
+    number: data.number,
+    number_of_elements: data.numberOfElements ?? data.number_of_elements ?? 0,
+    first: data.first,
+    empty: data.empty,
+    sort: data.sort,
+  }));
+
+/**
+ * @description Frontend schema for paginated salesman list responses.
+ */
+export const SalesmanListSchema = z.object({
+  content: z.array(SalesmanListItemSchema),
   total_elements: z.number().int().nonnegative(),
   total_pages: z.number().int().nonnegative(),
   last: z.boolean(),
@@ -112,18 +151,6 @@ export const SalesmanListApiSchema = z.object({
   number_of_elements: z.number().int().nonnegative(),
   first: z.boolean(),
   empty: z.boolean(),
-  sort: z.object({
-    empty: z.boolean(),
-    sorted: z.boolean(),
-    unsorted: z.boolean(),
-  }),
-});
-
-/**
- * @description Frontend schema for paginated salesman list responses.
- */
-export const SalesmanListSchema = SalesmanListApiSchema.extend({
-  content: z.array(SalesmanListItemSchema),
 });
 
 /**

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AdminDashboard } from './AdminDashboard';
 
 vi.mock('@services/queries/useDashboard', () => ({
+  useGetDashboardMetrics: vi.fn(),
   useGetMeetingsByCompany: vi.fn(),
   useGetMeetingsByMonth: vi.fn(),
 }));
@@ -18,10 +19,14 @@ vi.mock('@pages/DashboardPage/context/DashboardFilterContext', () => ({
 }));
 
 import {
+  useGetDashboardMetrics,
   useGetMeetingsByCompany,
   useGetMeetingsByMonth,
 } from '@services/queries/useDashboard';
 
+const mockUseGetDashboardMetrics = useGetDashboardMetrics as ReturnType<
+  typeof vi.fn
+>;
 const mockUseGetMeetingsByCompany = useGetMeetingsByCompany as ReturnType<
   typeof vi.fn
 >;
@@ -31,6 +36,32 @@ const mockUseGetMeetingsByMonth = useGetMeetingsByMonth as ReturnType<
 
 describe('AdminDashboard', () => {
   beforeEach(() => {
+    mockUseGetDashboardMetrics.mockReturnValue({
+      data: {
+        active_companies: {
+          value: 4,
+          variationPercentage: 12,
+          trend: 'up',
+        },
+        inactive_companies: {
+          value: 1,
+          variationPercentage: -25,
+          trend: 'down',
+        },
+        salesmen: {
+          value: 76,
+          variationPercentage: 8,
+          trend: 'up',
+        },
+        total_meetings: {
+          value: 502,
+          variationPercentage: 15,
+          trend: 'up',
+        },
+      },
+      isError: false,
+      isLoading: false,
+    });
     mockUseGetMeetingsByCompany.mockReturnValue({
       data: [],
       isError: false,

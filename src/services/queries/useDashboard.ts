@@ -1,7 +1,7 @@
 import { dashboardApi } from '@services/api/dashboard';
 import type {
   TDashboardFilters,
-  TDashboardPeriodParams,
+  TDashboardMetrics,
   TMeetingsByCompany,
   TMeetingsByMonth,
   TMeetingsBySalesman,
@@ -13,8 +13,10 @@ export const dashboardQueryKeys = {
   all: ['dashboard'] as const,
   meetingsByCompany: (filters?: TDashboardFilters) =>
     [...dashboardQueryKeys.all, 'meetings-by-company', filters] as const,
-  meetingsByMonth: (period: TDashboardPeriodParams) =>
-    [...dashboardQueryKeys.all, 'meetings-by-month', period] as const,
+  meetingsByMonth: (filters?: TDashboardFilters) =>
+    [...dashboardQueryKeys.all, 'meetings-by-month', filters] as const,
+  metrics: (filters?: TDashboardFilters) =>
+    [...dashboardQueryKeys.all, 'metrics', filters] as const,
   meetingsBySalesman: (filters?: TDashboardFilters) =>
     [...dashboardQueryKeys.all, 'meetings-by-salesman', filters] as const,
 };
@@ -32,13 +34,28 @@ export const useGetMeetingsByCompany = (
 };
 
 export const useGetMeetingsByMonth = (
-  period: TDashboardPeriodParams
-): ReturnType<typeof useQuery<TMeetingsByMonth, Error>> =>
-  useQuery<TMeetingsByMonth, Error>({
-    queryKey: dashboardQueryKeys.meetingsByMonth(period),
-    queryFn: () => dashboardApi.getMeetingsByMonth(period),
+  filters?: TDashboardFilters,
+  options?: UseQueryOptions<TMeetingsByMonth>
+): ReturnType<typeof useQuery<TMeetingsByMonth, Error>> => {
+  return useQuery<TMeetingsByMonth, Error>({
+    queryKey: dashboardQueryKeys.meetingsByMonth(filters),
+    queryFn: () => dashboardApi.getMeetingsByMonth(filters),
     staleTime: 0,
+    ...options,
   });
+};
+
+export const useGetDashboardMetrics = (
+  filters?: TDashboardFilters,
+  options?: UseQueryOptions<TDashboardMetrics>
+): ReturnType<typeof useQuery<TDashboardMetrics, Error>> => {
+  return useQuery<TDashboardMetrics, Error>({
+    queryKey: dashboardQueryKeys.metrics(filters),
+    queryFn: () => dashboardApi.getMetrics(filters),
+    staleTime: 0,
+    ...options,
+  });
+};
 
 export const useGetMeetingsBySalesman = (
   filters?: TDashboardFilters,

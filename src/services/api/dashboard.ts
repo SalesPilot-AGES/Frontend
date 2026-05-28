@@ -2,18 +2,25 @@ import {
   mockMeetingsByCompany,
   mockMeetingsBySalesman,
 } from '@data/mocks/Dashboard';
+import { mockDashboardAvgDurationData } from '@data/mocks/DashboardAvgDuration';
 import { dashboardMeetingsByMonthMock } from '@data/mocks/DashboardMeetingsByMonth';
+import { dashboardMetricsMock } from '@data/mocks/DashboardMetrics';
 import {
+  DashboardAvgDurationResponseSchema,
+  DashboardMetricsResponseSchema,
   MeetingsByCompanySchema,
   MeetingsByMonthResponseSchema,
   MeetingsBySalesmanSchema,
+  type TDashboardAvgDurationApiPoint,
+  type TDashboardAvgDurationPoint,
   type TDashboardFilters,
-  type TDashboardPeriodParams,
+  type TDashboardMetrics,
   type TMeetingsByCompany,
   type TMeetingsByMonth,
   type TMeetingsBySalesman,
 } from '@services/models/DashboardSchema';
 import axios from 'axios';
+import { ZodError } from 'zod';
 
 import apiClient from './apiClient';
 
@@ -46,10 +53,20 @@ const getDashboardPeriodParams = (
 
   return {
     period: filters.period,
-    ...(filters.startDate ? { start_date: filters.startDate } : {}),
-    ...(filters.endDate ? { end_date: filters.endDate } : {}),
+    ...(filters.period === 'custom' &&
+      filters.startDate && { start_date: filters.startDate }),
+    ...(filters.period === 'custom' &&
+      filters.endDate && { end_date: filters.endDate }),
   };
 };
+
+const mapAvgDurationPoint = (
+  point: TDashboardAvgDurationApiPoint
+): TDashboardAvgDurationPoint => ({
+  month: point.month,
+  monthLabel: point.month_label,
+  avgMinutes: point.avg_minutes,
+});
 
 export const dashboardApi = {
   getMeetingsByCompany: async (
@@ -65,32 +82,31 @@ export const dashboardApi = {
 
       return MeetingsByCompanySchema.parse(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
+      if (shouldUseMockFallback(error)) {
         return MeetingsByCompanySchema.parse(mockMeetingsByCompany);
       }
 
       throw error;
     }
   },
+
   getMeetingsByMonth: async (
-    period: TDashboardPeriodParams
+    filters?: TDashboardFilters
   ): Promise<TMeetingsByMonth> => {
     try {
       const response = await apiClient.get<unknown>(
         '/api/dashboard/meetings-by-month',
         {
-          params: {
-            period: period.period,
-            ...(period.period === 'custom' &&
-              period.startDate && { start_date: period.startDate }),
-            ...(period.period === 'custom' &&
-              period.endDate && { end_date: period.endDate }),
-          },
+          params: getDashboardPeriodParams(filters),
         }
       );
 
       return MeetingsByMonthResponseSchema.parse(response.data);
     } catch (error) {
+      if (error instanceof ZodError && isFallbackEnvironment) {
+        return dashboardMeetingsByMonthMock;
+      }
+
       if (shouldUseMockFallback(error)) {
         return dashboardMeetingsByMonthMock;
       }
@@ -98,6 +114,29 @@ export const dashboardApi = {
       throw error;
     }
   },
+
+  getMetrics: async (
+    filters?: TDashboardFilters
+  ): Promise<TDashboardMetrics> => {
+    try {
+      const response = await apiClient.get<unknown>('/api/painel/metricas', {
+        params: getDashboardPeriodParams(filters),
+      });
+
+      return DashboardMetricsResponseSchema.parse(response.data);
+    } catch (error) {
+      if (error instanceof ZodError && isFallbackEnvironment) {
+        return dashboardMetricsMock;
+      }
+
+      if (shouldUseMockFallback(error)) {
+        return dashboardMetricsMock;
+      }
+
+      throw error;
+    }
+  },
+
   getMeetingsBySalesman: async (
     filters?: TDashboardFilters
   ): Promise<TMeetingsBySalesman> => {
@@ -111,8 +150,35 @@ export const dashboardApi = {
 
       return MeetingsBySalesmanSchema.parse(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
+      if (shouldUseMockFallback(error)) {
         return MeetingsBySalesmanSchema.parse(mockMeetingsBySalesman);
+      }
+
+      throw error;
+    }
+  },
+
+  getAvgDuration: async (
+    filters?: TDashboardFilters
+  ): Promise<TDashboardAvgDurationPoint[]> => {
+    try {
+      const response = await apiClient.get<unknown>(
+        '/api/dashboard/avg-duration',
+        {
+          params: getDashboardPeriodParams(filters),
+        }
+      );
+
+      const parsedResponse = DashboardAvgDurationResponseSchema.parse(
+        response.data
+      );
+      return parsedResponse.data.map(mapAvgDurationPoint);
+    } catch (error) {
+      if (shouldUseMockFallback(error)) {
+        const parsedMockResponse = DashboardAvgDurationResponseSchema.parse({
+          data: mockDashboardAvgDurationData,
+        });
+        return parsedMockResponse.data.map(mapAvgDurationPoint);
       }
 
       throw error;

@@ -163,6 +163,25 @@ export const MeetingsBySalesmanSchema = z
 
 export type TMeetingsBySalesman = z.infer<typeof MeetingsBySalesmanSchema>;
 
+const StatusCountApiSchema = z
+  .object({
+    active: z.number().optional(),
+    inactive: z.number().optional(),
+    ativo: z.number().optional(),
+    inativo: z.number().optional(),
+  })
+  .transform((item) => ({
+    active: item.active ?? item.ativo ?? 0,
+    inactive: item.inactive ?? item.inativo ?? 0,
+  }));
+
+export const StatusCountResponseSchema = z
+  .object({ data: StatusCountApiSchema })
+  .transform((r) => r.data)
+  .or(StatusCountApiSchema);
+
+export type TDashboardStatusCount = { active: number; inactive: number };
+
 const DashboardAvgDurationPointApiSchema = z.object({
   month: z.string(),
   month_label: z.string(),

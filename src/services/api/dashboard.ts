@@ -3,18 +3,22 @@ import {
   mockMeetingsBySalesman,
 } from '@data/mocks/Dashboard';
 import { mockDashboardAvgDurationData } from '@data/mocks/DashboardAvgDuration';
+import { dashboardCompaniesStatusMock } from '@data/mocks/DashboardCompaniesStatus';
 import { dashboardMeetingsByMonthMock } from '@data/mocks/DashboardMeetingsByMonth';
 import { dashboardMetricsMock } from '@data/mocks/DashboardMetrics';
+import { dashboardSalesmenStatusMock } from '@data/mocks/DashboardSalesmenStatus';
 import {
   DashboardAvgDurationResponseSchema,
   DashboardMetricsResponseSchema,
   MeetingsByCompanySchema,
   MeetingsByMonthResponseSchema,
   MeetingsBySalesmanSchema,
+  StatusCountResponseSchema,
   type TDashboardAvgDurationApiPoint,
   type TDashboardAvgDurationPoint,
   type TDashboardFilters,
   type TDashboardMetrics,
+  type TDashboardStatusCount,
   type TMeetingsByCompany,
   type TMeetingsByMonth,
   type TMeetingsBySalesman,
@@ -24,7 +28,7 @@ import { ZodError } from 'zod';
 
 import apiClient from './apiClient';
 
-const isFallbackEnvironment = import.meta.env.MODE !== 'production';
+const isFallbackEnvironment = import.meta.env.DEV;
 
 const shouldUseMockFallback = (error: unknown): boolean => {
   if (!isFallbackEnvironment) {
@@ -152,6 +156,38 @@ export const dashboardApi = {
     } catch (error) {
       if (shouldUseMockFallback(error)) {
         return MeetingsBySalesmanSchema.parse(mockMeetingsBySalesman);
+      }
+
+      throw error;
+    }
+  },
+
+  getCompaniesStatus: async (): Promise<TDashboardStatusCount> => {
+    try {
+      const response = await apiClient.get<unknown>(
+        '/api/dashboard/companies-status'
+      );
+
+      return StatusCountResponseSchema.parse(response.data);
+    } catch (error) {
+      if (shouldUseMockFallback(error)) {
+        return dashboardCompaniesStatusMock;
+      }
+
+      throw error;
+    }
+  },
+
+  getSalesmenStatus: async (): Promise<TDashboardStatusCount> => {
+    try {
+      const response = await apiClient.get<unknown>(
+        '/api/dashboard/salesmen-status'
+      );
+
+      return StatusCountResponseSchema.parse(response.data);
+    } catch (error) {
+      if (shouldUseMockFallback(error)) {
+        return dashboardSalesmenStatusMock;
       }
 
       throw error;

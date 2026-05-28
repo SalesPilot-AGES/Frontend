@@ -12,7 +12,11 @@ import { DemoAccountsInfo } from './DemoAccountsInfo/DemoAccountsInfo';
 import { useLoginForm } from './useLoginForm';
 
 export const LoginForm = (): JSX.Element => {
-  const { register, handleSubmit, errors, onSubmit, setValue } = useLoginForm();
+  const { register, handleSubmit, errors, onSubmit, setValue, watch } =
+    useLoginForm();
+
+  const emailValue = watch('email');
+  const passwordValue = watch('password');
 
   const handleFormSubmit = handleSubmit(onSubmit);
 
@@ -38,6 +42,7 @@ export const LoginForm = (): JSX.Element => {
             sx={{ mb: 2 }}
             error={!!errors.email}
             helperText={errors.email?.message}
+            InputLabelProps={{ shrink: Boolean(emailValue) }}
             {...register('email')}
           />
 
@@ -51,6 +56,7 @@ export const LoginForm = (): JSX.Element => {
             sx={{ mb: 3 }}
             error={!!errors.password || !!errors.root}
             helperText={errors.password?.message || errors.root?.message}
+            InputLabelProps={{ shrink: Boolean(passwordValue) }}
             {...register('password')}
           />
 

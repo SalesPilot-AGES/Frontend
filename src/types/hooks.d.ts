@@ -3,6 +3,7 @@ import type {
   UseFormHandleSubmit,
   UseFormRegister,
   UseFormSetValue,
+  UseFormWatch,
 } from 'react-hook-form';
 
 export type TColorThemeOptions =
@@ -33,4 +34,5 @@ export type UseLoginFormReturn = {
   errors: FieldErrors<LoginFormData>;
   onSubmit: (data: LoginFormData) => Promise<void>;
   setValue: UseFormSetValue<LoginFormData>;
+  watch: UseFormWatch<LoginFormData>;
 };

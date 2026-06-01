@@ -22,8 +22,13 @@ export const useLoginForm = (): UseLoginFormReturn => {
     setError,
     clearErrors,
     setValue,
+    watch,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
 
   const onSubmit = async (data: LoginFormData): Promise<void> => {
@@ -45,5 +50,6 @@ export const useLoginForm = (): UseLoginFormReturn => {
     errors,
     onSubmit,
     setValue,
+    watch,
   };
 };

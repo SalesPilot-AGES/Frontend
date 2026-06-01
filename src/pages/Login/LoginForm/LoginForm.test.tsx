@@ -8,6 +8,7 @@ vi.mock('./useLoginForm', () => ({
     errors: {},
     onSubmit: vi.fn(),
     setValue: vi.fn(),
+    watch: vi.fn(() => ''),
   }),
 }));
 

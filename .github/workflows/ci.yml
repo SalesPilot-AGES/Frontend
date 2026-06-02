@@ -1,0 +1,62 @@
+name: CI/CD Frontend
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  build-and-test:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm run build
+      - name: Test
+        run: pnpm run test:check
+
+  secret-detection:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect --source /path --exit-code 1
+
+  docker-build-push:
+    runs-on: self-hosted
+    needs: [build-and-test, secret-detection]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+      - name: Build and push
+        run: |
+          IMAGE_TAG=${{ secrets.ECR_REGISTRY }}/salespilot/web:${{ github.sha }}
+          IMAGE_LATEST=${{ secrets.ECR_REGISTRY }}/salespilot/web:latest
+          docker build -t $IMAGE_TAG -t $IMAGE_LATEST .
+          docker push $IMAGE_TAG
+          docker push $IMAGE_LATEST

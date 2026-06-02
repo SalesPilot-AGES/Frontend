@@ -1,0 +1,180 @@
+name: Discord Notification
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+    branches:
+      - main
+      - development
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    if: |
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false) ||
+      github.event_name == 'pull_request_review' ||
+      github.event_name == 'pull_request_review_comment'
+    steps:
+      - name: Send notification to Discord Forum
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GH_TOKEN: ${{ github.token }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          REVIEW_BODY: ${{ github.event.review.body }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          EVENT="${{ github.event_name }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+
+          # ── PR aberto: cria o tópico e armazena o thread ID ──────────────
+          if [ "$EVENT" = "pull_request" ]; then
+            ASSIGNEES=$(echo '${{ toJson(github.event.pull_request.assignees) }}' | jq -r '[.[].login] | if length == 0 then "Nenhum" else join(", ") end')
+            REVIEWERS=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}' | jq -r '[.[].login] | if length == 0 then "Nenhum" else join(", ") end')
+
+            BODY="$PR_BODY"
+            if [ -z "$BODY" ]; then BODY="Sem descrição."; fi
+            TRUNCATED_BODY="${BODY:0:1000}"
+            [ "${#BODY}" -gt 1000 ] && TRUNCATED_BODY="${TRUNCATED_BODY}..."
+
+            THREAD_NAME="PR #${PR_NUMBER} — ${{ github.event.pull_request.title }}"
+            THREAD_NAME="${THREAD_NAME:0:100}"
+
+            PAYLOAD=$(jq -n \
+              --arg thread_name "$THREAD_NAME" \
+              --arg pr_url "${{ github.event.pull_request.html_url }}" \
+              --arg author "${{ github.event.pull_request.user.login }}" \
+              --arg base "${{ github.event.pull_request.base.ref }}" \
+              --arg head "${{ github.event.pull_request.head.ref }}" \
+              --arg assignees "$ASSIGNEES" \
+              --arg reviewers "$REVIEWERS" \
+              --arg body "$TRUNCATED_BODY" \
+              '{
+                thread_name: $thread_name,
+                embeds: [{
+                  title: $thread_name,
+                  url: $pr_url,
+                  color: 5814783,
+                  fields: [
+                    { name: "Autor",     value: $author,                                inline: true },
+                    { name: "Branch",    value: ("`" + $head + "` → `" + $base + "`"), inline: true },
+                    { name: "Assignees", value: $assignees,                             inline: true },
+                    { name: "Reviewers", value: $reviewers,                             inline: true },
+                    { name: "Descrição", value: $body,                                  inline: false }
+                  ],
+                  footer: { text: "SalesPilot Frontend" }
+                }]
+              }')
+
+            # ?wait=true faz o Discord retornar o objeto da mensagem criada
+            HTTP_CODE=$(curl -s -o /tmp/discord_response \
+              -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD" \
+              "${DISCORD_WEBHOOK_URL}?wait=true")
+            RESPONSE=$(cat /tmp/discord_response)
+            echo "HTTP ${HTTP_CODE}: ${RESPONSE}"
+
+            if [ "${HTTP_CODE}" -lt 200 ] || [ "${HTTP_CODE}" -ge 300 ]; then
+              echo "Discord webhook failed with HTTP ${HTTP_CODE}."
+              exit 1
+            fi
+
+            # channel_id no contexto de fórum é o ID do tópico criado
+            THREAD_ID=$(echo "$RESPONSE" | jq -r '.channel_id // empty')
+            if [ -n "$THREAD_ID" ]; then
+              gh pr comment "$PR_NUMBER" \
+                --repo "${{ github.repository }}" \
+                --body "<!-- discord-thread-id: ${THREAD_ID} -->"
+            else
+              echo "Warning: channel_id not found in response. Is DISCORD_WEBHOOK_URL a Forum channel webhook?"
+            fi
+
+          # ── Review / Comentário: posta dentro do tópico existente ─────────
+          else
+            THREAD_ID=$(gh pr view "$PR_NUMBER" \
+              --repo "${{ github.repository }}" \
+              --json comments \
+              --jq '.comments[].body' 2>/dev/null \
+              | grep -oE 'discord-thread-id: [0-9]+' \
+              | grep -oE '[0-9]+$' \
+              | head -1)
+
+            if [ -z "$THREAD_ID" ]; then
+              echo "Thread ID não encontrado para PR #${PR_NUMBER}, notificação ignorada."
+              exit 0
+            fi
+
+            if [ "$EVENT" = "pull_request_review" ]; then
+              REVIEW_STATE="${{ github.event.review.state }}"
+              case "$REVIEW_STATE" in
+                approved)          STATE_LABEL="Aprovado ✅";             COLOR=3066993  ;;
+                changes_requested) STATE_LABEL="Mudanças Solicitadas ❌"; COLOR=15158332 ;;
+                *)                 STATE_LABEL="Comentado 💬";            COLOR=16776960 ;;
+              esac
+
+              EMBED_TITLE="Review: PR #${PR_NUMBER} — ${{ github.event.pull_request.title }}"
+              EMBED_TITLE="${EMBED_TITLE:0:256}"
+
+              if [ -z "$REVIEW_BODY" ]; then REVIEW_BODY="Sem comentário."; fi
+              TRUNCATED_BODY="${REVIEW_BODY:0:1000}"
+              [ "${#REVIEW_BODY}" -gt 1000 ] && TRUNCATED_BODY="${TRUNCATED_BODY}..."
+
+              PAYLOAD=$(jq -n \
+                --arg title "$EMBED_TITLE" \
+                --arg review_url "${{ github.event.review.html_url }}" \
+                --arg reviewer "${{ github.event.review.user.login }}" \
+                --arg state_label "$STATE_LABEL" \
+                --arg body "$TRUNCATED_BODY" \
+                --argjson color "$COLOR" \
+                '{
+                  embeds: [{
+                    title: $title,
+                    url: $review_url,
+                    color: $color,
+                    fields: [
+                      { name: "Revisor", value: $reviewer,    inline: true },
+                      { name: "Status",  value: $state_label, inline: true },
+                      { name: "Comentário", value: $body,     inline: false }
+                    ],
+                    footer: { text: "SalesPilot Frontend" }
+                  }]
+                }')
+
+            elif [ "$EVENT" = "pull_request_review_comment" ]; then
+              EMBED_TITLE="Comentário: PR #${PR_NUMBER} — ${{ github.event.pull_request.title }}"
+              EMBED_TITLE="${EMBED_TITLE:0:256}"
+
+              TRUNCATED_BODY="${COMMENT_BODY:0:1000}"
+              [ "${#COMMENT_BODY}" -gt 1000 ] && TRUNCATED_BODY="${TRUNCATED_BODY}..."
+
+              PAYLOAD=$(jq -n \
+                --arg title "$EMBED_TITLE" \
+                --arg comment_url "${{ github.event.comment.html_url }}" \
+                --arg commenter "${{ github.event.comment.user.login }}" \
+                --arg body "$TRUNCATED_BODY" \
+                '{
+                  embeds: [{
+                    title: $title,
+                    url: $comment_url,
+                    color: 3447003,
+                    fields: [
+                      { name: "Autor",      value: $commenter, inline: true },
+                      { name: "Comentário", value: $body,      inline: false }
+                    ],
+                    footer: { text: "SalesPilot Frontend" }
+                  }]
+                }')
+            fi
+
+            RESPONSE=$(curl -s -w "\nHTTP_%{http_code}" \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD" \
+              "${DISCORD_WEBHOOK_URL}?thread_id=${THREAD_ID}")
+            echo "$RESPONSE"
+          fi

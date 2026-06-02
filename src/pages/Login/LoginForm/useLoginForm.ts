@@ -1,0 +1,55 @@
+import { EPageRoutes } from '@data/enums/EPageRoutes';
+import type { LoginFormData, UseLoginFormReturn } from '@declarations';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuthStore } from '@store/authStore';
+import { useNavigate } from '@tanstack/react-router';
+import { useForm } from 'react-hook-form';
+import z from 'zod';
+
+const loginSchema = z.object({
+  email: z.email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export const useLoginForm = (): UseLoginFormReturn => {
+  const navigate = useNavigate();
+  const loginUser = useAuthStore((state) => state.loginUser);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+    clearErrors,
+    setValue,
+    watch,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData): Promise<void> => {
+    clearErrors('root');
+    const user = await loginUser(data.email, data.password);
+
+    if (user) {
+      navigate({ to: EPageRoutes.DASHBOARD });
+    } else {
+      setError('root', {
+        message: 'Invalid email or password',
+      });
+    }
+  };
+
+  return {
+    register,
+    handleSubmit,
+    errors,
+    onSubmit,
+    setValue,
+    watch,
+  };
+};

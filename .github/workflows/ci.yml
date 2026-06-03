@@ -56,5 +56,7 @@ jobs:
       - name: Build and push
         run: |
           IMAGE_TAG=${{ secrets.ECR_REGISTRY }}/salespilot/web:${{ github.sha }}
-          docker build -t $IMAGE_TAG .
+          IMAGE_LATEST=${{ secrets.ECR_REGISTRY }}/salespilot/web:latest
+          docker build -t $IMAGE_TAG -t $IMAGE_LATEST .
           docker push $IMAGE_TAG
+          docker push $IMAGE_LATEST

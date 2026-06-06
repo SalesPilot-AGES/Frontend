@@ -117,7 +117,7 @@ describe('ManagerSalesmenPage', () => {
     expect(screen.queryByText('Carlos Lima')).not.toBeInTheDocument();
   });
 
-  it('filters salesmen by search on company name', () => {
+  it('filters salesmen by search on email', () => {
     vi.mocked(useGetSalesmen).mockReturnValue({
       data: { content: mockSalesmen },
       isLoading: false,
@@ -125,11 +125,33 @@ describe('ManagerSalesmenPage', () => {
 
     render(<ManagerSalesmenPage />);
     const searchInput = screen.getByPlaceholderText('Buscar vendedor...');
-    fireEvent.change(searchInput, { target: { value: 'Beta' } });
+    fireEvent.change(searchInput, { target: { value: 'carlos@outra.com' } });
 
     expect(screen.getByText('Carlos Lima')).toBeInTheDocument();
     expect(screen.queryByText('João Silva')).not.toBeInTheDocument();
     expect(screen.queryByText('Maria Souza')).not.toBeInTheDocument();
+  });
+
+  it('renders email column header', () => {
+    render(<ManagerSalesmenPage />);
+    expect(screen.getByText('E-mail')).toBeInTheDocument();
+  });
+
+  it('does not render company name column', () => {
+    render(<ManagerSalesmenPage />);
+    expect(screen.queryByText('Nome da empresa')).not.toBeInTheDocument();
+  });
+
+  it('renders email values in the table', () => {
+    vi.mocked(useGetSalesmen).mockReturnValue({
+      data: { content: mockSalesmen },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useGetSalesmen>);
+
+    render(<ManagerSalesmenPage />);
+    expect(screen.getByText('joao@empresa.com')).toBeInTheDocument();
+    expect(screen.getByText('maria@empresa.com')).toBeInTheDocument();
+    expect(screen.getByText('carlos@outra.com')).toBeInTheDocument();
   });
 
   it('renders the AddSalesmanModal', () => {

@@ -16,10 +16,8 @@ import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 
 import { AddSalesmanModal } from '../AddSalesmanModal/AddSalesmanModal';
-import {
-  buildSalesmenColumns,
-  formatAverageSentiment,
-} from '../AdminSalesmenPage/salesmenColumns';
+import { formatAverageSentiment } from '../AdminSalesmenPage/salesmenColumns';
+import { buildManagerSalesmenColumns } from './salesmenColumns';
 
 export const ManagerSalesmenPage = (): JSX.Element => {
   const { palette } = useTheme();
@@ -40,12 +38,14 @@ export const ManagerSalesmenPage = (): JSX.Element => {
       if (query.length === 0) return true;
       const nameMatch = salesman.name.toLowerCase().includes(query);
       const emailMatch = salesman.email.toLowerCase().includes(query);
-      const companyMatch = salesman.company.name.toLowerCase().includes(query);
-      return nameMatch || emailMatch || companyMatch;
+      return nameMatch || emailMatch;
     });
   }, [salesmen, searchValue, filterValue]);
 
-  const columns = useMemo(() => buildSalesmenColumns(palette), [palette]);
+  const columns = useMemo(
+    () => buildManagerSalesmenColumns(palette),
+    [palette]
+  );
 
   const activeSalesmen = salesmen.filter((salesman) => salesman.active).length;
   const inactiveSalesmen = salesmen.filter(

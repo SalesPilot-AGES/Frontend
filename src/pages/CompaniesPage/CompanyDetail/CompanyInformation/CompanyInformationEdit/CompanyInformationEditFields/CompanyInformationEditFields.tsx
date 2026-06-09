@@ -62,54 +62,7 @@ export const CompanyInformationEditFields = ({
           'ID da empresa',
           <Typography fontWeight={600}>{draft.id}</Typography>
         )}
-        <Stack spacing={0.75}>
-          <Typography variant="body2" color={labelColor} fontWeight={500}>
-            Nome da empresa
-          </Typography>
-          <Controller
-            name="name"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                fullWidth
-                size="small"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                onChange={(e) => {
-                  field.onChange(e);
-                  setDraft((d) => ({ ...d, name: e.target.value }));
-                }}
-              />
-            )}
-          />
-        </Stack>
         {row('CNPJ', <Typography fontWeight={600}>{draft.tax_id}</Typography>)}
-        <Stack spacing={0.75}>
-          <Typography variant="body2" color={labelColor} fontWeight={500}>
-            Telefone
-          </Typography>
-          <TextField
-            fullWidth
-            value={'99999-9999'}
-            onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
-            size="small"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PhoneOutlinedIcon
-                      sx={{
-                        fontSize: '1.125rem',
-                        color: palette.neutrals[500],
-                      }}
-                    />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </Stack>
         <Stack spacing={0.75}>
           <Typography variant="body2" color={labelColor} fontWeight={500}>
             Endereço
@@ -140,11 +93,58 @@ export const CompanyInformationEditFields = ({
             }}
           />
         </Stack>
+        <Stack spacing={0.75}>
+          <Typography variant="body2" color={labelColor} fontWeight={500}>
+            Telefone
+          </Typography>
+          <TextField
+            fullWidth
+            value={'99999-9999'}
+            onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
+            size="small"
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PhoneOutlinedIcon
+                      sx={{
+                        fontSize: '1.125rem',
+                        color: palette.neutrals[500],
+                      }}
+                    />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        </Stack>
       </Stack>
       <Stack
         spacing={2.5}
         sx={{ flex: { md: '1 1 42%' }, minWidth: { md: 200 } }}
       >
+        <Stack spacing={0.75}>
+          <Typography variant="body2" color={labelColor} fontWeight={500}>
+            Nome da empresa
+          </Typography>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                fullWidth
+                size="small"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                onChange={(e) => {
+                  field.onChange(e);
+                  setDraft((d) => ({ ...d, name: e.target.value }));
+                }}
+              />
+            )}
+          />
+        </Stack>
         <Stack spacing={0.75}>
           <Typography variant="body2" color={labelColor} fontWeight={500}>
             Plano
@@ -198,8 +198,13 @@ export const CompanyInformationEditFields = ({
             name="active"
             control={control}
             render={({ field }) => (
-              <Stack direction="row" alignItems="center" gap={1.5}>
-                <Typography variant="body2" color={valueColor} fontWeight={500}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                gap={1.5}
+                sx={{ minHeight: '3rem' }}
+              >
+                <Typography variant="h6" fontWeight={500}>
                   {field.value ? EStatus.ACTIVE : EStatus.INACTIVE}
                 </Typography>
                 <Switch
@@ -211,10 +216,11 @@ export const CompanyInformationEditFields = ({
                   }}
                   sx={{
                     '& .MuiSwitch-switchBase.Mui-checked': {
-                      color: '#2E7D32',
+                      color: palette.success[400],
                     },
                     '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                      backgroundColor: '#2E7D32',
+                      backgroundColor: palette.success[200],
+                      opacity: 1,
                     },
                   }}
                   slotProps={{

@@ -25,25 +25,25 @@ export const CompanyInformationView = ({
     <ItemDetail label="ID da empresa" value={id} />
     <ItemDetail label="Nome da empresa" value={name} />
     <ItemDetail label="CNPJ" value={tax_id} />
-    <ItemDetail
-      label="Telefone"
-      value="99999-9999"
-      icon={<PhoneOutlinedIcon fontSize="small" />}
-    />
+    <ItemDetail label="Plano">
+      <Box sx={{ alignSelf: 'flex-start' }}>
+        <PlanBadge plan={plan} />
+      </Box>
+    </ItemDetail>
     <ItemDetail
       label="Endereço"
       value="Rua Exemplo, 123"
       icon={<LocationOnOutlinedIcon fontSize="small" />}
     />
-    <ItemDetail label="Plano">
-      <Box sx={{ display: 'inline-flex', alignSelf: 'flex-start' }}>
-        <PlanBadge plan={plan} />
-      </Box>
-    </ItemDetail>
     <ItemDetail label="Status">
       <Box sx={{ display: 'inline-flex', alignSelf: 'flex-start' }}>
         <StatusBadge active={active} />
       </Box>
     </ItemDetail>
+    <ItemDetail
+      label="Telefone"
+      value="99999-9999"
+      icon={<PhoneOutlinedIcon fontSize="small" />}
+    />
   </Box>
 );

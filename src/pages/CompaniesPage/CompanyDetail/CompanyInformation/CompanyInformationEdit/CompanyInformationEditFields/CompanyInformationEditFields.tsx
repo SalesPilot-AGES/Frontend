@@ -44,7 +44,7 @@ export const CompanyInformationEditFields = ({
 }: CompanyInformationEditFieldsProps): JSX.Element => {
   const row = (fieldLabel: string, value: ReactNode): JSX.Element => (
     <Stack spacing={0.75}>
-      <Typography variant="body2" color={labelColor} fontWeight={500}>
+      <Typography variant="body2" color={labelColor}>
         {fieldLabel}
       </Typography>
       <Box sx={{ color: valueColor }}>{value}</Box>
@@ -58,13 +58,10 @@ export const CompanyInformationEditFields = ({
       alignItems={{ xs: 'stretch', md: 'flex-start' }}
     >
       <Stack spacing={2.5} sx={{ flex: { md: '1 1 58%' } }}>
-        {row(
-          'ID da empresa',
-          <Typography fontWeight={600}>{draft.id}</Typography>
-        )}
-        {row('CNPJ', <Typography fontWeight={600}>{draft.tax_id}</Typography>)}
+        {row('ID da empresa', <Typography variant="h6">{draft.id}</Typography>)}
+        {row('CNPJ', <Typography variant="h6">{draft.tax_id}</Typography>)}
         <Stack spacing={0.75}>
-          <Typography variant="body2" color={labelColor} fontWeight={500}>
+          <Typography variant="body2" color={labelColor}>
             Endereço
           </Typography>
           <TextField
@@ -73,7 +70,6 @@ export const CompanyInformationEditFields = ({
             onChange={(e) =>
               setDraft((d) => ({ ...d, address: e.target.value }))
             }
-            size="small"
             slotProps={{
               input: {
                 startAdornment: (
@@ -94,14 +90,13 @@ export const CompanyInformationEditFields = ({
           />
         </Stack>
         <Stack spacing={0.75}>
-          <Typography variant="body2" color={labelColor} fontWeight={500}>
+          <Typography variant="body2" color={labelColor}>
             Telefone
           </Typography>
           <TextField
             fullWidth
             value={'99999-9999'}
             onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
-            size="small"
             slotProps={{
               input: {
                 startAdornment: (
@@ -124,7 +119,7 @@ export const CompanyInformationEditFields = ({
         sx={{ flex: { md: '1 1 42%' }, minWidth: { md: 200 } }}
       >
         <Stack spacing={0.75}>
-          <Typography variant="body2" color={labelColor} fontWeight={500}>
+          <Typography variant="body2" color={labelColor}>
             Nome da empresa
           </Typography>
           <Controller
@@ -134,7 +129,6 @@ export const CompanyInformationEditFields = ({
               <TextField
                 {...field}
                 fullWidth
-                size="small"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 onChange={(e) => {
@@ -146,7 +140,7 @@ export const CompanyInformationEditFields = ({
           />
         </Stack>
         <Stack spacing={0.75}>
-          <Typography variant="body2" color={labelColor} fontWeight={500}>
+          <Typography variant="body2" color={labelColor}>
             Plano
           </Typography>
           <Controller
@@ -191,7 +185,7 @@ export const CompanyInformationEditFields = ({
           />
         </Stack>
         <Stack spacing={0.75}>
-          <Typography variant="body2" color={labelColor} fontWeight={500}>
+          <Typography variant="body2" color={labelColor}>
             Status
           </Typography>
           <Controller

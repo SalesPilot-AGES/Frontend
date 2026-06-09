@@ -68,15 +68,15 @@ src/
 │   ├── api/
 │   ├── config/         # Configuration files (e.g., queryClient)
 │   ├── models/
-│   └── queries/         
+│   └── queries/
 ├── store/              # Zustand state stores
-│   └── hooks/   
+│   └── hooks/
 ├── tests/              # Test files and setup
 ├── theme/              # MUI theme configuration and palettes
 │   ├── components/
-│   ├── hooks/         
+│   ├── hooks/
 │   ├── palettes/
-│   └── typography/  
+│   └── typography/
 ├── types/              # TypeScript type definitions
 ├── UI/                 # Reusable React components
 ├── utils/              # Utility functions and helpers

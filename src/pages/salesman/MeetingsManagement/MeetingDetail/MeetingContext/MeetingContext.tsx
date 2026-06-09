@@ -47,9 +47,9 @@ export const MeetingContext = ({
 
   return (
     <Stack
-      spacing={3}
+      spacing={2}
       sx={{
-        p: 2,
+        p: 2.5,
       }}
     >
       <Typography variant="body2" color="text.secondary">

@@ -50,19 +50,36 @@ This document contains comprehensive documentation about the architecture, desig
 
 ```
 src/
-├── components/          # Reusable React components
-├── config/             # Configuration files (e.g., queryClient)
+├── data/               # Page components organized by role
+│   ├── enums/
+│   └── mocks/
 ├── hooks/              # Custom React hooks
 ├── pages/              # Page components organized by role
-│   ├── admin/
-│   ├── manager/
-│   └── salesmen/
+│   ├── CompaniesPage/
+│   ├── DashboardPage/
+│   ├── Layout/
+│   ├── Login/
+│   ├── ManagersPage/
+│   ├── MeetingsPage/
+│   ├── PageNotFound/
+│   ├── RootComponent/
+│   └── SalesmenPage/
+├── services/           # Zustand state stores
+│   ├── api/
+│   ├── config/         # Configuration files (e.g., queryClient)
+│   ├── models/
+│   └── queries/         
 ├── store/              # Zustand state stores
+│   └── hooks/   
 ├── tests/              # Test files and setup
 ├── theme/              # MUI theme configuration and palettes
+│   ├── components/
+│   ├── hooks/         
+│   ├── palettes/
+│   └── typography/  
 ├── types/              # TypeScript type definitions
+├── UI/                 # Reusable React components
 ├── utils/              # Utility functions and helpers
-├── App.tsx             # Root component
 ├── main.tsx            # Entry point
 └── router.tsx          # Route definitions
 ```

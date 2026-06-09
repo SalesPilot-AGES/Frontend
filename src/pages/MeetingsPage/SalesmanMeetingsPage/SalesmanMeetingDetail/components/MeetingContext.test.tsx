@@ -1,7 +1,7 @@
+import type { TMeetingDetail } from '@services/models/MeetingSchema';
 import { render, screen } from '@tests/testUtils';
 import { describe, expect, it } from 'vitest';
 
-import type { TMeetingDetail } from '../MeetingDetail.interface';
 import { MeetingContext } from './MeetingContext';
 
 const mockMeeting: TMeetingDetail = {

@@ -6,6 +6,10 @@ import {
   useTheme,
 } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
+import type {
+  TMeetingDetail,
+  TMeetingTab,
+} from '@services/models/MeetingSchema';
 import {
   useGetMeetingById,
   useGetMeetingInsights,
@@ -16,9 +20,8 @@ import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { type JSX } from 'react';
 import React from 'react';
 
-import type { TMeetingDetail, TMeetingTab } from './MeetingDetail.interface';
-import { MeetingDetailHeaderStats } from './MeetingDetailHeaderStats/MeetingDetailHeaderStats';
-import { MeetingDetailTabsContent } from './MeetingDetailTabsContent/MeetingDetailTabsContent';
+import { MeetingDetailHeaderStats } from './components/MeetingDetailHeaderStats';
+import { MeetingDetailTabsContent } from './components/MeetingDetailTabsContent';
 
 export const MeetingDetail = (): JSX.Element => {
   const { palette, breakpoints } = useTheme();

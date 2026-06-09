@@ -4,11 +4,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import { IconButton, Link as MuiLink, Stack, Typography } from '@mui/material';
 import type { Theme } from '@mui/material/styles';
+import type { TMeetingDetail } from '@services/models/MeetingSchema';
 import { Link } from '@tanstack/react-router';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { type JSX } from 'react';
-
-import type { TMeetingDetail } from '../MeetingDetail.interface';
 
 type TMeetingDetailHeaderStatsProps = {
   meeting: TMeetingDetail;

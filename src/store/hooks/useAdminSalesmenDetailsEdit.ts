@@ -90,7 +90,7 @@ export const useAdminSalesmenDetailsEdit = (
       },
       {
         onSuccess: (updatedSalesman) => {
-          setDraftEditForm(createEditForm(updatedSalesman));
+          setDraftEditForm(createEditForm(updatedSalesman.content));
           onSaveSuccess?.();
         },
       }

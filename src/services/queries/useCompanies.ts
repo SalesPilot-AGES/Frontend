@@ -1,4 +1,6 @@
 import { companyApi } from '@services/api/company';
+import { getErrorMessage } from '@services/api/errorHandler';
+import { type ApiMutationResponse } from '@services/api/responseMessage';
 import type {
   TCompany,
   TCompanyCreatePayload,
@@ -16,6 +18,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { useToast } from '@UI/Toast/useToast';
 
 /**
  * @description Query keys for companies.
@@ -123,20 +126,40 @@ export const useGetAllCompanies = (
  * @returns {ReturnType<typeof useMutation<TCompany, Error, TCompanyCreatePayload>>} The mutation result.
  */
 export const useCreateCompany = (
-  options?: UseMutationOptions<TCompany, Error, TCompanyCreatePayload>
-): ReturnType<typeof useMutation<TCompany, Error, TCompanyCreatePayload>> => {
+  options?: UseMutationOptions<
+    ApiMutationResponse<TCompany>,
+    Error,
+    TCompanyCreatePayload
+  >
+): ReturnType<
+  typeof useMutation<
+    ApiMutationResponse<TCompany>,
+    Error,
+    TCompanyCreatePayload
+  >
+> => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
-  return useMutation<TCompany, Error, TCompanyCreatePayload>({
+  return useMutation<
+    ApiMutationResponse<TCompany>,
+    Error,
+    TCompanyCreatePayload
+  >({
     ...options,
     mutationFn: companyApi.createCompany,
     onSuccess: (newCompany, variables, onMutateResult, context) => {
       queryClient.invalidateQueries({ queryKey: companyQueryKeys.lists() });
       queryClient.setQueryData(
-        companyQueryKeys.detail(newCompany.id),
-        newCompany
+        companyQueryKeys.detail(newCompany.content.id),
+        newCompany.content
       );
+      showToast(newCompany.message ?? 'Empresa criada com sucesso', 'success');
       options?.onSuccess?.(newCompany, variables, onMutateResult, context);
+    },
+    onError: (error, variables, onMutateResult, context) => {
+      showToast(getErrorMessage(error), 'error');
+      options?.onError?.(error, variables, onMutateResult, context);
     },
   });
 };
@@ -148,21 +171,22 @@ export const useCreateCompany = (
  */
 export const useUpdateCompany = (
   options?: UseMutationOptions<
-    TCompany,
+    ApiMutationResponse<TCompany>,
     Error,
     { uuid: string; data: TCompanyUpdatePayload }
   >
 ): ReturnType<
   typeof useMutation<
-    TCompany,
+    ApiMutationResponse<TCompany>,
     Error,
     { uuid: string; data: TCompanyUpdatePayload }
   >
 > => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   return useMutation<
-    TCompany,
+    ApiMutationResponse<TCompany>,
     Error,
     { uuid: string; data: TCompanyUpdatePayload }
   >({
@@ -170,11 +194,19 @@ export const useUpdateCompany = (
     mutationFn: ({ uuid, data }) => companyApi.updateCompany(uuid, data),
     onSuccess: (updatedCompany, variables, onMutateResult, context) => {
       queryClient.setQueryData(
-        companyQueryKeys.detail(updatedCompany.id),
-        updatedCompany
+        companyQueryKeys.detail(updatedCompany.content.id),
+        updatedCompany.content
       );
       queryClient.invalidateQueries({ queryKey: companyQueryKeys.lists() });
+      showToast(
+        updatedCompany.message ?? 'Empresa atualizada com sucesso',
+        'success'
+      );
       options?.onSuccess?.(updatedCompany, variables, onMutateResult, context);
+    },
+    onError: (error, variables, onMutateResult, context) => {
+      showToast(getErrorMessage(error), 'error');
+      options?.onError?.(error, variables, onMutateResult, context);
     },
   });
 };

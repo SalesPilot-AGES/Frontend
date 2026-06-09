@@ -1,4 +1,6 @@
+import { getErrorMessage } from '@services/api/errorHandler';
 import { managerApi } from '@services/api/manager';
+import { type ApiMutationResponse } from '@services/api/responseMessage';
 import type {
   TManager,
   TManagerCreatePayload,
@@ -16,6 +18,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { useToast } from '@UI/Toast/useToast';
 
 /**
  * @description Query keys for managers.
@@ -122,20 +125,40 @@ export const useGetAllManagers = (
  * @returns {ReturnType<typeof useMutation<TManager, Error, TManagerCreatePayload>>} The mutation result.
  */
 export const useCreateManager = (
-  options?: UseMutationOptions<TManager, Error, TManagerCreatePayload>
-): ReturnType<typeof useMutation<TManager, Error, TManagerCreatePayload>> => {
+  options?: UseMutationOptions<
+    ApiMutationResponse<TManager>,
+    Error,
+    TManagerCreatePayload
+  >
+): ReturnType<
+  typeof useMutation<
+    ApiMutationResponse<TManager>,
+    Error,
+    TManagerCreatePayload
+  >
+> => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
-  return useMutation<TManager, Error, TManagerCreatePayload>({
+  return useMutation<
+    ApiMutationResponse<TManager>,
+    Error,
+    TManagerCreatePayload
+  >({
     ...options,
     mutationFn: managerApi.createManager,
     onSuccess: (newManager, variables, onMutateResult, context) => {
       queryClient.invalidateQueries({ queryKey: managerQueryKeys.lists() });
       queryClient.setQueryData(
-        managerQueryKeys.detail(newManager.id),
-        newManager
+        managerQueryKeys.detail(newManager.content.id),
+        newManager.content
       );
+      showToast(newManager.message ?? 'Gerente criado com sucesso', 'success');
       options?.onSuccess?.(newManager, variables, onMutateResult, context);
+    },
+    onError: (error, variables, onMutateResult, context) => {
+      showToast(getErrorMessage(error), 'error');
+      options?.onError?.(error, variables, onMutateResult, context);
     },
   });
 };
@@ -147,21 +170,22 @@ export const useCreateManager = (
  */
 export const useUpdateManager = (
   options?: UseMutationOptions<
-    TManager,
+    ApiMutationResponse<TManager>,
     Error,
     { uuid: string; data: TManagerUpdatePayload }
   >
 ): ReturnType<
   typeof useMutation<
-    TManager,
+    ApiMutationResponse<TManager>,
     Error,
     { uuid: string; data: TManagerUpdatePayload }
   >
 > => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   return useMutation<
-    TManager,
+    ApiMutationResponse<TManager>,
     Error,
     { uuid: string; data: TManagerUpdatePayload }
   >({
@@ -169,11 +193,19 @@ export const useUpdateManager = (
     mutationFn: ({ uuid, data }) => managerApi.updateManager(uuid, data),
     onSuccess: (updatedManager, variables, onMutateResult, context) => {
       queryClient.setQueryData(
-        managerQueryKeys.detail(updatedManager.id),
-        updatedManager
+        managerQueryKeys.detail(updatedManager.content.id),
+        updatedManager.content
       );
       queryClient.invalidateQueries({ queryKey: managerQueryKeys.lists() });
+      showToast(
+        updatedManager.message ?? 'Gerente atualizado com sucesso',
+        'success'
+      );
       options?.onSuccess?.(updatedManager, variables, onMutateResult, context);
+    },
+    onError: (error, variables, onMutateResult, context) => {
+      showToast(getErrorMessage(error), 'error');
+      options?.onError?.(error, variables, onMutateResult, context);
     },
   });
 };

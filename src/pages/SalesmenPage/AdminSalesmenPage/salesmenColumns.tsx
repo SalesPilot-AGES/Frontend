@@ -79,7 +79,7 @@ export const buildSalesmenColumns = (
     ),
   },
   {
-    header: 'Sentimento medio',
+    header: 'Sentimento médio',
     accessor: (row: TSalesmanWithCompany) => row.average_sentiment ?? 0,
     render: (_value: ReactNode, row: TSalesmanWithCompany): JSX.Element => {
       const sentimentValue = row.average_sentiment;

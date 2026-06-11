@@ -79,7 +79,11 @@ export const ManagerSalesmenPage = (): JSX.Element => {
             subtitle={EpageDescriptions.SALESMEN}
           />
 
-          <Button startIcon={<AddIcon />} variant="gradient">
+          <Button
+            startIcon={<AddIcon />}
+            variant="gradient"
+            // TODO: Implementar funcionalidade de adicionar vendedor (FE-28)
+          >
             Adicionar vendedor
           </Button>
         </Box>

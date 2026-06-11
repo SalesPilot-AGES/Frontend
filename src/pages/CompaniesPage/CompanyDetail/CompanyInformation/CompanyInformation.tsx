@@ -1,5 +1,7 @@
+import { EPageTitles } from '@data/enums/EPageTitles';
 import EditIcon from '@mui/icons-material/Edit';
-import { Button, Paper, Stack, Typography, useTheme } from '@mui/material';
+import { Button } from '@mui/material';
+import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import type { JSX } from 'react';
 
 import { CompanyInformationView } from './CompanyInformationView/CompanyInformationView';
@@ -13,37 +15,17 @@ export interface ICompanyInformationProps {
 export const CompanyInformation = ({
   viewValues,
   onEdit,
-}: ICompanyInformationProps): JSX.Element => {
-  const { palette } = useTheme();
-
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: { xs: 2, sm: 3 },
-        width: '100%',
-        border: `1px solid ${palette.neutrals[200]}`,
-      }}
-    >
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        flexWrap="wrap"
-        gap={1.5}
-        sx={{ mb: 3 }}
-      >
-        <Typography variant="h2">Informações da empresa</Typography>
-        <Button
-          variant="contained"
-          startIcon={<EditIcon />}
-          onClick={onEdit}
-          aria-label="Editar informações da empresa"
-        >
+}: ICompanyInformationProps): JSX.Element => (
+  <EntityDetailsCard
+    title={EPageTitles.COMPANY_INFORMATION}
+    headerRight={
+      onEdit ? (
+        <Button variant="contained" startIcon={<EditIcon />} onClick={onEdit}>
           Editar
         </Button>
-      </Stack>
-      <CompanyInformationView {...viewValues} />
-    </Paper>
-  );
-};
+      ) : undefined
+    }
+  >
+    <CompanyInformationView {...viewValues} />
+  </EntityDetailsCard>
+);

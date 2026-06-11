@@ -1,4 +1,8 @@
-import { Button, Paper, Stack, Typography } from '@mui/material';
+import { EPageTitles } from '@data/enums/EPageTitles';
+import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
+import { Box, Button } from '@mui/material';
+import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import type { Dispatch, JSX, SetStateAction } from 'react';
 
 import type { CompanyInformationValues } from '../CompanyInformationView/types';
@@ -34,37 +38,29 @@ export const CompanyInformationEdit = ({
   });
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: { xs: 2, sm: 3 },
-        width: '100%',
-        border: `1px solid ${palette.neutrals[200]}`,
-      }}
-    >
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        flexWrap="wrap"
-        gap={1.5}
-        sx={{ mb: 3 }}
-      >
-        <Typography variant="h2">Editar informações da empresa</Typography>
-        <Stack direction="row" spacing={1}>
-          <Button variant="text" onClick={onCancel}>
+    <EntityDetailsCard
+      title={EPageTitles.COMPANY_INFORMATION}
+      headerRight={
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Button
+            variant="outlined"
+            startIcon={<CloseIcon />}
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             Cancelar
           </Button>
           <Button
             variant="contained"
+            startIcon={<SaveIcon />}
             onClick={handleSubmit(onSubmit)}
             disabled={!isValid || isSubmitting}
           >
             Salvar
           </Button>
-        </Stack>
-      </Stack>
-
+        </Box>
+      }
+    >
       <CompanyInformationEditFields
         draft={draft}
         setDraft={setDraft}
@@ -73,6 +69,6 @@ export const CompanyInformationEdit = ({
         valueColor={valueColor}
         palette={palette}
       />
-    </Paper>
+    </EntityDetailsCard>
   );
 };

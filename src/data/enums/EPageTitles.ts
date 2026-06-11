@@ -6,6 +6,7 @@ export const EPageTitles = {
   COMPANIES: 'Empresas',
   MANAGERS: 'Gestores',
   MANAGER_INFORMATION: 'Informações do gestor',
+  COMPANY_INFORMATION: 'Informações da empresa',
   SALESMEN: 'Vendedores',
   SALESMAN_INFORMATION: 'Informações do vendedor',
   MEETINGS: 'Reuniões',

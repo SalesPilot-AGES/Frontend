@@ -1,7 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
+import type { TMeetingDetail } from '@services/models/MeetingSchema';
 import { type JSX } from 'react';
-
-import type { TMeetingDetail } from '../MeetingDetail.interface';
 
 type TMeetingContextProps = {
   meeting: TMeetingDetail;

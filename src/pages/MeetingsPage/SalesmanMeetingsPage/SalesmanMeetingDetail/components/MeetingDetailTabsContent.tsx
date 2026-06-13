@@ -3,16 +3,17 @@ import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import PlaylistAddCheckCircleOutlinedIcon from '@mui/icons-material/PlaylistAddCheckCircleOutlined';
 import { Box, Tab, Tabs } from '@mui/material';
 import type {
+  TMeetingDetail,
   TMeetingPostAnalysis,
   TMeetingRealtimeInsight,
+  TMeetingTab,
 } from '@services/models/MeetingSchema';
 import type { JSX } from 'react';
 import React from 'react';
 
-import { MeetingActionPlan } from '../MeetingActionPlan/MeetingActionPlan';
-import { MeetingContext } from '../MeetingContext/MeetingContext';
-import type { TMeetingDetail, TMeetingTab } from '../MeetingDetail.interface';
-import { MeetingInsights } from '../MeetingInsights/MeetingInsights';
+import { MeetingActionPlan } from './MeetingActionPlan';
+import { MeetingContext } from './MeetingContext';
+import { MeetingInsights } from './MeetingInsights';
 
 type TMeetingDetailTabsContentProps = {
   meeting: TMeetingDetail;

@@ -84,16 +84,16 @@ playwright.globalSetup.ts         ← pre-warms the Vite dev server before tests
 `test.step()` blocks that play through the app exactly as a real admin user would,
 using data seeded by `../backend/bootstrap/src/main/resources/db/migration/V4__seed_data.sql`:
 
-| Step | What happens |
-|------|-------------|
-| 1 | Login via the real form — `POST /api/auth/login` against the seeded admin (`ana@digitalsales.com`) |
-| 2 | Dashboard — verify admin heading and sidebar items |
-| 3 | Companies list — verify seeded companies and active/inactive stat cards |
-| 4 | Company detail — heading and CNPJ for "Digital Sales" |
-| 5 | Managers list and detail — seeded manager "Gabriel Ribeiro" |
-| 6 | Salesmen list and detail — seeded salesmen, including inactive "Laura Silva" |
-| 7 | Meetings list and detail — all three tabs (Contexto → Insights → Plano de Ação) with real pre/post-analysis data |
-| 8 | Logout — verify auth state is cleared from `localStorage` |
+| Step | What happens                                                                                                     |
+| ---- | ---------------------------------------------------------------------------------------------------------------- |
+| 1    | Login via the real form — `POST /api/auth/login` against the seeded admin (`ana@digitalsales.com`)               |
+| 2    | Dashboard — verify admin heading and sidebar items                                                               |
+| 3    | Companies list — verify seeded companies and active/inactive stat cards                                          |
+| 4    | Company detail — heading and CNPJ for "Digital Sales"                                                            |
+| 5    | Managers list and detail — seeded manager "Gabriel Ribeiro"                                                      |
+| 6    | Salesmen list and detail — seeded salesmen, including inactive "Laura Silva"                                     |
+| 7    | Meetings list and detail — all three tabs (Contexto → Insights → Plano de Ação) with real pre/post-analysis data |
+| 8    | Logout — verify auth state is cleared from `localStorage`                                                        |
 
 Because everything runs against the real API, there is no route mocking and no
 pre-authentication helper — the test logs in through the actual login form and
@@ -116,18 +116,18 @@ await page.waitForURL('/reuni%C3%B5es');
 
 ```typescript
 // Best — ARIA roles with accessible names
-page.getByRole('button', { name: /login/i })
-page.getByRole('tab', { name: /CONTEXTO DA REUNIÃO/i })
-page.getByRole('heading', { name: 'Digital Sales', level: 1 })
+page.getByRole('button', { name: /login/i });
+page.getByRole('tab', { name: /CONTEXTO DA REUNIÃO/i });
+page.getByRole('heading', { name: 'Digital Sales', level: 1 });
 
 // Good — visible text, scoped to a table to avoid hidden chart-label duplicates
-page.getByRole('table').getByText('Digital Sales')
+page.getByRole('table').getByText('Digital Sales');
 
 // Acceptable — DataTable's "details" button uses an aria-label with the row id
-page.getByRole('button', { name: `Ver detalhes de ${rowId}` })
+page.getByRole('button', { name: `Ver detalhes de ${rowId}` });
 
 // Avoid — CSS classes from MUI (can change between MUI versions)
-page.locator('.MuiButton-root')  // fragile
+page.locator('.MuiButton-root'); // fragile
 ```
 
 The one existing exception is `.MuiDrawer-paper button` for the logout icon button
@@ -144,17 +144,21 @@ gets an `aria-label`, prefer that instead.
 ## 5. Running tests
 
 ### Run the suite (requires the backend already running)
+
 ```bash
 pnpm test:e2e
 ```
+
 This runs `playwright test --project=backend --headed`. Make sure
 `docker compose up --build` is running in `../backend` first, and that the
 frontend dev server is reachable (Playwright will start it via `webServer` if needed).
 
 ### Let Playwright start everything for you
+
 ```bash
 pnpm test:e2e:full
 ```
+
 This uses `playwright.full.config.ts`, which spins up both the frontend dev server and
 the backend (`db` + `api` via Docker Compose with `--build`) before running the test.
 Both are stopped automatically when the run finishes.
@@ -162,21 +166,26 @@ Both are stopped automatically when the run finishes.
 will be reused instead of rebuilt.
 
 ### Run a single test by name
+
 ```bash
 pnpm exec playwright test -g "admin can browse all platform areas"
 ```
 
 ### Headed vs headless
+
 ```bash
 pnpm exec playwright test --project=backend
 ```
+
 Drop `--headed` to run without opening a browser window. Add `--slowmo=500` to
 slow each step down by 500ms when watching headed runs.
 
 ### Open the HTML report
+
 ```bash
 pnpm test:e2e:report
 ```
+
 The report is generated automatically after every run at `playwright-report/`.
 
 ---
@@ -192,6 +201,7 @@ Running 1 test using 1 worker
 ```
 
 A `✗` failure includes:
+
 - **Error message** — what assertion failed, including which `test.step()` it was in.
 - **Trace file** — a recorded timeline of every action (captured on retry, or
   always in CI). Open traces with:
@@ -217,7 +227,9 @@ pattern (`DIGITAL_SALES_ID`, `GABRIEL_MANAGER_ID`, etc.).
 await test.step('New feature interaction', async () => {
   await page.locator('.MuiDrawer-paper').getByText('Nova Página').click();
   await page.waitForURL(/\/nova-pagina/);
-  await expect(page.getByRole('table').getByText('Conteúdo esperado')).toBeVisible();
+  await expect(
+    page.getByRole('table').getByText('Conteúdo esperado')
+  ).toBeVisible();
 });
 ```
 
@@ -270,7 +282,7 @@ The trace shows every action, DOM snapshot before and after, and console logs.
 ```typescript
 test('debug this @backend', async ({ page }) => {
   await page.goto('/login');
-  await page.pause();  // opens the Playwright inspector
+  await page.pause(); // opens the Playwright inspector
 });
 ```
 
@@ -278,12 +290,12 @@ Run with `--headed` for this to work. Remove `page.pause()` before committing.
 
 ### Common failure patterns
 
-| Symptom | Likely cause | Fix |
-|---------|-------------|-----|
-| `waitForURL` timeout | Backend not running or seed data missing | Confirm `docker compose up --build` in `../backend` is healthy and the migration ran |
-| `strict mode violation` on `getByText` | Hidden duplicate (e.g. chart label SVG `<text>`) matches the same name | Scope the locator to `page.getByRole('table')` or another container |
+| Symptom                                       | Likely cause                                                           | Fix                                                                                                  |
+| --------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `waitForURL` timeout                          | Backend not running or seed data missing                               | Confirm `docker compose up --build` in `../backend` is healthy and the migration ran                 |
+| `strict mode violation` on `getByText`        | Hidden duplicate (e.g. chart label SVG `<text>`) matches the same name | Scope the locator to `page.getByRole('table')` or another container                                  |
 | Redirect to `/login` when expecting `/painel` | Login credentials don't match a seeded user, or backend is unreachable | Check `V4__seed_data.sql` for valid email/password and that `VITE_API_URL` points at the running API |
-| Flaky tab assertion | Backend response slower than expected | Use `await expect(tab).toHaveAttribute('aria-selected', 'true')`, which auto-retries |
+| Flaky tab assertion                           | Backend response slower than expected                                  | Use `await expect(tab).toHaveAttribute('aria-selected', 'true')`, which auto-retries                 |
 
 ---
 

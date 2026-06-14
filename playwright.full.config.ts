@@ -11,7 +11,8 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
     },
     {
-      command: 'docker compose -f ../backend/docker-compose.yml up --build db api',
+      command:
+        'docker compose -f ../backend/docker-compose.yml up --build db api',
       url: 'http://localhost:8080',
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

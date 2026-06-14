@@ -9,6 +9,7 @@ import { MeetingsByChart } from '@pages/DashboardPage/components/MeetingsByChart
 import { MeetingsByMonthChart } from '@pages/DashboardPage/components/MeetingsByMonthChart/MeetingsByMonthChart';
 import { useDashboardFilterContext } from '@pages/DashboardPage/context/DashboardFilterContext';
 import {
+  type TDashboardMetric,
   type TDashboardMetricKey,
   type TDashboardMetrics,
 } from '@services/models/DashboardSchema';
@@ -59,7 +60,7 @@ const metricCardConfig: readonly TMetricCardConfig[] = [
 const getMetricValue = (
   metrics: TDashboardMetrics | undefined,
   metricKey: TDashboardMetricKey
-): TDashboardMetrics[TDashboardMetricKey] =>
+): TDashboardMetric =>
   metrics?.[metricKey] ?? {
     value: 0,
     variationPercentage: 0,

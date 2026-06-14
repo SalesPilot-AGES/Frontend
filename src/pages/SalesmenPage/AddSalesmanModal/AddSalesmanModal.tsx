@@ -6,32 +6,40 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import type { TCompany } from '@services/models/CompanySchema';
 import {
   CreateSalesmanSchema,
   type TCreateSalesman,
 } from '@services/models/SalesmanSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
+import { useGetManagerById } from '@services/queries/useManagers';
 import { useCreateSalesman } from '@services/queries/useSalesman';
+import { selectUser, useAuthStore } from '@store/authStore';
 import { AppModal } from '@UI/AppModal/AppModal';
 import type { JSX } from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
+type CompanyOption = { id: string; name: string };
+
 export interface IAddSalesmanModalProps {
   open: boolean;
   handleClose: () => void;
+  variant?: 'admin' | 'manager';
 }
 
 export const AddSalesmanModal = ({
   open,
   handleClose,
+  variant = 'admin',
 }: IAddSalesmanModalProps): JSX.Element => {
+  const isManagerVariant = variant === 'manager';
+
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<TCreateSalesman>({
     resolver: zodResolver(CreateSalesmanSchema),
     defaultValues: {
@@ -42,16 +50,36 @@ export const AddSalesmanModal = ({
     },
   });
 
+  // ADMIN: fetch all companies via the admin-scoped endpoint.
   const { data: companiesPage } = useGetCompanies();
-  const companyOptions: TCompany[] = (companiesPage?.content ?? []).filter(
-    (c) => c.active
-  );
+
+  // MANAGER: fetch the authenticated manager's own record to get the official company.
+  // useGetManagerById is a no-op when uuid is null (enabled: !!uuid).
+  const user = useAuthStore(selectUser);
+  const {
+    data: managerData,
+    isLoading: isManagerLoading,
+    isError: isManagerError,
+  } = useGetManagerById(isManagerVariant ? (user?.id ?? null) : null);
+
+  const companyOptions: CompanyOption[] = isManagerVariant
+    ? managerData?.company
+      ? [managerData.company]
+      : []
+    : (companiesPage?.content ?? []).filter((c) => c.active);
 
   useEffect(() => {
     if (!open) {
       reset();
     }
   }, [open, reset]);
+
+  // Manager: pre-fill the company field once the manager record loads.
+  useEffect(() => {
+    if (isManagerVariant && managerData?.company) {
+      setValue('company', managerData.company);
+    }
+  }, [isManagerVariant, managerData?.company, setValue]);
 
   const { mutate: createSalesman } = useCreateSalesman();
 
@@ -63,13 +91,30 @@ export const AddSalesmanModal = ({
     });
   };
 
+  const getCompanyHelperText = (): string | undefined => {
+    if (errors.company?.message) return errors.company.message;
+    if (isManagerVariant) {
+      if (isManagerError)
+        return 'Não foi possível carregar a empresa do gestor.';
+      if (!isManagerLoading && companyOptions.length === 0)
+        return 'Nenhuma empresa disponível para vincular.';
+      return undefined;
+    }
+    if (companyOptions.length === 0)
+      return 'Nenhuma empresa disponível para vincular.';
+    return undefined;
+  };
+
   return (
     <AppModal
       modalName="Adicionar vendedor"
       open={open}
       handleClose={handleClose}
       handleSubmit={handleSubmit(onSubmit)}
-      isSaveButtonDisabled={false}
+      isSaveButtonDisabled={
+        isManagerVariant &&
+        (isManagerLoading || isManagerError || !managerData?.company)
+      }
     >
       <Box
         sx={{
@@ -109,8 +154,9 @@ export const AddSalesmanModal = ({
             name="company"
             control={control}
             render={({ field }) => (
-              <Autocomplete<TCompany, false, false, false>
+              <Autocomplete<CompanyOption, false, false, false>
                 disablePortal
+                disabled={isManagerVariant}
                 options={companyOptions}
                 getOptionLabel={(option) => option.name}
                 isOptionEqualToValue={(a, b) => a.id === b.id}
@@ -126,13 +172,10 @@ export const AddSalesmanModal = ({
                     {...params}
                     name={field.name}
                     inputRef={field.ref}
-                    error={!!errors.company}
-                    helperText={
-                      errors.company?.message ??
-                      (companyOptions.length === 0
-                        ? 'Nenhuma empresa disponível para vincular.'
-                        : undefined)
+                    error={
+                      !!errors.company || (isManagerVariant && isManagerError)
                     }
+                    helperText={getCompanyHelperText()}
                   />
                 )}
               />

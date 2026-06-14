@@ -19,6 +19,7 @@ export const DashboardMetricTrendSchema = z.enum(['up', 'down', 'neutral']);
 
 export const DashboardMetricKeySchema = z.enum([
   'active_companies',
+  'average_duration',
   'inactive_companies',
   'total_meetings',
   'salesmen',
@@ -36,6 +37,7 @@ const DashboardMetricApiSchema = z
     variation_percent: z.number().optional(),
     variation_pct: z.number().optional(),
     variationPct: z.number().optional(),
+    variationPercent: z.number().optional(),
     percentage: z.number().optional(),
     trend: DashboardMetricTrendSchema.optional(),
   })
@@ -45,6 +47,7 @@ const DashboardMetricApiSchema = z
       metric.variation_percent ??
       metric.variation_pct ??
       metric.variationPct ??
+      metric.variationPercent ??
       metric.percentage ??
       0;
 
@@ -63,26 +66,57 @@ const DashboardMetricApiSchema = z
     };
   });
 
-export const DashboardMetricsResponseSchema = z
+const defaultDashboardMetric = {
+  value: 0,
+  variationPercentage: 0,
+  trend: 'neutral' as const,
+};
+
+const unwrapDashboardMetricsPayload = (payload: unknown): unknown => {
+  if (typeof payload === 'object' && payload !== null && 'data' in payload) {
+    return (payload as { data?: unknown }).data ?? payload;
+  }
+
+  return payload;
+};
+
+const DashboardMetricsPayloadSchema = z
   .object({
-    active_companies: DashboardMetricApiSchema,
-    inactive_companies: DashboardMetricApiSchema,
-    total_meetings: DashboardMetricApiSchema,
-    active_sellers: DashboardMetricApiSchema,
+    active_companies: DashboardMetricApiSchema.optional(),
+    activeCompanies: DashboardMetricApiSchema.optional(),
+    inactive_companies: DashboardMetricApiSchema.optional(),
+    inactiveCompanies: DashboardMetricApiSchema.optional(),
+    total_meetings: DashboardMetricApiSchema.optional(),
+    totalMeetings: DashboardMetricApiSchema.optional(),
+    salesmen: DashboardMetricApiSchema.optional(),
+    active_sellers: DashboardMetricApiSchema.optional(),
+    activeSellers: DashboardMetricApiSchema.optional(),
+    average_duration: DashboardMetricApiSchema.optional(),
+    averageDuration: DashboardMetricApiSchema.optional(),
   })
+  .passthrough()
   .transform((r) => ({
-    active_companies: r.active_companies,
-    inactive_companies: r.inactive_companies,
-    total_meetings: r.total_meetings,
-    salesmen: r.active_sellers,
+    active_companies:
+      r.active_companies ?? r.activeCompanies ?? defaultDashboardMetric,
+    average_duration:
+      r.average_duration ?? r.averageDuration ?? defaultDashboardMetric,
+    inactive_companies:
+      r.inactive_companies ?? r.inactiveCompanies ?? defaultDashboardMetric,
+    total_meetings:
+      r.total_meetings ?? r.totalMeetings ?? defaultDashboardMetric,
+    salesmen:
+      r.salesmen ??
+      r.active_sellers ??
+      r.activeSellers ??
+      defaultDashboardMetric,
   }));
 
-export const DashboardMetricsSchema = z.object({
-  active_companies: DashboardMetricApiSchema,
-  inactive_companies: DashboardMetricApiSchema,
-  total_meetings: DashboardMetricApiSchema,
-  salesmen: DashboardMetricApiSchema,
-});
+export const DashboardMetricsResponseSchema = z.preprocess(
+  unwrapDashboardMetricsPayload,
+  DashboardMetricsPayloadSchema
+);
+
+export const DashboardMetricsSchema = DashboardMetricsPayloadSchema;
 
 export type TDashboardMetric = z.infer<typeof DashboardMetricApiSchema>;
 export type TDashboardMetrics = z.infer<typeof DashboardMetricsSchema>;

@@ -6,6 +6,11 @@ export const dashboardMetricsMock: TDashboardMetrics = {
     variationPercentage: 12,
     trend: 'up',
   },
+  average_duration: {
+    value: 2400,
+    variationPercentage: 5,
+    trend: 'up',
+  },
   inactive_companies: {
     value: 1,
     variationPercentage: -25,

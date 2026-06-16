@@ -163,6 +163,7 @@ export const SalesmanFiltersSchema = z.object({
   active: z.boolean().optional(),
 });
 
+export type TSalesmanCompany = z.infer<typeof SalesmanCompanySchema>;
 export type TSalesman = z.infer<typeof SalesmanSchema>;
 export type TCreateSalesman = z.infer<typeof CreateSalesmanSchema>;
 export type TSalesmanWithCompany = z.infer<typeof SalesmanListItemSchema>;

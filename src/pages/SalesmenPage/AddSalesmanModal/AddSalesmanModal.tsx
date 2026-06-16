@@ -9,6 +9,7 @@ import {
 import {
   CreateSalesmanSchema,
   type TCreateSalesman,
+  type TSalesmanCompany,
 } from '@services/models/SalesmanSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
 import { useGetManagerById } from '@services/queries/useManagers';
@@ -18,8 +19,6 @@ import { AppModal } from '@UI/AppModal/AppModal';
 import type { JSX } from 'react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-
-type CompanyOption = { id: string; name: string };
 
 export interface IAddSalesmanModalProps {
   open: boolean;
@@ -62,7 +61,7 @@ export const AddSalesmanModal = ({
     isError: isManagerError,
   } = useGetManagerById(isManagerVariant ? (user?.id ?? null) : null);
 
-  const companyOptions: CompanyOption[] = isManagerVariant
+  const companyOptions: TSalesmanCompany[] = isManagerVariant
     ? managerData?.company
       ? [managerData.company]
       : []
@@ -154,7 +153,7 @@ export const AddSalesmanModal = ({
             name="company"
             control={control}
             render={({ field }) => (
-              <Autocomplete<CompanyOption, false, false, false>
+              <Autocomplete<TSalesmanCompany, false, false, false>
                 disablePortal
                 disabled={isManagerVariant}
                 options={companyOptions}

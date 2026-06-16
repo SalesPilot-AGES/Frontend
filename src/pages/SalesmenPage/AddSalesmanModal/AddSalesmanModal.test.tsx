@@ -140,7 +140,13 @@ describe('AddSalesmanModal — variant admin (default)', () => {
 // ─── MANAGER ────────────────────────────────────────────────────────────────
 
 describe('AddSalesmanModal — variant manager', () => {
-  it('renders the Empresa field visible and disabled', () => {
+  it('renders the Empresa field visible and disabled when manager data is available', () => {
+    vi.mocked(useGetManagerById).mockReturnValue({
+      data: mockManagerData,
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useGetManagerById>);
+
     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
     expect(screen.getByText('Empresa')).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toBeDisabled();
@@ -197,7 +203,7 @@ describe('AddSalesmanModal — variant manager', () => {
     expect(screen.getByText('Salvar').closest('button')).toBeDisabled();
   });
 
-  it('shows an error message when manager company fails to load', () => {
+  it('shows error message in the modal body when manager query fails', () => {
     vi.mocked(useGetManagerById).mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -208,6 +214,54 @@ describe('AddSalesmanModal — variant manager', () => {
     expect(
       screen.getByText('Não foi possível carregar a empresa do gestor.')
     ).toBeInTheDocument();
+  });
+
+  it('does not render the form when manager query fails', () => {
+    vi.mocked(useGetManagerById).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+    } as unknown as ReturnType<typeof useGetManagerById>);
+
+    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+    expect(screen.queryByText('Nome do vendedor')).not.toBeInTheDocument();
+    expect(screen.queryByText('Email de acesso')).not.toBeInTheDocument();
+  });
+
+  it('shows error message in the modal body when manager has no company', () => {
+    vi.mocked(useGetManagerById).mockReturnValue({
+      data: { ...mockManagerData, company: undefined },
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useGetManagerById>);
+
+    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+    expect(
+      screen.getByText('O gestor não possui empresa vinculada.')
+    ).toBeInTheDocument();
+  });
+
+  it('does not render the form when manager has no company', () => {
+    vi.mocked(useGetManagerById).mockReturnValue({
+      data: { ...mockManagerData, company: undefined },
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useGetManagerById>);
+
+    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+    expect(screen.queryByText('Nome do vendedor')).not.toBeInTheDocument();
+    expect(screen.queryByText('Email de acesso')).not.toBeInTheDocument();
+  });
+
+  it('disables the submit button when manager has no company', () => {
+    vi.mocked(useGetManagerById).mockReturnValue({
+      data: { ...mockManagerData, company: undefined },
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof useGetManagerById>);
+
+    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+    expect(screen.getByText('Salvar').closest('button')).toBeDisabled();
   });
 
   it("submits with company_id from manager's official company", async () => {

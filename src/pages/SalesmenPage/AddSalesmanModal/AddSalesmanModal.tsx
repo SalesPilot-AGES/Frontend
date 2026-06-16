@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  Alert,
   Autocomplete,
   Box,
   Switch,
@@ -92,17 +93,21 @@ export const AddSalesmanModal = ({
 
   const getCompanyHelperText = (): string | undefined => {
     if (errors.company?.message) return errors.company.message;
-    if (isManagerVariant) {
-      if (isManagerError)
-        return 'Não foi possível carregar a empresa do gestor.';
-      if (!isManagerLoading && companyOptions.length === 0)
-        return 'Nenhuma empresa disponível para vincular.';
-      return undefined;
-    }
-    if (companyOptions.length === 0)
+    if (!isManagerVariant && companyOptions.length === 0)
       return 'Nenhuma empresa disponível para vincular.';
     return undefined;
   };
+
+  // Manager blocking states: failed query or successful load with no company.
+  // In either case the form must not be rendered as usable.
+  const showManagerBlockingError =
+    isManagerVariant &&
+    !isManagerLoading &&
+    (isManagerError || !managerData?.company);
+
+  const managerErrorMessage = isManagerError
+    ? 'Não foi possível carregar a empresa do gestor.'
+    : 'O gestor não possui empresa vinculada.';
 
   return (
     <AppModal
@@ -115,132 +120,147 @@ export const AddSalesmanModal = ({
         (isManagerLoading || isManagerError || !managerData?.company)
       }
     >
-      <Box
-        sx={{
-          width: '100%',
-          boxSizing: 'border-box',
-          padding: '48px',
-          marginBottom: '48px',
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-          columnGap: '32px',
-          rowGap: '32px',
-        }}
-      >
-        <Box>
-          <Typography sx={{ mb: 1 }} variant="body2">
-            Nome do vendedor
-          </Typography>
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                error={!!errors.name}
-                helperText={errors.name?.message}
-              />
-            )}
-          />
+      {showManagerBlockingError ? (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '48px',
+            minHeight: 200,
+          }}
+        >
+          <Alert severity="error" sx={{ width: '100%' }}>
+            {managerErrorMessage}
+          </Alert>
         </Box>
-
-        <Box>
-          <Typography sx={{ mb: 1 }} variant="body2">
-            Empresa
-          </Typography>
-          <Controller
-            name="company"
-            control={control}
-            render={({ field }) => (
-              <Autocomplete<TSalesmanCompany, false, false, false>
-                disablePortal
-                disabled={isManagerVariant}
-                options={companyOptions}
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(a, b) => a.id === b.id}
-                value={
-                  companyOptions.find((c) => c.id === field.value?.id) ?? null
-                }
-                onChange={(_, company) => {
-                  field.onChange(company ?? null);
-                }}
-                onBlur={field.onBlur}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    name={field.name}
-                    inputRef={field.ref}
-                    error={
-                      !!errors.company || (isManagerVariant && isManagerError)
-                    }
-                    helperText={getCompanyHelperText()}
-                  />
-                )}
-              />
-            )}
-          />
-        </Box>
-
-        <Box>
-          <Typography sx={{ mb: 1 }} variant="body2">
-            Email de acesso
-          </Typography>
-          <Controller
-            name="email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                type="email"
-                error={!!errors.email}
-                helperText={errors.email?.message}
-              />
-            )}
-          />
-        </Box>
-
-        <Box>
-          <Typography sx={{ mb: 1 }} variant="body2">
-            Status
-          </Typography>
-          <Controller
-            name="active"
-            control={control}
-            render={({ field }) => (
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                }}
-              >
-                <Typography variant="body2">
-                  {field.value ? 'Ativo' : 'Inativo'}
-                </Typography>
-                <Switch
+      ) : (
+        <Box
+          sx={{
+            width: '100%',
+            boxSizing: 'border-box',
+            padding: '48px',
+            marginBottom: '48px',
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            columnGap: '32px',
+            rowGap: '32px',
+          }}
+        >
+          <Box>
+            <Typography sx={{ mb: 1 }} variant="body2">
+              Nome do vendedor
+            </Typography>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <TextField
                   {...field}
-                  checked={field.value}
-                  sx={{
-                    '& .MuiSwitch-switchBase.Mui-checked': {
-                      color: '#2E7D32',
-                    },
-                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                      backgroundColor: '#2E7D32',
-                    },
-                  }}
-                  slotProps={{
-                    input: {
-                      'aria-label': 'status do vendedor',
-                    },
-                  }}
+                  fullWidth
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
                 />
-              </Box>
-            )}
-          />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={{ mb: 1 }} variant="body2">
+              Empresa
+            </Typography>
+            <Controller
+              name="company"
+              control={control}
+              render={({ field }) => (
+                <Autocomplete<TSalesmanCompany, false, false, false>
+                  disablePortal
+                  disabled={isManagerVariant}
+                  options={companyOptions}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(a, b) => a.id === b.id}
+                  value={
+                    companyOptions.find((c) => c.id === field.value?.id) ?? null
+                  }
+                  onChange={(_, company) => {
+                    field.onChange(company ?? null);
+                  }}
+                  onBlur={field.onBlur}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name={field.name}
+                      inputRef={field.ref}
+                      error={!!errors.company}
+                      helperText={getCompanyHelperText()}
+                    />
+                  )}
+                />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={{ mb: 1 }} variant="body2">
+              Email de acesso
+            </Typography>
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  type="email"
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Typography sx={{ mb: 1 }} variant="body2">
+              Status
+            </Typography>
+            <Controller
+              name="active"
+              control={control}
+              render={({ field }) => (
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}
+                >
+                  <Typography variant="body2">
+                    {field.value ? 'Ativo' : 'Inativo'}
+                  </Typography>
+                  <Switch
+                    {...field}
+                    checked={field.value}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: '#2E7D32',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track':
+                        {
+                          backgroundColor: '#2E7D32',
+                        },
+                    }}
+                    slotProps={{
+                      input: {
+                        'aria-label': 'status do vendedor',
+                      },
+                    }}
+                  />
+                </Box>
+              )}
+            />
+          </Box>
         </Box>
-      </Box>
+      )}
     </AppModal>
   );
 };

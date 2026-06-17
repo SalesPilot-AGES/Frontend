@@ -3,9 +3,9 @@ import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import type { TColorThemeOptions } from '@declarations/hooks';
 import type { TIconName } from '@declarations/ui';
-import { Box, Stack, useTheme } from '@mui/material';
+import { Box, Grid, Stack } from '@mui/material';
 import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
-import { InsightChip } from '@pages/DashboardPage/components/InsightChip/InsightChip';
+import { formatDurationSecondsAsMinutes } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart.utils';
 import { MeetingsByMonthChart } from '@pages/DashboardPage/components/MeetingsByMonthChart/MeetingsByMonthChart';
 import { useDashboardFilterContext } from '@pages/DashboardPage/context/DashboardFilterContext';
 import type {
@@ -35,9 +35,6 @@ const defaultMetric: TDashboardMetric = {
 
 const mockedAverageSentiment = 90;
 
-const formatAverageDuration = (durationSeconds: number): string =>
-  `${Math.round(durationSeconds / 60)} min`;
-
 const metricCardConfig: readonly TSalesmanMetricCardConfig[] = [
   {
     key: 'total_meetings',
@@ -51,7 +48,7 @@ const metricCardConfig: readonly TSalesmanMetricCardConfig[] = [
     iconName: 'duration',
     iconTheme: 'neutrals',
     label: ECardLabel.AVERAGE_DURATION,
-    formatValue: formatAverageDuration,
+    formatValue: formatDurationSecondsAsMinutes,
   },
 ];
 
@@ -61,7 +58,6 @@ const getMetricValue = (
 ): TDashboardMetric => metrics?.[metricKey] ?? defaultMetric;
 
 export const SalesmanDashboard = (): JSX.Element => {
-  const { spacing } = useTheme();
   const { filters } = useDashboardFilterContext();
   const { data: dashboardMetrics } = useGetDashboardMetrics(filters);
 
@@ -73,25 +69,15 @@ export const SalesmanDashboard = (): JSX.Element => {
           subtitle={EpageDescriptions.SALESMAN_DASHBOARD}
         />
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, minmax(0, 1fr))',
-              lg: 'repeat(3, minmax(0, 1fr))',
-            },
-            gap: 2,
-          }}
-        >
+        <Grid container spacing={2}>
           {metricCardConfig.map((config) => {
             const metric = getMetricValue(dashboardMetrics, config.key);
 
             return (
-              <Box
+              <Grid
                 key={config.key}
+                size={{ xs: 12, sm: 6, lg: 4 }}
                 data-testid={`salesman-dashboard-metric-card-${config.key}`}
-                sx={{ position: 'relative' }}
               >
                 <StatCard
                   iconName={config.iconName}
@@ -99,28 +85,22 @@ export const SalesmanDashboard = (): JSX.Element => {
                   value={config.formatValue(metric.value)}
                   label={config.label}
                 />
-                <InsightChip
-                  variationPercentage={metric.variationPercentage}
-                  trend={metric.trend}
-                  sx={{
-                    position: 'absolute',
-                    top: spacing(3),
-                    right: spacing(3),
-                  }}
-                />
-              </Box>
+              </Grid>
             );
           })}
 
-          <Box data-testid="salesman-dashboard-metric-card-average_sentiment">
+          <Grid
+            size={{ xs: 12, sm: 6, lg: 4 }}
+            data-testid="salesman-dashboard-metric-card-average_sentiment"
+          >
             <StatCard
               iconName="sentimentHappy"
               theme="success"
               value={`${mockedAverageSentiment}%`}
               label={ECardLabel.AVERAGE_FEELING}
             />
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
 
         <Stack
           direction={{ xs: 'column', md: 'row' }}

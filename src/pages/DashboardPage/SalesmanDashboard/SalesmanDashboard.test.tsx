@@ -93,5 +93,7 @@ describe('SalesmanDashboard', () => {
     expect(screen.getByText(ECardLabel.AVERAGE_FEELING)).toBeInTheDocument();
     expect(screen.getByText('40 min')).toBeInTheDocument();
     expect(screen.getByText('90%')).toBeInTheDocument();
+    expect(screen.queryByText('+12%')).not.toBeInTheDocument();
+    expect(screen.queryByText('+8%')).not.toBeInTheDocument();
   });
 });

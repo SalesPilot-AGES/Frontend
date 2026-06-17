@@ -53,7 +53,16 @@ export const MeetingsByMonthChart = (): JSX.Element => {
         Total de reuniões
       </Typography>
 
-      <Box sx={{ width: '100%', height: '15rem', overflow: 'hidden' }}>
+      <Box
+        sx={{
+          width: '100%',
+          flex: 1,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
         {isLoading ? (
           <Box
             sx={{

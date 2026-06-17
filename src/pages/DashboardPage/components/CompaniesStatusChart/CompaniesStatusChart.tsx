@@ -76,13 +76,13 @@ export const CompaniesStatusChart = (): JSX.Element => {
                       {
                         id: 0,
                         value: data?.active ?? 0,
-                        label: `${LABEL_ACTIVE}: ${data?.active ?? 0}`,
+                        label: LABEL_ACTIVE,
                         color: activeColor,
                       },
                       {
                         id: 1,
                         value: data?.inactive ?? 0,
-                        label: `${LABEL_INACTIVE}: ${data?.inactive ?? 0}`,
+                        label: LABEL_INACTIVE,
                         color: inactiveColor,
                       },
                     ],

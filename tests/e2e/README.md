@@ -65,7 +65,10 @@ pnpm test:e2e:full
 ```
 tests/e2e/
 ├── README.md                    ← this file
-└── admin-flow.spec.ts           ← single end-to-end admin journey against the real backend
+├── e2e-helpers.ts               ← shared seeded users, ids, login/logout helpers
+├── admin-flow.spec.ts           ← end-to-end admin journey against the real backend
+├── manager-flow.spec.ts         ← manager journey and permission checks
+└── salesman-flow.spec.ts        ← salesman journey and permission checks
 ```
 
 Configuration lives at the project root:
@@ -80,9 +83,11 @@ playwright.globalSetup.ts         ← pre-warms the Vite dev server before tests
 
 ## 4. What the test covers
 
-`admin-flow.spec.ts` contains one `test()` tagged `@backend`, split into named
-`test.step()` blocks that play through the app exactly as a real admin user would,
-using data seeded by `../backend/bootstrap/src/main/resources/db/migration/V4__seed_data.sql`:
+Each spec contains one `test()` tagged `@backend`, split into named
+`test.step()` blocks that play through the app exactly as a real user would,
+using data seeded by `../backend/bootstrap/src/main/resources/db/seed/V4__seed_data.sql`.
+
+`admin-flow.spec.ts` covers the full platform surface:
 
 | Step | What happens                                                                                                     |
 | ---- | ---------------------------------------------------------------------------------------------------------------- |
@@ -98,6 +103,28 @@ using data seeded by `../backend/bootstrap/src/main/resources/db/migration/V4__s
 Because everything runs against the real API, there is no route mocking and no
 pre-authentication helper — the test logs in through the actual login form and
 every assertion reflects real data from the seeded database.
+
+`manager-flow.spec.ts` verifies the middle access level:
+
+| Step | What happens                                                                 |
+| ---- | ---------------------------------------------------------------------------- |
+| 1    | Login via the real form — seeded manager (`gabriel@digitalsales.com`)        |
+| 2    | Dashboard — verify manager heading and sidebar items                         |
+| 3    | Permission redirects — `/empresas` and `/gestores` return to `/painel`       |
+| 4    | Salesmen area — manager can access `/vendedores` and seller detail data      |
+| 5    | Meetings area — manager can access `/reuniões` and real meeting detail tabs  |
+| 6    | Logout — verify auth state is cleared from `localStorage`                    |
+
+`salesman-flow.spec.ts` verifies the lowest access level:
+
+| Step | What happens                                                                       |
+| ---- | ---------------------------------------------------------------------------------- |
+| 1    | Login via the real form — seeded seller (`saulo@digitalsales.com`)                 |
+| 2    | Dashboard — verify salesman heading and sidebar items                              |
+| 3    | Permission redirects — admin/manager-only routes return to `/painel`               |
+| 4    | Meetings area — seller can access `/reuniões`                                      |
+| 5    | Meeting detail — seller sees real own meeting data and completed analysis tab data |
+| 6    | Logout — verify auth state is cleared from `localStorage`                          |
 
 ### Handling routes with special characters
 

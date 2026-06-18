@@ -33,8 +33,8 @@ export const meetingApi = {
       params: {
         page,
         size,
-        ...(filters?.search && { search: filters.search }),
-        ...(filters?.companies && { companies: filters.companies }),
+        ...(filters?.search && { title: filters.search }),
+        ...(filters?.companies && { clientCompanyName: filters.companies }),
       },
     });
 

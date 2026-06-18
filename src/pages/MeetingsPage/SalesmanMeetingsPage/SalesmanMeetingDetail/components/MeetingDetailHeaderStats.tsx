@@ -1,29 +1,33 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { getSentimentConfig } from '@hooks/useSentiment';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
-import { IconButton, Link as MuiLink, Stack, Typography } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
+import {
+  Chip,
+  Link as MuiLink,
+  Stack,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import type { TMeetingDetail } from '@services/models/MeetingSchema';
 import { Link } from '@tanstack/react-router';
 import { StatCard } from '@UI/StatCard/StatCard';
+import {
+  formatMeetingStatus,
+  formatMeetingType,
+  getAnalysisSentimentPercent,
+} from '@utils/meetingFormatters';
 import { type JSX } from 'react';
 
 type TMeetingDetailHeaderStatsProps = {
   meeting: TMeetingDetail;
   sentimentScore?: number;
-  palette: Theme['palette'];
-  themePalette: Theme['palette'];
-  responsiveValueFontSize: string;
 };
 
 export const MeetingDetailHeaderStats = ({
   meeting,
   sentimentScore,
-  palette,
-  themePalette,
-  responsiveValueFontSize,
 }: TMeetingDetailHeaderStatsProps): JSX.Element => {
+  const { palette } = useTheme();
   const formattedDate = meeting.scheduled_for
     ? new Date(meeting.scheduled_for).toLocaleDateString('pt-BR')
     : '';
@@ -31,12 +35,15 @@ export const MeetingDetailHeaderStats = ({
     ? Math.floor(meeting.duration_seconds / 60)
     : 0;
 
-  const sentimentPercent =
-    sentimentScore != null ? Math.round(sentimentScore * 100) : undefined;
+  const sentimentPercent = getAnalysisSentimentPercent(sentimentScore);
   const sentimentConfig = getSentimentConfig(sentimentPercent);
-  const sentimentPalette = themePalette[
-    sentimentConfig.theme as keyof Theme['palette']
-  ] as Record<number, string> | undefined;
+  const statValueSx = {
+    flex: '1 1 0',
+    minWidth: { xs: '100%', sm: 160 },
+    '& .MuiTypography-root:nth-of-type(1)': {
+      fontSize: { xs: '1rem', lg: '1.25rem' },
+    },
+  };
 
   return (
     <>
@@ -58,25 +65,8 @@ export const MeetingDetailHeaderStats = ({
         Voltar para reuniões
       </MuiLink>
 
-      <Stack direction="row" alignItems="center" spacing={2} flexWrap="wrap">
-        <IconButton
-          disableRipple
-          sx={{
-            width: 48,
-            height: 48,
-            p: 0,
-            borderRadius: '0.75rem',
-            bgcolor: palette.meetings[200],
-            color: palette.meetings[500],
-            '&:hover': {
-              bgcolor: palette.meetings[100],
-            },
-          }}
-        >
-          <EventNoteOutlinedIcon sx={{ fontSize: '1.5rem' }} />
-        </IconButton>
-
-        <Stack direction="column" spacing={0.5} sx={{ minWidth: 0 }}>
+      <Stack direction="column" spacing={0.75} sx={{ minWidth: 0 }}>
+        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
           <Typography
             variant="h1"
             component="h1"
@@ -84,10 +74,19 @@ export const MeetingDetailHeaderStats = ({
           >
             {meeting.title}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {formattedDate} {durationMinutes > 0 && `- ${durationMinutes} min`}
-          </Typography>
+          <Chip
+            label={formatMeetingStatus(meeting.status)}
+            size="small"
+            sx={{
+              bgcolor: palette.primary[100],
+              color: palette.primary[700],
+              fontWeight: 600,
+            }}
+          />
         </Stack>
+        <Typography variant="body2" color="text.secondary">
+          {formattedDate} {durationMinutes > 0 && `- ${durationMinutes} min`}
+        </Typography>
       </Stack>
 
       <Stack
@@ -101,59 +100,28 @@ export const MeetingDetailHeaderStats = ({
           theme="primary"
           value={meeting.client.name}
           label="Nome do cliente"
-          sx={{
-            flex: '1 1 0',
-            minWidth: { xs: '100%', sm: 160 },
-            '& .MuiTypography-root:nth-of-type(1)': {
-              fontSize: responsiveValueFontSize,
-            },
-          }}
-        />
-        <StatCard
-          iconName="salesman"
-          theme="salesmen"
-          value={meeting.seller.name}
-          label="Vendedor responsável"
-          sx={{
-            flex: '1 1 0',
-            minWidth: { xs: '100%', sm: 160 },
-            '& .MuiTypography-root:nth-of-type(1)': {
-              fontSize: responsiveValueFontSize,
-            },
-          }}
+          sx={statValueSx}
         />
         <StatCard
           iconName="company"
-          theme="companies"
-          value={meeting.client.client_company_name}
-          label="Empresa responsável"
-          sx={{
-            flex: '1 1 0',
-            minWidth: { xs: '100%', sm: 160 },
-            '& .MuiTypography-root:nth-of-type(1)': {
-              fontSize: responsiveValueFontSize,
-            },
-          }}
+          theme="primary"
+          value={meeting.client.sector || 'Não informado'}
+          label="Setor do cliente"
+          sx={statValueSx}
+        />
+        <StatCard
+          iconName="meeting"
+          theme="meetings"
+          value={formatMeetingType(meeting.meeting_type)}
+          label="Tipo de reunião"
+          sx={statValueSx}
         />
         <StatCard
           iconName={sentimentConfig.iconName}
           theme={sentimentConfig.theme}
-          value={`${sentimentPercent ?? 0}%`}
+          value={sentimentPercent == null ? '-' : `${sentimentPercent}%`}
           label="Sentimento da reunião"
-          sx={{
-            flex: '1 1 0',
-            minWidth: { xs: '100%', sm: 160 },
-            '& .MuiTypography-root:nth-of-type(1)': {
-              fontSize: responsiveValueFontSize,
-            },
-            '& .MuiStack-root > :first-child': {
-              backgroundColor: sentimentPalette?.[100],
-              color: sentimentPalette?.[300],
-            },
-            '& .MuiStack-root > :first-child svg': {
-              color: sentimentPalette?.[300],
-            },
-          }}
+          sx={statValueSx}
         />
       </Stack>
     </>

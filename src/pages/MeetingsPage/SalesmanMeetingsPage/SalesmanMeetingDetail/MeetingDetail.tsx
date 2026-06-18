@@ -1,10 +1,4 @@
-import {
-  Box,
-  CircularProgress,
-  Stack,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Box, CircularProgress, Stack } from '@mui/material';
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import type {
   TMeetingDetail,
@@ -24,11 +18,6 @@ import { MeetingDetailHeaderStats } from './components/MeetingDetailHeaderStats'
 import { MeetingDetailTabsContent } from './components/MeetingDetailTabsContent';
 
 export const MeetingDetail = (): JSX.Element => {
-  const { palette, breakpoints } = useTheme();
-  const isDesktop = useMediaQuery(breakpoints.up('lg'));
-
-  const themePalette = palette as typeof palette;
-
   const { meetingId } = useParams({ strict: false }) as { meetingId: string };
   const search = useSearch({
     from: '/protected/reuniões/$meetingId',
@@ -83,19 +72,12 @@ export const MeetingDetail = (): JSX.Element => {
     return <PageNotFound />;
   }
 
-  const responsiveValueFontSize = isDesktop
-    ? '1.25rem !important'
-    : '1rem !important';
-
   return (
     <PageContainter>
       <Stack spacing={3} sx={{ width: '100%', height: '100%' }}>
         <MeetingDetailHeaderStats
           meeting={meeting}
           sentimentScore={meetingPostAnalysis?.sentiment_analysis?.score}
-          palette={palette}
-          themePalette={themePalette}
-          responsiveValueFontSize={responsiveValueFontSize}
         />
 
         <Box

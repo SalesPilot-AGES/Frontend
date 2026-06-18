@@ -8,7 +8,8 @@ vi.mock('@services/queries/useSalesmen', () => ({
 }));
 
 vi.mock('../AddSalesmanModal/AddSalesmanModal', () => ({
-  AddSalesmanModal: () => <div data-testid="add-salesman-modal" />,
+  AddSalesmanModal: ({ open }: { open: boolean }) =>
+    open ? <div data-testid="add-salesman-modal" /> : null,
 }));
 
 import { useGetSalesmen } from '@services/queries/useSalesmen';
@@ -155,8 +156,16 @@ describe('ManagerSalesmenPage', () => {
     expect(screen.getByText('carlos@outra.com')).toBeInTheDocument();
   });
 
-  it('renders the AddSalesmanModal', () => {
+  it('modal is closed by default', () => {
     render(<ManagerSalesmenPage />);
+    expect(screen.queryByTestId('add-salesman-modal')).not.toBeInTheDocument();
+  });
+
+  it('opens AddSalesmanModal when add salesman button is clicked', () => {
+    render(<ManagerSalesmenPage />);
+    fireEvent.click(
+      screen.getByRole('button', { name: /adicionar vendedor/i })
+    );
     expect(screen.getByTestId('add-salesman-modal')).toBeInTheDocument();
   });
 

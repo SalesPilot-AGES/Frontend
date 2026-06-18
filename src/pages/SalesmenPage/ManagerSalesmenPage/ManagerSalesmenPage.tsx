@@ -82,7 +82,7 @@ export const ManagerSalesmenPage = (): JSX.Element => {
           <Button
             startIcon={<AddIcon />}
             variant="gradient"
-            // TODO: Implementar funcionalidade de adicionar vendedor (FE-28)
+            onClick={() => setIsModalOpen(true)}
           >
             Adicionar vendedor
           </Button>
@@ -142,6 +142,7 @@ export const ManagerSalesmenPage = (): JSX.Element => {
       <AddSalesmanModal
         open={isModalOpen}
         handleClose={() => setIsModalOpen(false)}
+        variant="manager"
       />
     </PageContainter>
   );

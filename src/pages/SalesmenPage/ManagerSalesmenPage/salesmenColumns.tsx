@@ -1,7 +1,6 @@
-import { ECardLabel } from '@data/enums/ECardLabel';
 import type { DataTableProps } from '@declarations/ui';
 import { getSentimentConfig } from '@hooks/useSentiment';
-import ApartmentIcon from '@mui/icons-material/Apartment';
+import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
 import SentimentNeutralRoundedIcon from '@mui/icons-material/SentimentNeutralRounded';
 import SentimentSatisfiedAltRoundedIcon from '@mui/icons-material/SentimentSatisfiedAltRounded';
@@ -13,9 +12,6 @@ import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
 import type { JSX, ReactNode } from 'react';
 
 const formatSentimentPercentage = (value: number): string =>
-  `${Math.round(value * 100)}%`;
-
-export const formatAverageSentiment = (value: number): string =>
   `${Math.round(value * 100)}%`;
 
 const getSentimentIcon = (value: number): JSX.Element => {
@@ -42,7 +38,7 @@ const getSentimentColor = (
   return palette.neutrals[500];
 };
 
-export const buildSalesmenColumns = (
+export const buildManagerSalesmenColumns = (
   palette: Theme['palette']
 ): DataTableProps<TSalesmanWithCompany>['columns'] => [
   {
@@ -58,13 +54,11 @@ export const buildSalesmenColumns = (
     ),
   },
   {
-    header: ECardLabel.COMPANY_NAME,
-    accessor: (row: TSalesmanWithCompany) => row.company.name,
+    header: 'E-mail',
+    accessor: (row: TSalesmanWithCompany) => row.email,
     render: (value: ReactNode): JSX.Element => (
       <Stack direction="row" alignItems="center" spacing="0.5rem">
-        <ApartmentIcon
-          sx={{ color: palette.companies[500], fontSize: '1.5rem' }}
-        />
+        <EmailIcon sx={{ color: palette.neutrals[500], fontSize: '1.5rem' }} />
         <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
           {value ?? '-'}
         </Typography>

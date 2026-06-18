@@ -198,6 +198,8 @@ export const mapMeetingListItem = (
   };
 };
 
+export type TMeetingDetail = TMeetingContextMetadata;
+export type TMeetingTab = 'context' | 'insights' | 'action-plan';
 export type TMeetingsResponse = z.infer<typeof MeetingsResponseSchema>;
 export type TMeetingSummary = z.infer<typeof MeetingSummarySchema>;
 export type TMeetingContextMetadata = z.infer<

@@ -9,7 +9,6 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { TMeetingListItem } from '@services/models/MeetingSchema';
-import { useGetCompanies } from '@services/queries/useCompanies';
 import { useGetMeetings } from '@services/queries/useMeetings';
 import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
@@ -42,23 +41,14 @@ export const AdminMeetingsPage = (): JSX.Element => {
     [searchValue, filterValue]
   );
 
-  const { data: companiesPage } = useGetCompanies(0, 100);
   const { data, isLoading } = useGetMeetings(0, 20, filters);
 
   const meetings = useMemo(() => data?.content ?? [], [data?.content]);
   const summary = data?.summary;
 
-  const filteredMeetings = useMemo(() => {
-    if (!filterValue) {
-      return meetings;
-    }
-
-    return meetings.filter((meeting) => meeting.companyName === filterValue);
-  }, [meetings, filterValue]);
-
   const companyFilterOptions = useMemo(() => {
     const companyNames = Array.from(
-      new Set((companiesPage?.content ?? []).map((company) => company.name))
+      new Set(meetings.map((meeting) => meeting.companyName))
     )
       .filter((name) => name.trim().length > 0)
       .sort((a, b) => a.localeCompare(b, 'pt-BR'));
@@ -67,7 +57,7 @@ export const AdminMeetingsPage = (): JSX.Element => {
       { label: 'Todas', value: '' },
       ...companyNames.map((name) => ({ label: name, value: name })),
     ];
-  }, [companiesPage]);
+  }, [meetings]);
 
   const successRatePercent =
     summary != null ? Math.round(summary.success_rate * 100) : undefined;
@@ -177,7 +167,7 @@ export const AdminMeetingsPage = (): JSX.Element => {
         </Box>
 
         <DataTable
-          data={filteredMeetings}
+          data={meetings}
           columns={columns}
           getRowId={(row: TMeetingListItem) => row.id}
           loading={isLoading}

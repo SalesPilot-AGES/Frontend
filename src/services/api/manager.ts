@@ -8,6 +8,10 @@ import {
 } from '@services/models/ManagerSchema';
 
 import apiClient, { unwrapContent } from './apiClient';
+import {
+  type ApiMutationResponse,
+  getResponseMessage,
+} from './responseMessage';
 
 const normalizePayload = <T extends Record<string, unknown>>(payload: T): T => {
   return {
@@ -49,22 +53,30 @@ export const managerApi = {
     return ManagerSchema.parse(unwrapContent(response.data));
   },
 
-  createManager: async (payload: TManagerCreatePayload): Promise<TManager> => {
+  createManager: async (
+    payload: TManagerCreatePayload
+  ): Promise<ApiMutationResponse<TManager>> => {
     const response = await apiClient.post<TManager>(
       '/api/collaborators/managers',
       normalizePayload(payload)
     );
-    return ManagerSchema.parse(unwrapContent(response.data));
+    return {
+      content: ManagerSchema.parse(unwrapContent(response.data)),
+      message: getResponseMessage(response.data),
+    };
   },
 
   updateManager: async (
     uuid: string,
     payload: TManagerUpdatePayload
-  ): Promise<TManager> => {
+  ): Promise<ApiMutationResponse<TManager>> => {
     const response = await apiClient.put<TManager>(
       `/api/collaborators/managers/${uuid}`,
       normalizePayload(payload)
     );
-    return ManagerSchema.parse(unwrapContent(response.data));
+    return {
+      content: ManagerSchema.parse(unwrapContent(response.data)),
+      message: getResponseMessage(response.data),
+    };
   },
 };

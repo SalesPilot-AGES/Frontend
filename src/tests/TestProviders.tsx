@@ -3,6 +3,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { queryClient } from '@services/config/queryClient';
 import { QueryClientProvider } from '@tanstack/react-query';
 import theme from '@theme/Theme';
+import { ToastProvider } from '@UI/Toast/ToastProvider';
 import type { JSX, PropsWithChildren } from 'react';
 
 /**
@@ -19,11 +20,13 @@ import type { JSX, PropsWithChildren } from 'react';
  */
 export function TestProviders({ children }: PropsWithChildren): JSX.Element {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ToastProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ToastProvider>
   );
 }

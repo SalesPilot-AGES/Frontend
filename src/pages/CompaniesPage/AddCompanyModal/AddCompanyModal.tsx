@@ -55,8 +55,11 @@ export const AddCompanyModal = ({
   const { mutate: createCompany } = useCreateCompany();
 
   const onSubmit = (data: TCompanyCreatePayload): void => {
-    createCompany(data);
-    handleClose();
+    createCompany(data, {
+      onSuccess: () => {
+        handleClose();
+      },
+    });
   };
 
   return (

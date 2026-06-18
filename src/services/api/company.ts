@@ -11,6 +11,10 @@ import {
 } from '@services/models/CompanySchema';
 
 import apiClient, { unwrapContent } from './apiClient';
+import {
+  type ApiMutationResponse,
+  getResponseMessage,
+} from './responseMessage';
 
 export const companyApi = {
   getCompanies: async (
@@ -37,19 +41,27 @@ export const companyApi = {
     return CompanySchema.parse(unwrapContent(response.data));
   },
 
-  createCompany: async (payload: TCompanyCreatePayload): Promise<TCompany> => {
+  createCompany: async (
+    payload: TCompanyCreatePayload
+  ): Promise<ApiMutationResponse<TCompany>> => {
     const response = await apiClient.post('/api/companies', {
       ...payload,
       tax_id: payload.tax_id.replace(/\D/g, ''),
     });
-    return CompanySchema.parse(unwrapContent(response.data));
+    return {
+      content: CompanySchema.parse(unwrapContent(response.data)),
+      message: getResponseMessage(response.data),
+    };
   },
 
   updateCompany: async (
     uuid: string,
     payload: TCompanyUpdatePayload
-  ): Promise<TCompany> => {
+  ): Promise<ApiMutationResponse<TCompany>> => {
     const response = await apiClient.put(`/api/companies/${uuid}`, payload);
-    return CompanySchema.parse(unwrapContent(response.data));
+    return {
+      content: CompanySchema.parse(unwrapContent(response.data)),
+      message: getResponseMessage(response.data),
+    };
   },
 };

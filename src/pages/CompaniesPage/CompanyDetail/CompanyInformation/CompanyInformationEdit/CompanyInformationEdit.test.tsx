@@ -32,9 +32,7 @@ const draft = {
 describe('CompanyInformationEdit', () => {
   it('renders edit heading', () => {
     render(<CompanyInformationEdit draft={draft} setDraft={vi.fn()} />);
-    expect(
-      screen.getByText('Editar informações da empresa')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Informações da empresa')).toBeInTheDocument();
   });
 
   it('renders Cancelar and Salvar buttons', () => {

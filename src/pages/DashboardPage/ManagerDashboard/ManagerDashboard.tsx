@@ -2,9 +2,8 @@ import { ECardLabel } from '@data/enums/ECardLabel';
 import { EMeetingsByTitle } from '@data/enums/EMeetingsByTitle';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import { Box, Stack, useTheme } from '@mui/material';
+import { Box, Grid, Stack, useTheme } from '@mui/material';
 import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
-import { InsightChip } from '@pages/DashboardPage/components/InsightChip/InsightChip';
 import { MeetingsByChart } from '@pages/DashboardPage/components/MeetingsByChart/MeetingsByChart';
 import { MeetingsByMonthChart } from '@pages/DashboardPage/components/MeetingsByMonthChart/MeetingsByMonthChart';
 import { SalesmenStatusChart } from '@pages/DashboardPage/components/SalesmenStatusChart/SalesmenStatusChart';
@@ -21,7 +20,7 @@ import type { JSX } from 'react';
 import { useMemo } from 'react';
 
 export const ManagerDashboard = (): JSX.Element => {
-  const { palette, spacing } = useTheme();
+  const { palette } = useTheme();
   const { filters } = useDashboardFilterContext();
   const { data = [], isError, isLoading } = useGetMeetingsBySalesman(filters);
   const { data: dashboardMetrics } = useGetDashboardMetrics(filters);
@@ -36,16 +35,9 @@ export const ManagerDashboard = (): JSX.Element => {
     [data]
   );
 
-  const activeSalesmenMetric = dashboardMetrics?.salesmen ?? {
-    value: salesmenStatus?.active ?? 0,
-    variationPercentage: 0,
-    trend: 'neutral' as const,
-  };
-  const totalMeetingsMetric = dashboardMetrics?.total_meetings ?? {
-    value: 0,
-    variationPercentage: 0,
-    trend: 'neutral' as const,
-  };
+  const activeSalesmenValue =
+    dashboardMetrics?.salesmen.value ?? salesmenStatus?.active ?? 0;
+  const totalMeetingsValue = dashboardMetrics?.total_meetings.value ?? 0;
 
   return (
     <PageContainter>
@@ -55,68 +47,43 @@ export const ManagerDashboard = (): JSX.Element => {
           subtitle={EpageDescriptions.MANAGER_DASHBOARD}
         />
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(2, minmax(0, 1fr))',
-              lg: 'repeat(3, minmax(0, 1fr))',
-            },
-            gap: 2,
-          }}
-        >
-          <Box
+        <Grid container spacing={2}>
+          <Grid
+            size={{ xs: 12, sm: 6, lg: 4 }}
             data-testid="manager-dashboard-metric-card-active-salesmen"
-            sx={{ position: 'relative' }}
           >
             <StatCard
               iconName="salesman"
               theme="salesmen"
-              value={activeSalesmenMetric.value}
+              value={activeSalesmenValue}
               label={ECardLabel.ACTIVE_SALESMAN}
             />
-            <InsightChip
-              variationPercentage={activeSalesmenMetric.variationPercentage}
-              trend={activeSalesmenMetric.trend}
-              sx={{
-                position: 'absolute',
-                top: spacing(3),
-                right: spacing(3),
-              }}
-            />
-          </Box>
+          </Grid>
 
-          <Box data-testid="manager-dashboard-metric-card-inactive-salesmen">
+          <Grid
+            size={{ xs: 12, sm: 6, lg: 4 }}
+            data-testid="manager-dashboard-metric-card-inactive-salesmen"
+          >
             <StatCard
               iconName="salesman"
               theme="neutrals"
               value={salesmenStatus?.inactive ?? 0}
               label={ECardLabel.INACTIVE_SALESMAN}
             />
-          </Box>
+          </Grid>
 
-          <Box
+          <Grid
+            size={{ xs: 12, sm: 6, lg: 4 }}
             data-testid="manager-dashboard-metric-card-total-meetings"
-            sx={{ position: 'relative' }}
           >
             <StatCard
               iconName="meeting"
               theme="meetings"
-              value={totalMeetingsMetric.value}
+              value={totalMeetingsValue}
               label={ECardLabel.TOTAL_MEETINGS}
             />
-            <InsightChip
-              variationPercentage={totalMeetingsMetric.variationPercentage}
-              trend={totalMeetingsMetric.trend}
-              sx={{
-                position: 'absolute',
-                top: spacing(3),
-                right: spacing(3),
-              }}
-            />
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
 
         <Stack direction="row" spacing={2} sx={{ width: '100%' }}>
           <Box sx={{ flex: 1, minWidth: 0, height: '100%' }}>

@@ -27,9 +27,7 @@ export const StatCard = ({
 
   return (
     <Box
-      gap="0.75rem"
       width="100%"
-      height="fit-content"
       sx={{
         padding: '1.5rem',
         border: '1px solid',
@@ -39,17 +37,19 @@ export const StatCard = ({
         ...sx,
       }}
     >
-      <Stack gap="0.75rem" alignItems="left">
-        <IconBox iconName={iconName} theme={theme} />
+      <Stack gap="0.75rem">
+        <Stack direction="row" alignItems="center" gap="1rem">
+          <IconBox iconName={iconName} theme={theme} />
 
-        <Typography
-          fontSize="1.5rem"
-          fontWeight="600"
-          lineHeight="2rem"
-          color={valueColor ?? palette.neutrals[900]}
-        >
-          {value}
-        </Typography>
+          <Typography
+            fontSize="2rem"
+            fontWeight="600"
+            lineHeight="2.5rem"
+            color={valueColor ?? palette.neutrals[900]}
+          >
+            {value}
+          </Typography>
+        </Stack>
 
         <Typography
           fontSize="1rem"

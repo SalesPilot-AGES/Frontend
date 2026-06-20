@@ -1,4 +1,4 @@
-import { fireEvent,render, screen } from '@tests/testUtils';
+import { fireEvent, render, screen } from '@tests/testUtils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@tanstack/react-router', () => ({

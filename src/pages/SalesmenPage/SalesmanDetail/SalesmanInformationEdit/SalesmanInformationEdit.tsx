@@ -17,6 +17,7 @@ type ISalesmanInformationEditProps = {
   salesmanId: string;
   editForm: TSalesmanEditForm;
   companyOptions: TSalesmanCompanyOption[];
+  isCompanyEditable?: boolean;
   onFieldChange: (
     field: keyof Omit<TSalesmanEditForm, 'active'>,
     value: string
@@ -28,6 +29,7 @@ export const SalesmanInformationEdit = ({
   salesmanId,
   editForm,
   companyOptions,
+  isCompanyEditable = true,
   onFieldChange,
   onStatusChange,
 }: ISalesmanInformationEditProps): JSX.Element => {
@@ -64,6 +66,7 @@ export const SalesmanInformationEdit = ({
             value={editForm.companyId}
             onChange={(e) => onFieldChange('companyId', e.target.value)}
             fullWidth
+            disabled={!isCompanyEditable}
           >
             {companyOptions.map((option) => (
               <MenuItem key={option.id} value={option.id}>

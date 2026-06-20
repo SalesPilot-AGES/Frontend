@@ -29,7 +29,8 @@ export const SalesmanDetail = (): JSX.Element => {
   const { id } = useParams({ strict: false }) as { id: string };
   const { data: salesman, isLoading, isError } = useGetSalesmanById(id ?? null);
   const role = useCurrentUserRole();
-  const canEdit = role === 'admin';
+  const canEdit = role === 'admin' || role === 'manager';
+  const isAdmin = role === 'admin';
   const [isEditing, setIsEditing] = useState(false);
 
   const handleStartEdit = (): void => {
@@ -51,7 +52,7 @@ export const SalesmanDetail = (): JSX.Element => {
     salesman ?? null,
     isEditing,
     handleCancelEdit,
-    canEdit
+    isAdmin
   );
 
   if (isLoading) {
@@ -131,6 +132,7 @@ export const SalesmanDetail = (): JSX.Element => {
               salesmanId={salesman.id}
               editForm={editForm}
               companyOptions={companyOptions}
+              isCompanyEditable={isAdmin}
               onFieldChange={handleFieldChange}
               onStatusChange={handleStatusChange}
             />

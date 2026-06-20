@@ -12,6 +12,7 @@ import type { TMeetingDetail } from '@services/models/MeetingSchema';
 import { Link } from '@tanstack/react-router';
 import { StatCard } from '@UI/StatCard/StatCard';
 import {
+  formatClientSector,
   formatMeetingStatus,
   formatMeetingType,
   getAnalysisSentimentPercent,
@@ -105,7 +106,7 @@ export const MeetingDetailHeaderStats = ({
         <StatCard
           iconName="company"
           theme="primary"
-          value={meeting.client.sector || 'Não informado'}
+          value={formatClientSector(meeting.client.sector)}
           label="Setor do cliente"
           sx={statValueSx}
         />

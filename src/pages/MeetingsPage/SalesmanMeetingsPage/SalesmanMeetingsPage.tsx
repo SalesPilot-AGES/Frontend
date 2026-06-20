@@ -26,6 +26,7 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
   const { palette } = useTheme();
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
+  const [clientFilterValue, setClientFilterValue] = useState('');
 
   const filters = useMemo(
     () => ({
@@ -35,8 +36,29 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
   );
 
   const { data, isLoading } = useGetMeetings(0, 20, filters);
-  const meetings = data?.content ?? [];
+  const meetings = useMemo(() => data?.content ?? [], [data?.content]);
   const summary = data?.summary;
+  const filteredMeetings = useMemo(
+    () =>
+      clientFilterValue
+        ? meetings.filter((meeting) => meeting.clientId === clientFilterValue)
+        : meetings,
+    [clientFilterValue, meetings]
+  );
+  const clientFilterOptions = useMemo(() => {
+    const clients = Array.from(
+      new Map(
+        meetings.map((meeting) => [meeting.clientId, meeting.clientName])
+      ).entries()
+    ).sort(([, firstName], [, secondName]) =>
+      firstName.localeCompare(secondName, 'pt-BR')
+    );
+
+    return [
+      { label: 'Todos', value: '' },
+      ...clients.map(([id, name]) => ({ label: name, value: id })),
+    ];
+  }, [meetings]);
   const successRatePercent =
     summary != null ? Math.round(summary.success_rate * 100) : undefined;
   const sentimentConfig = getSentimentConfig(successRatePercent);
@@ -153,7 +175,7 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
         </Stack>
 
         <DataTable
-          data={meetings}
+          data={filteredMeetings}
           columns={columns}
           getRowId={(row) => row.id}
           loading={isLoading}
@@ -164,10 +186,15 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
             });
           }}
           onSearchChange={setSearchValue}
+          onFilterChange={setClientFilterValue}
           searchValue={searchValue}
+          filterValue={clientFilterValue}
           toolbarTitle="Lista de reuniões"
           searchPlaceholder="Buscar reunião..."
           searchAriaLabel="Buscar reunião"
+          filterPlaceholder="Selecionar cliente"
+          filterAriaLabel="Filtrar reuniões por cliente"
+          filterOptions={clientFilterOptions}
           sx={{
             border: `1px solid ${palette.neutrals[200]}`,
             flex: 1,

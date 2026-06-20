@@ -16,6 +16,16 @@ const SENTIMENT_LABELS: Record<string, string> = {
   negative: 'Negativo',
 };
 
+const CLIENT_SECTOR_LABELS: Record<string, string> = {
+  manufacturing: 'Indústria',
+  technology: 'Tecnologia',
+  education: 'Educação',
+  logistics: 'Logística',
+  retail: 'Varejo',
+  'financial services': 'Serviços financeiros',
+  consulting: 'Consultoria',
+};
+
 export const formatMeetingDate = (date: string): string =>
   new Intl.DateTimeFormat('pt-BR').format(new Date(date));
 
@@ -27,6 +37,12 @@ export const formatMeetingType = (meetingType: string): string =>
 
 export const formatSentimentLabel = (sentiment: string): string =>
   SENTIMENT_LABELS[sentiment.toLowerCase()] ?? sentiment;
+
+export const formatClientSector = (sector?: string): string => {
+  if (!sector?.trim()) return 'Não informado';
+
+  return CLIENT_SECTOR_LABELS[sector.trim().toLowerCase()] ?? sector;
+};
 
 export const getClientSentimentPercent = (
   sentiment?: number

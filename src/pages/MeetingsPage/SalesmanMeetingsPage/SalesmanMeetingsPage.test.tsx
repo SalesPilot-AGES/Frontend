@@ -29,11 +29,24 @@ describe('SalesmanMeetingsPage', () => {
             id: 'meeting-1',
             title: 'Apresentação do produto',
             sellerName: 'Vendedor',
+            clientId: 'client-1',
             clientName: 'Marcelo Yamaguti',
             companyName: 'PUCRS',
             sentiment: 8.6,
             date: '2026-03-20T10:00:00Z',
             durationMinutes: 105,
+            status: 'COMPLETED',
+          },
+          {
+            id: 'meeting-2',
+            title: 'Reunião de acompanhamento',
+            sellerName: 'Vendedor',
+            clientId: 'client-2',
+            clientName: 'Lucas Vaz',
+            companyName: 'Empresa Teste',
+            sentiment: 7.5,
+            date: '2026-03-21T10:00:00Z',
+            durationMinutes: 45,
             status: 'COMPLETED',
           },
         ],
@@ -53,7 +66,7 @@ describe('SalesmanMeetingsPage', () => {
     expect(screen.getByText(EPageTitles.MEETINGS)).toBeInTheDocument();
   });
 
-  it('renders salesman stats and columns without seller filter', () => {
+  it('renders salesman stats, columns and client filter', () => {
     render(<SalesmanMeetingsPage />);
 
     expect(screen.getByText('15')).toBeInTheDocument();
@@ -63,7 +76,23 @@ describe('SalesmanMeetingsPage', () => {
     expect(screen.getByText('Status')).toBeInTheDocument();
     expect(screen.getByText('Sentimento')).toBeInTheDocument();
     expect(screen.queryByText('Vendedor')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/filtrar/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Filtrar reuniões por cliente')
+    ).toBeInTheDocument();
+  });
+
+  it('filters meetings by client', () => {
+    render(<SalesmanMeetingsPage />);
+
+    fireEvent.mouseDown(screen.getByLabelText('Filtrar reuniões por cliente'));
+    fireEvent.click(screen.getByRole('option', { name: 'Lucas Vaz' }));
+
+    expect(
+      screen.getByLabelText('Ver detalhes de meeting-2')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText('Ver detalhes de meeting-1')
+    ).not.toBeInTheDocument();
   });
 
   it('searches by meeting title and navigates to details', () => {

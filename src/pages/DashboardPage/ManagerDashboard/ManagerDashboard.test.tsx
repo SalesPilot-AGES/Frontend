@@ -34,21 +34,11 @@ import { useDashboardAvgDuration } from '@store/hooks/useDashboardAvgDuration';
 
 import { ManagerDashboard } from './ManagerDashboard';
 
-const mockUseGetDashboardMetrics = useGetDashboardMetrics as ReturnType<
-  typeof vi.fn
->;
-const mockUseGetMeetingsBySalesman = useGetMeetingsBySalesman as ReturnType<
-  typeof vi.fn
->;
-const mockUseGetMeetingsByMonth = useGetMeetingsByMonth as ReturnType<
-  typeof vi.fn
->;
-const mockUseGetSalesmenStatus = useGetSalesmenStatus as ReturnType<
-  typeof vi.fn
->;
-const mockUseDashboardAvgDuration = useDashboardAvgDuration as ReturnType<
-  typeof vi.fn
->;
+const mockUseGetDashboardMetrics = vi.mocked(useGetDashboardMetrics);
+const mockUseGetMeetingsBySalesman = vi.mocked(useGetMeetingsBySalesman);
+const mockUseGetMeetingsByMonth = vi.mocked(useGetMeetingsByMonth);
+const mockUseGetSalesmenStatus = vi.mocked(useGetSalesmenStatus);
+const mockUseDashboardAvgDuration = vi.mocked(useDashboardAvgDuration);
 
 describe('ManagerDashboard', () => {
   beforeEach(() => {
@@ -64,11 +54,6 @@ describe('ManagerDashboard', () => {
           variationPercentage: 0,
           trend: 'neutral',
         },
-        salesmen: {
-          value: 8,
-          variationPercentage: 12,
-          trend: 'up',
-        },
         total_meetings: {
           value: 42,
           variationPercentage: -5,
@@ -77,27 +62,27 @@ describe('ManagerDashboard', () => {
       },
       isError: false,
       isLoading: false,
-    });
+    } as unknown as ReturnType<typeof useGetDashboardMetrics>);
     mockUseGetMeetingsBySalesman.mockReturnValue({
       data: [],
       isError: false,
       isLoading: false,
-    });
+    } as unknown as ReturnType<typeof useGetMeetingsBySalesman>);
     mockUseGetMeetingsByMonth.mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
-    });
+    } as unknown as ReturnType<typeof useGetMeetingsByMonth>);
     mockUseGetSalesmenStatus.mockReturnValue({
       data: { active: 8, inactive: 2 },
       isLoading: false,
       isError: false,
-    });
+    } as unknown as ReturnType<typeof useGetSalesmenStatus>);
     mockUseDashboardAvgDuration.mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
-    });
+    } as unknown as ReturnType<typeof useDashboardAvgDuration>);
   });
 
   it('renders manager dashboard title', () => {

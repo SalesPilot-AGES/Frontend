@@ -35,9 +35,8 @@ export const ManagerDashboard = (): JSX.Element => {
     [data]
   );
 
-  const activeSalesmenValue =
-    dashboardMetrics?.salesmen.value ?? salesmenStatus?.active ?? 0;
-  const totalMeetingsValue = dashboardMetrics?.total_meetings.value ?? 0;
+  const activeSalesmenValue = salesmenStatus?.active ?? 0;
+  const totalMeetingsValue = dashboardMetrics?.total_meetings?.value ?? 0;
 
   return (
     <PageContainter>

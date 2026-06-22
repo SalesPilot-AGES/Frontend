@@ -1,5 +1,6 @@
 import BusinessIcon from '@mui/icons-material/Business';
 import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
 import { Box } from '@mui/material';
 import type { TSalesman } from '@services/models/SalesmanSchema';
 import { ItemDetail } from '@UI/ItemDetail/ItemDetail';
@@ -40,6 +41,12 @@ export const SalesmanInformationView = ({
       label="Email de acesso"
       value={salesman.email}
       icon={<EmailIcon fontSize="small" />}
+    />
+
+    <ItemDetail
+      label="Telefone"
+      value={salesman.phone || 'Não informado'}
+      icon={<PhoneIcon fontSize="small" />}
     />
   </Box>
 );

@@ -13,6 +13,7 @@ import {
 import { PageNotFound } from '@pages/PageNotFound/PageNotFound';
 import { useGetSalesmanById } from '@services/queries/useSalesmen';
 import { useAdminSalesmenDetailsEdit } from '@store/hooks/useAdminSalesmenDetailsEdit';
+import { useCurrentUserRole } from '@store/hooks/useCurrentUser';
 import { Link, useParams } from '@tanstack/react-router';
 import { EntityDetailsCard } from '@UI/EntityDetailsCard/EntityDetailsCard';
 import { IconBox } from '@UI/IconBox/IconBox';
@@ -27,6 +28,8 @@ export const SalesmanDetail = (): JSX.Element => {
   const { palette } = useTheme();
   const { id } = useParams({ strict: false }) as { id: string };
   const { data: salesman, isLoading, isError } = useGetSalesmanById(id ?? null);
+  const role = useCurrentUserRole();
+  const canEdit = role === 'admin';
   const [isEditing, setIsEditing] = useState(false);
 
   const handleStartEdit = (): void => {
@@ -47,7 +50,8 @@ export const SalesmanDetail = (): JSX.Element => {
   } = useAdminSalesmenDetailsEdit(
     salesman ?? null,
     isEditing,
-    handleCancelEdit
+    handleCancelEdit,
+    canEdit
   );
 
   if (isLoading) {
@@ -97,7 +101,7 @@ export const SalesmanDetail = (): JSX.Element => {
 
         <EntityDetailsCard
           title={EPageTitles.SALESMAN_INFORMATION}
-          onEdit={isEditing ? undefined : handleStartEdit}
+          onEdit={isEditing || !canEdit ? undefined : handleStartEdit}
           headerRight={
             isEditing ? (
               <Box

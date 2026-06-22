@@ -50,7 +50,8 @@ export const SalesmanDetail = (): JSX.Element => {
   } = useAdminSalesmenDetailsEdit(
     salesman ?? null,
     isEditing,
-    handleCancelEdit
+    handleCancelEdit,
+    canEdit
   );
 
   if (isLoading) {

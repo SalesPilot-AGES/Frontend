@@ -35,7 +35,11 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
     [searchValue]
   );
 
-  const { data, isLoading } = useGetMeetings(0, 20, filters);
+  // O filtro de cliente (clientFilterValue) é aplicado client-side abaixo porque
+  // a API só suporta filtro por clientCompanyName, não por clientId individual.
+  // Buscamos um tamanho de página maior para reduzir a chance do filtro
+  // esconder reuniões que estão fora da primeira página.
+  const { data, isLoading } = useGetMeetings(0, 100, filters);
   const meetings = useMemo(() => data?.content ?? [], [data?.content]);
   const summary = data?.summary;
   const filteredMeetings = useMemo(

@@ -103,7 +103,7 @@ describe('SalesmanMeetingsPage', () => {
     });
     fireEvent.click(screen.getByLabelText('Ver detalhes de meeting-1'));
 
-    expect(mockUseGetMeetings).toHaveBeenLastCalledWith(0, 20, {
+    expect(mockUseGetMeetings).toHaveBeenLastCalledWith(0, 100, {
       search: 'produto',
     });
     expect(mockNavigate).toHaveBeenCalledWith({

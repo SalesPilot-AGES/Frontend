@@ -44,6 +44,7 @@ export const formatClientSector = (sector?: string): string => {
   return CLIENT_SECTOR_LABELS[sector.trim().toLowerCase()] ?? sector;
 };
 
+// client.overall_sentiment vem da API em escala 0-10 (ex.: 8 = 80%).
 export const getClientSentimentPercent = (
   sentiment?: number
 ): number | undefined => {
@@ -52,6 +53,7 @@ export const getClientSentimentPercent = (
   return Math.round(sentiment <= 10 ? sentiment * 10 : sentiment);
 };
 
+// sentiment_analysis.score vem da API em escala 0-1 (ex.: 0.86 = 86%).
 export const getAnalysisSentimentPercent = (
   sentiment?: number
 ): number | undefined => {

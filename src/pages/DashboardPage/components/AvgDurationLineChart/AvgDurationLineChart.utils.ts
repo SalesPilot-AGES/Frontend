@@ -42,3 +42,11 @@ export const formatDuration = (value: number): string => {
 
   return `${hourText} e ${pluralize(minutes, 'minuto', 'minutos')}`;
 };
+
+export const formatDurationSecondsAsMinutes = (
+  durationSeconds: number
+): string => {
+  const roundedMinutes = Math.max(0, Math.round(durationSeconds / 60));
+
+  return `${roundedMinutes} min`;
+};

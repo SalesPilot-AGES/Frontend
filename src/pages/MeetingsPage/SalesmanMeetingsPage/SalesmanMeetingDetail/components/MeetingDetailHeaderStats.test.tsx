@@ -1,7 +1,5 @@
-import { useTheme } from '@mui/material/styles';
 import type { TMeetingDetail } from '@services/models/MeetingSchema';
 import { render, screen } from '@tests/testUtils';
-import type { JSX } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MeetingDetailHeaderStats } from './MeetingDetailHeaderStats';
@@ -37,23 +35,11 @@ const mockMeeting: TMeetingDetail = {
   },
 };
 
-const HeaderStatsTestHarness = (): JSX.Element => {
-  const { palette } = useTheme();
-
-  return (
-    <MeetingDetailHeaderStats
-      meeting={mockMeeting}
-      sentimentScore={0.9}
-      palette={palette}
-      themePalette={palette}
-      responsiveValueFontSize="1rem"
-    />
-  );
-};
-
 describe('MeetingDetailHeaderStats', () => {
   it('renders meeting title and status', () => {
-    render(<HeaderStatsTestHarness />);
+    render(
+      <MeetingDetailHeaderStats meeting={mockMeeting} sentimentScore={0.9} />
+    );
 
     expect(screen.getByText('Reunião de descoberta')).toBeInTheDocument();
     expect(screen.getByText('Agendada')).toBeInTheDocument();

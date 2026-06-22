@@ -43,7 +43,11 @@ export const ManagerMeetingsPage = (): JSX.Element => {
   );
 
   const { data: salesmenPage } = useGetSalesmen(0, 100, {});
-  const { data, isLoading } = useGetMeetings(0, 20, filters);
+  // O filtro de vendedor (filterValue) é aplicado client-side abaixo porque
+  // a API só suporta filtro por título/empresa, não por vendedor. Buscamos
+  // um tamanho de página maior para reduzir a chance do filtro esconder
+  // reuniões que estão fora da primeira página.
+  const { data, isLoading } = useGetMeetings(0, 100, filters);
 
   const meetings = useMemo(() => data?.content ?? [], [data?.content]);
   const summary = data?.summary;

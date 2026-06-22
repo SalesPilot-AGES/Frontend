@@ -34,10 +34,6 @@ export const MeetingDetailTabsContent = ({
   currentTab,
   onTabChange,
 }: TMeetingDetailTabsContentProps): JSX.Element => {
-  const actionItemsFromApi =
-    meetingPostAnalysis?.action_plan ?? meetingPostAnalysis?.action_items;
-  const actionItemsToRender = actionItemsFromApi ?? [];
-
   return (
     <Box
       sx={{
@@ -75,13 +71,7 @@ export const MeetingDetailTabsContent = ({
       </Box>
 
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        {currentTab === 'context' && (
-          <MeetingContext
-            meeting={meeting}
-            summary={meetingPostAnalysis?.summary || null}
-            isSummaryLoading={isMeetingPostAnalysisLoading}
-          />
-        )}
+        {currentTab === 'context' && <MeetingContext meeting={meeting} />}
 
         {currentTab === 'insights' && (
           <MeetingInsights
@@ -92,7 +82,7 @@ export const MeetingDetailTabsContent = ({
 
         {currentTab === 'action-plan' && (
           <MeetingActionPlan
-            actionItems={actionItemsToRender}
+            postAnalysis={meetingPostAnalysis}
             isLoading={isMeetingPostAnalysisLoading}
           />
         )}

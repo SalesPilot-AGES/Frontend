@@ -170,7 +170,10 @@ export type TMeetingListItem = {
   title: string;
 
   sellerName: string;
+  clientId: string;
+  clientName: string;
   companyName: string;
+  sentiment?: number;
 
   date: string;
   durationMinutes: number;
@@ -189,7 +192,10 @@ export const mapMeetingListItem = (
     title: row.title,
 
     sellerName: row.seller.name,
+    clientId: row.client.id,
+    clientName: row.client.name,
     companyName: row.client.client_company_name,
+    sentiment: row.client.overall_sentiment,
 
     date: row.scheduled_for,
     durationMinutes: Math.round(row.duration_seconds / 60),

@@ -26,6 +26,11 @@ export const MeetingInsights = ({
   isLoading,
 }: TMeetingInsightsProps): JSX.Element => {
   const { palette } = useTheme();
+  const orderedInsights = [...insights].sort(
+    (first, second) =>
+      new Date(first.created_at).getTime() -
+      new Date(second.created_at).getTime()
+  );
 
   return (
     <Stack
@@ -51,9 +56,9 @@ export const MeetingInsights = ({
         >
           <CircularProgress size={24} />
         </Box>
-      ) : insights.length > 0 ? (
+      ) : orderedInsights.length > 0 ? (
         <Stack spacing={2}>
-          {insights.map((insight) => (
+          {orderedInsights.map((insight) => (
             <Box
               key={insight.id}
               sx={{

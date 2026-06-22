@@ -4,8 +4,6 @@ import { type JSX } from 'react';
 
 type TMeetingContextProps = {
   meeting: TMeetingDetail;
-  summary: string | null;
-  isSummaryLoading: boolean;
 };
 
 type TContextSectionProps = {
@@ -37,12 +35,10 @@ const ContextSection = ({
 
 export const MeetingContext = ({
   meeting,
-  summary,
-  isSummaryLoading,
 }: TMeetingContextProps): JSX.Element => {
-  const summaryText = isSummaryLoading
-    ? 'Carregando resumo da reunião...'
-    : resolveText(summary || null);
+  const preAnalysis = meeting.pre_analysis;
+  const keyPoints = preAnalysis?.key_points?.join(' • ');
+  const possibleObjections = preAnalysis?.possible_objections?.join(' • ');
 
   return (
     <Stack
@@ -56,6 +52,14 @@ export const MeetingContext = ({
       </Typography>
 
       <Stack spacing={2}>
+        <ContextSection
+          label="Cliente"
+          value={`${meeting.client.name} — ${meeting.client.client_company_name}`}
+        />
+        <ContextSection
+          label="Participantes"
+          value={`${meeting.client.name} (cliente) e ${meeting.seller.name} (vendedor)`}
+        />
         <ContextSection
           label="Objetivos"
           value={resolveText(meeting.objective)}
@@ -72,7 +76,22 @@ export const MeetingContext = ({
           label="Concorrentes"
           value={resolveText(meeting.competitors_involved)}
         />
-        <ContextSection label="Resumo / Transcrição" value={summaryText} />
+        {preAnalysis ? (
+          <>
+            <ContextSection
+              label="Estratégia recomendada"
+              value={resolveText(preAnalysis.recommended_strategy?.focus)}
+            />
+            <ContextSection
+              label="Pontos-chave da pré-análise"
+              value={resolveText(keyPoints)}
+            />
+            <ContextSection
+              label="Possíveis objeções"
+              value={resolveText(possibleObjections)}
+            />
+          </>
+        ) : null}
       </Stack>
     </Stack>
   );

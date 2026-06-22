@@ -43,30 +43,21 @@ const mockMeeting: TMeetingDetail = {
 
 describe('MeetingContext', () => {
   it('renders context sections and summary', () => {
-    render(
-      <MeetingContext
-        meeting={mockMeeting}
-        summary="Resumo de teste"
-        isSummaryLoading={false}
-      />
-    );
+    render(<MeetingContext meeting={mockMeeting} />);
 
+    expect(screen.getByText('Cliente')).toBeInTheDocument();
+    expect(screen.getByText('Participantes')).toBeInTheDocument();
     expect(screen.getByText('Objetivos')).toBeInTheDocument();
     expect(screen.getByText('Dores')).toBeInTheDocument();
     expect(screen.getByText('Interações anteriores')).toBeInTheDocument();
     expect(screen.getByText('Concorrentes')).toBeInTheDocument();
-    expect(screen.getByText('Resumo / Transcrição')).toBeInTheDocument();
-    expect(screen.getByText('Resumo de teste')).toBeInTheDocument();
+    expect(screen.getByText('Estratégia recomendada')).toBeInTheDocument();
+    expect(screen.getByText('Pontos-chave da pré-análise')).toBeInTheDocument();
+    expect(screen.getByText('Possíveis objeções')).toBeInTheDocument();
   });
 
-  it('renders fallback summary when summary is unavailable', () => {
-    render(
-      <MeetingContext
-        meeting={mockMeeting}
-        summary={null}
-        isSummaryLoading={false}
-      />
-    );
+  it('renders fallback text when context information is unavailable', () => {
+    render(<MeetingContext meeting={{ ...mockMeeting, objective: null }} />);
 
     expect(screen.getByText('Não informado.')).toBeInTheDocument();
   });

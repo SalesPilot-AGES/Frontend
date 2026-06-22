@@ -5,7 +5,6 @@ import { EPageTitles } from '@data/enums/EPageTitles';
 import { Box, Stack, useTheme } from '@mui/material';
 import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
 import { CompaniesStatusChart } from '@pages/DashboardPage/components/CompaniesStatusChart/CompaniesStatusChart';
-import { InsightChip } from '@pages/DashboardPage/components/InsightChip/InsightChip';
 import { MeetingsByChart } from '@pages/DashboardPage/components/MeetingsByChart/MeetingsByChart';
 import { MeetingsByMonthChart } from '@pages/DashboardPage/components/MeetingsByMonthChart/MeetingsByMonthChart';
 import { useDashboardFilterContext } from '@pages/DashboardPage/context/DashboardFilterContext';
@@ -68,7 +67,7 @@ const getMetricValue = (
   };
 
 export const AdminDashboard = (): JSX.Element => {
-  const { palette, spacing } = useTheme();
+  const { palette } = useTheme();
   const { filters } = useDashboardFilterContext();
   const { data = [], isError, isLoading } = useGetMeetingsByCompany(filters);
   const { data: dashboardMetrics } = useGetDashboardMetrics(filters);
@@ -108,22 +107,12 @@ export const AdminDashboard = (): JSX.Element => {
               <Box
                 key={config.key}
                 data-testid={`dashboard-metric-card-${config.key}`}
-                sx={{ position: 'relative' }}
               >
                 <StatCard
                   iconName={config.iconName}
                   theme={config.iconTheme}
                   value={metric.value}
                   label={config.label}
-                />
-                <InsightChip
-                  variationPercentage={metric.variationPercentage}
-                  trend={metric.trend}
-                  sx={{
-                    position: 'absolute',
-                    top: spacing(3),
-                    right: spacing(3),
-                  }}
                 />
               </Box>
             );

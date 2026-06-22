@@ -52,8 +52,7 @@ describe('StatCard Component', () => {
 
   it('merges custom sx on root box', () => {
     render(<StatCard {...defaultProps} sx={{ maxWidth: '18rem' }} />);
-    const stack = screen.getByText('4').closest('[class*="MuiStack"]');
-    const root = stack?.parentElement as HTMLElement;
+    const root = screen.getByText('4').closest('[class*="MuiBox"]');
     expect(root).toHaveStyle({ maxWidth: '18rem' });
   });
 

@@ -107,11 +107,6 @@ export const DashboardMetricsResponseSchema = z
     return metrics;
   });
 
-export const DashboardMetricsSchema = z.partialRecord(
-  DashboardMetricKeySchema,
-  DashboardMetricApiSchema
-);
-
 const MeetingsByCompanyItemApiSchema = z.object({
   company_name: z.string().trim().min(1),
   total_meetings: z.number().int().nonnegative().optional(),

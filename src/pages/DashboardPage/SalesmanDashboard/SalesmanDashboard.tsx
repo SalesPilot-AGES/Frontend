@@ -3,6 +3,7 @@ import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import type { TColorThemeOptions } from '@declarations/hooks';
 import type { TIconName } from '@declarations/ui';
+import { getSentimentConfig } from '@hooks/useSentiment';
 import { Box, Grid, Stack } from '@mui/material';
 import { AvgDurationLineChart } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart';
 import { formatDurationSecondsAsMinutes } from '@pages/DashboardPage/components/AvgDurationLineChart/AvgDurationLineChart.utils';
@@ -33,8 +34,6 @@ const defaultMetric: TDashboardMetric = {
   trend: 'neutral',
 };
 
-const mockedAverageSentiment = 90;
-
 const metricCardConfig: readonly TSalesmanMetricCardConfig[] = [
   {
     key: 'total_meetings',
@@ -54,12 +53,17 @@ const metricCardConfig: readonly TSalesmanMetricCardConfig[] = [
 
 const getMetricValue = (
   metrics: TDashboardMetrics | undefined,
-  metricKey: TSalesmanMetricCardConfig['key']
+  metricKey: TDashboardMetricKey
 ): TDashboardMetric => metrics?.[metricKey] ?? defaultMetric;
 
 export const SalesmanDashboard = (): JSX.Element => {
   const { filters } = useDashboardFilterContext();
   const { data: dashboardMetrics } = useGetDashboardMetrics(filters);
+  const averageSentiment = getMetricValue(
+    dashboardMetrics,
+    'average_sentiment'
+  );
+  const sentimentConfig = getSentimentConfig(averageSentiment.value);
 
   return (
     <PageContainter>
@@ -94,9 +98,9 @@ export const SalesmanDashboard = (): JSX.Element => {
             data-testid="salesman-dashboard-metric-card-average_sentiment"
           >
             <StatCard
-              iconName="sentimentHappy"
-              theme="success"
-              value={`${mockedAverageSentiment}%`}
+              iconName={sentimentConfig.iconName}
+              theme={sentimentConfig.theme}
+              value={`${averageSentiment.value}%`}
               label={ECardLabel.AVERAGE_FEELING}
             />
           </Grid>

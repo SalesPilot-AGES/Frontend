@@ -54,6 +54,11 @@ describe('SalesmanDashboard', () => {
           variationPercentage: 8,
           trend: 'up',
         },
+        average_sentiment: {
+          value: 90,
+          variationPercentage: 0,
+          trend: 'neutral',
+        },
       },
       isError: false,
       isLoading: false,

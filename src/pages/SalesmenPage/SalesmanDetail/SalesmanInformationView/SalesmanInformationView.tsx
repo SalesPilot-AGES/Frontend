@@ -43,12 +43,10 @@ export const SalesmanInformationView = ({
       icon={<EmailIcon fontSize="small" />}
     />
 
-    {salesman.phone && (
-      <ItemDetail
-        label="Telefone"
-        value={salesman.phone}
-        icon={<PhoneIcon fontSize="small" />}
-      />
-    )}
+    <ItemDetail
+      label="Telefone"
+      value={salesman.phone || 'Não informado'}
+      icon={<PhoneIcon fontSize="small" />}
+    />
   </Box>
 );

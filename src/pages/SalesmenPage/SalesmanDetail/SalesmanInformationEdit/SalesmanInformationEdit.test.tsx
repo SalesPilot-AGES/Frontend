@@ -1,4 +1,4 @@
-import { render, screen } from '@tests/testUtils';
+import { fireEvent, render, screen } from '@tests/testUtils';
 import { describe, expect, it, vi } from 'vitest';
 
 import { SalesmanInformationEdit } from './SalesmanInformationEdit';
@@ -90,11 +90,8 @@ describe('SalesmanInformationEdit', () => {
       />
     );
     const nameInput = screen.getByDisplayValue('João Silva');
-    nameInput.focus();
-    screen
-      .getByDisplayValue('João Silva')
-      .dispatchEvent(new Event('change', { bubbles: true }));
-    // Interaction is tested via RTL fireEvent in integration — here we verify the handler is wired
-    expect(nameInput).toBeInTheDocument();
+    fireEvent.change(nameInput, { target: { value: 'Maria Souza' } });
+
+    expect(onFieldChange).toHaveBeenCalledWith('name', 'Maria Souza');
   });
 });

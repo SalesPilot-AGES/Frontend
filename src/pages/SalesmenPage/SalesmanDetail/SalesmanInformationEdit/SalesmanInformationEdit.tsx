@@ -57,24 +57,25 @@ export const SalesmanInformationEdit = ({
           />
         </Box>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Empresa
-          </Typography>
-          <TextField
-            select
-            value={editForm.companyId}
-            onChange={(e) => onFieldChange('companyId', e.target.value)}
-            fullWidth
-            disabled={!isCompanyEditable}
-          >
-            {companyOptions.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
+        {isCompanyEditable && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Empresa
+            </Typography>
+            <TextField
+              select
+              value={editForm.companyId}
+              onChange={(e) => onFieldChange('companyId', e.target.value)}
+              fullWidth
+            >
+              {companyOptions.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+        )}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>

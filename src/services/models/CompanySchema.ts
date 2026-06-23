@@ -17,6 +17,8 @@ export const CompanySchema = z.object({
     }),
   plan: z.enum(['BASIC', 'PRO', 'ENTERPRISE']),
   active: z.boolean(),
+  phone: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
   created_at: z.string().optional(),
 });
 

@@ -14,6 +14,7 @@ import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatCard } from '@UI/StatCard/StatCard';
+import { normalizeText } from '@utils/normalizeText';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -34,13 +35,13 @@ export const ManagerSalesmenPage = (): JSX.Element => {
   );
 
   const filteredSalesmen = useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
+    const query = normalizeText(searchValue.trim());
     return salesmen.filter((salesman) => {
       if (filterValue === 'true' && !salesman.active) return false;
       if (filterValue === 'false' && salesman.active) return false;
       if (query.length === 0) return true;
-      const nameMatch = salesman.name.toLowerCase().includes(query);
-      const emailMatch = salesman.email.toLowerCase().includes(query);
+      const nameMatch = normalizeText(salesman.name).includes(query);
+      const emailMatch = normalizeText(salesman.email).includes(query);
       return nameMatch || emailMatch;
     });
   }, [salesmen, searchValue, filterValue]);

@@ -1,4 +1,10 @@
-import { Box, Button, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  Typography,
+} from '@mui/material';
 import Modal from '@mui/material/Modal';
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import { ModalHeader } from '@UI/AppModal/ModalHeader/ModalHeader';
@@ -11,6 +17,7 @@ export interface IAppModalProps {
   handleSubmit: () => void;
   children: JSX.Element;
   isSaveButtonDisabled?: boolean;
+  isSubmitting?: boolean;
 }
 
 export const AppModal = ({
@@ -20,6 +27,7 @@ export const AppModal = ({
   handleClose,
   handleSubmit,
   isSaveButtonDisabled,
+  isSubmitting,
 }: IAppModalProps): JSX.Element => {
   return (
     <Modal open={open} onClose={handleClose}>
@@ -55,14 +63,22 @@ export const AppModal = ({
             variant="outlined"
             onClick={handleClose}
             startIcon={GetAppIcon('close')}
+            disabled={isSubmitting}
           >
             <Typography variant="body1">{'Cancelar'}</Typography>
           </Button>
           <Button
-            startIcon={GetAppIcon('save')}
+            startIcon={
+              isSubmitting ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                GetAppIcon('save')
+              )
+            }
             variant="contained"
-            disabled={isSaveButtonDisabled}
+            disabled={isSaveButtonDisabled || isSubmitting}
             onClick={() => {
+              if (isSubmitting) return;
               void handleSubmit();
             }}
           >

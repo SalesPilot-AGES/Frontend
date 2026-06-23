@@ -21,6 +21,7 @@ import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
+import { normalizeText } from '@utils/normalizeText';
 import type { JSX, ReactNode } from 'react';
 import React, { useMemo, useState } from 'react';
 
@@ -58,13 +59,13 @@ export const CompaniesPage = (): JSX.Element => {
   );
 
   const filteredCompanies = useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
+    const query = normalizeText(searchValue.trim());
     return companies.filter((company) => {
       if (filterValue === 'true' && !company.active) return false;
       if (filterValue === 'false' && company.active) return false;
       if (query.length === 0) return true;
-      const nameMatch = company.name.toLowerCase().includes(query);
-      const taxIdMatch = company.tax_id.toLowerCase().includes(query);
+      const nameMatch = normalizeText(company.name).includes(query);
+      const taxIdMatch = normalizeText(company.tax_id).includes(query);
       return nameMatch || taxIdMatch;
     });
   }, [companies, searchValue, filterValue]);

@@ -10,6 +10,7 @@ import type {
 } from '@declarations/ui';
 import type { Palette } from '@mui/material/styles';
 import { alpha, useTheme } from '@mui/material/styles';
+import { normalizeText } from '@utils/normalizeText';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
@@ -114,10 +115,7 @@ export const chipLookFromValue = (
   palette: Palette
 ): BadgeLook => {
   const raw = String(value ?? '').trim();
-  const normalized = raw
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+  const normalized = normalizeText(raw);
 
   if (/^ativo|active|enabled/.test(normalized)) {
     return scaleBgFg(

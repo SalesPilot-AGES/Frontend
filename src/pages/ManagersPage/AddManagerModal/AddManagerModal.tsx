@@ -53,9 +53,11 @@ export const AddManagerModal = ({
     }
   }, [open, reset]);
 
-  const { mutate: createManager } = useCreateManager();
+  const { mutate: createManager, isPending } = useCreateManager();
 
   const onSubmit = (data: TManagerCreatePayload): void => {
+    if (isPending) return;
+
     createManager(data, {
       onSuccess: () => {
         handleClose();
@@ -69,6 +71,7 @@ export const AddManagerModal = ({
       open={open}
       handleClose={handleClose}
       handleSubmit={handleSubmit(onSubmit)}
+      isSubmitting={isPending}
     >
       <Box
         sx={{

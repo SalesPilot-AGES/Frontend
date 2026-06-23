@@ -14,6 +14,8 @@ export const CompanyInformationView = ({
   tax_id,
   plan,
   active,
+  address,
+  phone,
 }: CompanyInformationValues): JSX.Element => (
   <Box
     sx={{
@@ -32,7 +34,7 @@ export const CompanyInformationView = ({
     </ItemDetail>
     <ItemDetail
       label="Endereço"
-      value="Rua Exemplo, 123"
+      value={address || 'Não informado'}
       icon={<LocationOnOutlinedIcon fontSize="small" />}
     />
     <ItemDetail label="Status">
@@ -42,7 +44,7 @@ export const CompanyInformationView = ({
     </ItemDetail>
     <ItemDetail
       label="Telefone"
-      value="99999-9999"
+      value={phone || 'Não informado'}
       icon={<PhoneOutlinedIcon fontSize="small" />}
     />
   </Box>

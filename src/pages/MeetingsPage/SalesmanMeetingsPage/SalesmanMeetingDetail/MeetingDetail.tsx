@@ -20,12 +20,12 @@ import { MeetingDetailTabsContent } from './components/MeetingDetailTabsContent'
 export const MeetingDetail = (): JSX.Element => {
   const { meetingId } = useParams({ strict: false }) as { meetingId: string };
   const search = useSearch({
-    from: '/protected/reuniões/$meetingId',
+    from: '/protected/reunioes/$meetingId',
   });
 
   const currentTab = (search.tab || 'context') as TMeetingTab;
   const navigate = useNavigate({
-    from: '/reuniões/$meetingId',
+    from: '/reunioes/$meetingId',
   });
 
   const {

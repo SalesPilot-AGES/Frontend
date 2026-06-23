@@ -1,18 +1,15 @@
-import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import type { SxProps, Theme } from '@mui/material';
-import {
-  Box,
-  InputAdornment,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import type { Palette } from '@mui/material/styles';
 import type { JSX } from 'react';
 
-import type { DataTableFilterOption } from '../../../types/ui';
+import type {
+  DataTableFilterOption,
+  FilterGroup,
+  FilterType,
+} from '../../../types/ui';
+import { AdvancedFilter } from '../AdvancedFilter/AdvancedFilter';
+import { SearchInput } from '../SearchInput/SearchInput';
+import { SimpleFilter } from '../SimpleFilter/SimpleFilter';
 import type { DataTableSurfaceColors } from '../useDataTable';
 
 export interface IDataTableToolbarProps {
@@ -22,12 +19,19 @@ export interface IDataTableToolbarProps {
   onSearchChange?: (value: string) => void;
   searchPlaceholder: string;
   searchAriaLabel: string;
+  filterType?: FilterType;
   showFilter: boolean;
   filterValue?: string;
   onFilterChange?: (value: string) => void;
   filterOptions: DataTableFilterOption[];
   filterPlaceholder: string;
   filterAriaLabel: string;
+  filterGroups?: FilterGroup[];
+  selectedFilters?: Record<string, string[]>;
+  onFilterChangeAdvanced?: (groupId: string, selectedValues: string[]) => void;
+  onClearFilters?: () => void;
+  filterLabel?: string;
+  filterPlaceholderAdvanced?: string;
   showCompanyFilter: boolean;
   companyFilterValue?: string;
   onCompanyFilterChange?: (value: string) => void;
@@ -45,12 +49,19 @@ export const DataTableToolbar = ({
   onSearchChange,
   searchPlaceholder,
   searchAriaLabel,
+  filterType = 'simple',
   showFilter,
   filterValue,
   onFilterChange,
   filterOptions,
   filterPlaceholder,
   filterAriaLabel,
+  filterGroups = [],
+  selectedFilters = {},
+  onFilterChangeAdvanced,
+  onClearFilters,
+  filterLabel = 'Filtros',
+  filterPlaceholderAdvanced = 'Filtrar',
   showCompanyFilter,
   companyFilterValue,
   onCompanyFilterChange,
@@ -60,28 +71,24 @@ export const DataTableToolbar = ({
   surface,
   palette,
 }: IDataTableToolbarProps): JSX.Element => {
-  const pillControlSx: SxProps<Theme> = {
-    flex: 1,
-    minWidth: 0,
-    maxWidth: { xs: '100%', sm: 'calc(50% - 8px)' },
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 999,
-      backgroundColor: palette.neutrals.baseWhite,
-      '& fieldset': { borderColor: surface.divider },
-      '&:hover fieldset': { borderColor: palette.neutrals[300] },
-      '&.Mui-focused fieldset': {
-        borderWidth: 1,
-        borderColor: palette.neutrals[400],
-      },
-    },
-    '& .MuiInputBase-input, & .MuiSelect-select': {
-      fontSize: '0.875rem',
-      py: 1.25,
-    },
-    '& .MuiInputBase-input::placeholder': {
-      color: surface.filterMuted,
-      opacity: 1,
-    },
+  const isAdvancedFilter =
+    filterType === 'advanced' &&
+    filterGroups.length > 0 &&
+    onFilterChangeAdvanced;
+  const isSimpleFilter =
+    filterType === 'simple' && showFilter && onFilterChange;
+
+  const visibleFilters = [
+    showSearch,
+    isSimpleFilter || isAdvancedFilter,
+    showCompanyFilter && companyFilterOptions.length > 0,
+  ].filter(Boolean).length;
+
+  const getFilterWidth = (): string => {
+    if (visibleFilters <= 1) {
+      return '100%';
+    }
+    return `${100 / visibleFilters}%`;
   };
 
   return (
@@ -93,7 +100,7 @@ export const DataTableToolbar = ({
         borderBottom: `1px solid ${surface.divider}`,
       }}
     >
-      {toolbarTitle ? (
+      {toolbarTitle && (
         <Typography
           component="h2"
           variant="h6"
@@ -106,128 +113,73 @@ export const DataTableToolbar = ({
         >
           {toolbarTitle}
         </Typography>
-      ) : null}
+      )}
+
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={2}
         alignItems={{ xs: 'stretch', sm: 'center' }}
+        sx={{ width: '100%' }}
       >
-        {showSearch ? (
-          <TextField
-            placeholder={searchPlaceholder}
-            value={searchValue ?? ''}
-            onChange={(event) => onSearchChange?.(event.target.value)}
-            size="small"
-            fullWidth
-            inputProps={{ 'aria-label': searchAriaLabel }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchRoundedIcon
-                    sx={{ color: surface.filterMuted, fontSize: 20 }}
-                  />
-                </InputAdornment>
-              ),
-            }}
-            sx={pillControlSx}
-          />
-        ) : null}
-        {showFilter ? (
-          <TextField
-            select
-            value={filterValue ?? ''}
-            onChange={(event) => onFilterChange?.(event.target.value)}
-            size="small"
-            fullWidth
-            SelectProps={{
-              displayEmpty: true,
-              inputProps: { 'aria-label': filterAriaLabel },
-              renderValue: (selected) => {
-                if (selected === '' || selected == null) {
-                  return (
-                    <Typography
-                      component="span"
-                      sx={{ color: surface.filterMuted, fontSize: '0.875rem' }}
-                    >
-                      {filterPlaceholder}
-                    </Typography>
-                  );
-                }
-                return (
-                  filterOptions.find((opt) => opt.value === selected)?.label ??
-                  String(selected)
-                );
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FilterListRoundedIcon
-                    sx={{ color: surface.filterMuted, fontSize: 20 }}
-                  />
-                </InputAdornment>
-              ),
-            }}
-            sx={pillControlSx}
-          >
-            {filterOptions.map((opt) => (
-              <MenuItem
-                key={opt.value === '' ? '__all' : opt.value}
-                value={opt.value}
-              >
-                {opt.label}
-              </MenuItem>
-            ))}
-          </TextField>
-        ) : null}
-        {showCompanyFilter ? (
-          <TextField
-            select
-            value={companyFilterValue ?? ''}
-            onChange={(event) => onCompanyFilterChange?.(event.target.value)}
-            size="small"
-            fullWidth
-            SelectProps={{
-              displayEmpty: true,
-              inputProps: { 'aria-label': companyFilterAriaLabel },
-              renderValue: (selected) => {
-                if (selected === '' || selected == null) {
-                  return (
-                    <Typography
-                      component="span"
-                      sx={{ color: surface.filterMuted, fontSize: '0.875rem' }}
-                    >
-                      {companyFilterPlaceholder}
-                    </Typography>
-                  );
-                }
-                return (
-                  companyFilterOptions.find((opt) => opt.value === selected)
-                    ?.label ?? String(selected)
-                );
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FilterListRoundedIcon
-                    sx={{ color: surface.filterMuted, fontSize: 20 }}
-                  />
-                </InputAdornment>
-              ),
-            }}
-            sx={pillControlSx}
-          >
-            {companyFilterOptions.map((opt) => (
-              <MenuItem
-                key={opt.value === '' ? '__all' : opt.value}
-                value={opt.value}
-              >
-                {opt.label}
-              </MenuItem>
-            ))}
-          </TextField>
-        ) : null}
+        {showSearch && (
+          <Box sx={{ flex: 1, width: getFilterWidth() }}>
+            <SearchInput
+              value={searchValue}
+              onChange={onSearchChange}
+              placeholder={searchPlaceholder}
+              ariaLabel={searchAriaLabel}
+              surface={surface}
+              palette={palette}
+              sx={{ width: '100%' }}
+            />
+          </Box>
+        )}
+
+        {isSimpleFilter && (
+          <Box sx={{ flex: 1, width: getFilterWidth() }}>
+            <SimpleFilter
+              value={filterValue}
+              onChange={onFilterChange}
+              options={filterOptions}
+              placeholder={filterPlaceholder}
+              ariaLabel={filterAriaLabel}
+              surface={surface}
+              palette={palette}
+              sx={{ width: '100%' }}
+            />
+          </Box>
+        )}
+
+        {isAdvancedFilter && (
+          <Box sx={{ flex: 1, width: getFilterWidth() }}>
+            <AdvancedFilter
+              groups={filterGroups}
+              selectedFilters={selectedFilters}
+              onFilterChange={onFilterChangeAdvanced}
+              onClearFilters={() => onClearFilters && onClearFilters()}
+              label={filterLabel}
+              placeholder={filterPlaceholderAdvanced}
+              surface={surface}
+              palette={palette}
+              sx={{ width: '100%' }}
+            />
+          </Box>
+        )}
+
+        {showCompanyFilter && companyFilterOptions.length > 0 && (
+          <Box sx={{ flex: 1, width: getFilterWidth() }}>
+            <SimpleFilter
+              value={companyFilterValue}
+              onChange={onCompanyFilterChange}
+              options={companyFilterOptions}
+              placeholder={companyFilterPlaceholder}
+              ariaLabel={companyFilterAriaLabel}
+              surface={surface}
+              palette={palette}
+              sx={{ width: '100%' }}
+            />
+          </Box>
+        )}
       </Stack>
     </Box>
   );

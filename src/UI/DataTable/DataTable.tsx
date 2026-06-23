@@ -21,21 +21,38 @@ export const DataTable = <T,>({
   onSearchChange,
   searchPlaceholder = 'Buscar',
   searchAriaLabel = 'Buscar',
+  filterType = 'simple',
   filterValue,
   onFilterChange,
   filterOptions = [],
   filterPlaceholder = 'Filtrar',
   filterAriaLabel = 'Filtro',
+  filterGroups = [],
+  selectedFilters = {},
+  onFilterChangeAdvanced,
+  onClearFilters,
+  filterLabel = 'Filtros',
+  filterPlaceholderAdvanced = 'Filtrar',
   companyFilterValue,
   onCompanyFilterChange,
   companyFilterOptions = [],
   companyFilterPlaceholder = 'Filtrar por empresa',
   companyFilterAriaLabel = 'Filtrar por empresa',
+  infiniteScroll,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
 }: DataTableProps<T>): JSX.Element => {
   const { palette, surfaceColors } = useDataTable();
 
   const showSearch = onSearchChange != null;
-  const showFilter = onFilterChange != null && filterOptions.length > 0;
+  const showFilter =
+    (filterType === 'simple' &&
+      onFilterChange != null &&
+      filterOptions.length > 0) ||
+    (filterType === 'advanced' &&
+      onFilterChangeAdvanced != null &&
+      filterGroups.length > 0);
   const showCompanyFilter =
     onCompanyFilterChange != null && companyFilterOptions.length > 0;
   const showToolbar =
@@ -57,7 +74,7 @@ export const DataTable = <T,>({
         ...sx,
       }}
     >
-      {showToolbar ? (
+      {showToolbar && (
         <DataTableToolbar
           toolbarTitle={toolbarTitle}
           showSearch={showSearch}
@@ -65,12 +82,19 @@ export const DataTable = <T,>({
           onSearchChange={onSearchChange}
           searchPlaceholder={searchPlaceholder}
           searchAriaLabel={searchAriaLabel}
+          filterType={filterType}
           showFilter={showFilter}
           filterValue={filterValue}
           onFilterChange={onFilterChange}
           filterOptions={filterOptions}
           filterPlaceholder={filterPlaceholder}
           filterAriaLabel={filterAriaLabel}
+          filterGroups={filterGroups}
+          selectedFilters={selectedFilters}
+          onFilterChangeAdvanced={onFilterChangeAdvanced}
+          onClearFilters={onClearFilters}
+          filterLabel={filterLabel}
+          filterPlaceholderAdvanced={filterPlaceholderAdvanced}
           showCompanyFilter={showCompanyFilter}
           companyFilterValue={companyFilterValue}
           onCompanyFilterChange={onCompanyFilterChange}
@@ -80,7 +104,7 @@ export const DataTable = <T,>({
           surface={surfaceColors}
           palette={palette}
         />
-      ) : null}
+      )}
       <TableContainer
         sx={{
           flex: 1,
@@ -105,6 +129,7 @@ export const DataTable = <T,>({
             columns={columns}
             surface={surfaceColors}
             palette={palette}
+            showDetailsColumn={Boolean(onDetailsClick)}
           />
           <DataTableBody
             columns={columns}
@@ -116,6 +141,10 @@ export const DataTable = <T,>({
             emptyDescription={emptyDescription}
             surface={surfaceColors}
             palette={palette}
+            infiniteScroll={infiniteScroll}
+            fetchNextPage={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
           />
         </Table>
       </TableContainer>

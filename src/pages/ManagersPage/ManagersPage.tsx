@@ -18,6 +18,7 @@ import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
+import { normalizeText } from '@utils/normalizeText';
 import type { JSX, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -37,14 +38,14 @@ export const ManagersPage = (): JSX.Element => {
   );
 
   const filteredManagers = useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
+    const query = normalizeText(searchValue.trim());
     return managers.filter((manager) => {
       if (filterValue === 'true' && !manager.active) return false;
       if (filterValue === 'false' && manager.active) return false;
       if (query.length === 0) return true;
-      const nameMatch = manager.name.toLowerCase().includes(query);
-      const emailMatch = manager.email.toLowerCase().includes(query);
-      const companyMatch = manager.company.name.toLowerCase().includes(query);
+      const nameMatch = normalizeText(manager.name).includes(query);
+      const emailMatch = normalizeText(manager.email).includes(query);
+      const companyMatch = normalizeText(manager.company.name).includes(query);
       return nameMatch || emailMatch || companyMatch;
     });
   }, [managers, searchValue, filterValue]);

@@ -53,4 +53,26 @@ describe('AppModal', () => {
     render(<AppModal {...defaultProps} open={false} />);
     expect(screen.queryByText('Adicionar empresa')).not.toBeInTheDocument();
   });
+
+  it('disables Salvar and Cancelar buttons when isSubmitting is true', () => {
+    render(<AppModal {...defaultProps} isSubmitting={true} />);
+    const buttons = screen.getAllByRole('button');
+    const salvar = buttons.find((b) => b.textContent?.includes('Salvar'));
+    const cancelar = buttons.find((b) => b.textContent?.includes('Cancelar'));
+    expect(salvar).toBeDisabled();
+    expect(cancelar).toBeDisabled();
+  });
+
+  it('does not call handleSubmit again when Salvar is clicked while isSubmitting', () => {
+    const handleSubmit = vi.fn();
+    render(
+      <AppModal
+        {...defaultProps}
+        handleSubmit={handleSubmit}
+        isSubmitting={true}
+      />
+    );
+    fireEvent.click(screen.getByText('Salvar'));
+    expect(handleSubmit).not.toHaveBeenCalled();
+  });
 });

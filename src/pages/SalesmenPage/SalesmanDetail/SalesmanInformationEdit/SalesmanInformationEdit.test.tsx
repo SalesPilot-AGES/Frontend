@@ -56,29 +56,23 @@ describe('SalesmanInformationEdit', () => {
     expect(screen.queryByText(/papel|role/i)).not.toBeInTheDocument();
   });
 
-  it('enables company select by default (admin)', () => {
-    const { container } = render(<SalesmanInformationEdit {...defaultProps} />);
-    expect(
-      container.querySelector('.MuiInputBase-root.Mui-disabled')
-    ).not.toBeInTheDocument();
+  it('shows company select by default (admin)', () => {
+    render(<SalesmanInformationEdit {...defaultProps} />);
+    expect(screen.getByText('Empresa')).toBeInTheDocument();
   });
 
-  it('disables company select for manager (isCompanyEditable=false)', () => {
-    const { container } = render(
+  it('removes company field for manager (isCompanyEditable=false)', () => {
+    render(
       <SalesmanInformationEdit {...defaultProps} isCompanyEditable={false} />
     );
-    expect(
-      container.querySelector('.MuiInputBase-root.Mui-disabled')
-    ).toBeInTheDocument();
+    expect(screen.queryByText('Empresa')).not.toBeInTheDocument();
   });
 
-  it('enables company select when isCompanyEditable=true', () => {
-    const { container } = render(
+  it('shows company select when isCompanyEditable=true', () => {
+    render(
       <SalesmanInformationEdit {...defaultProps} isCompanyEditable={true} />
     );
-    expect(
-      container.querySelector('.MuiInputBase-root.Mui-disabled')
-    ).not.toBeInTheDocument();
+    expect(screen.getByText('Empresa')).toBeInTheDocument();
   });
 
   it('calls onFieldChange when name is edited', () => {

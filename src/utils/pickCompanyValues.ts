@@ -13,11 +13,16 @@ const isApiPlanCode = (plan: string): plan is CompanyPlanCode =>
 export const pickCompanyValues = (
   props:
     | CompanyInformationProps
-    | Pick<TCompany, 'id' | 'name' | 'tax_id' | 'plan' | 'active'>
+    | Pick<
+        TCompany,
+        'id' | 'name' | 'tax_id' | 'plan' | 'active' | 'phone' | 'address'
+      >
 ): CompanyInformationValues => ({
   id: props.id,
   name: props.name,
   tax_id: props.tax_id,
   plan: isApiPlanCode(props.plan) ? planApiToUiLabel[props.plan] : props.plan,
   active: props.active,
+  phone: props.phone,
+  address: props.address,
 });

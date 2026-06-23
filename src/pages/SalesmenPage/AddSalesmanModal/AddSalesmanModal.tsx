@@ -86,9 +86,11 @@ export const AddSalesmanModal = ({
     }
   }, [isManagerVariant, managerData?.company, setValue]);
 
-  const { mutate: createSalesman } = useCreateSalesman();
+  const { mutate: createSalesman, isPending } = useCreateSalesman();
 
   const onSubmit = (data: TCreateSalesman): void => {
+    if (isPending) return;
+
     createSalesman(data, {
       onSuccess: () => {
         handleClose();
@@ -120,6 +122,7 @@ export const AddSalesmanModal = ({
       open={open}
       handleClose={handleClose}
       handleSubmit={handleSubmit(onSubmit)}
+      isSubmitting={isPending}
       isSaveButtonDisabled={
         isManagerVariant &&
         (isManagerLoading || isManagerError || !managerData?.company)

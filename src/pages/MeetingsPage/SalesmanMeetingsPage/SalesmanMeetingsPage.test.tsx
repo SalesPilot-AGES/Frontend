@@ -107,7 +107,7 @@ describe('SalesmanMeetingsPage', () => {
       search: 'produto',
     });
     expect(mockNavigate).toHaveBeenCalledWith({
-      to: '/reuniões/$meetingId',
+      to: '/reunioes/$meetingId',
       params: { meetingId: 'meeting-1' },
     });
   });

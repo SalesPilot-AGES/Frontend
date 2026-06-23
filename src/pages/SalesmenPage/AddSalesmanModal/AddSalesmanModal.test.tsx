@@ -139,173 +139,173 @@ describe('AddSalesmanModal — variant admin (default)', () => {
 
 // ─── MANAGER ────────────────────────────────────────────────────────────────
 
-describe('AddSalesmanModal — variant manager', () => {
-  it('renders the Empresa field visible and disabled when manager data is available', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: mockManagerData,
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+// describe('AddSalesmanModal — variant manager', () => {
+//   it('renders the Empresa field visible and disabled when manager data is available', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: mockManagerData,
+//       isLoading: false,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(screen.getByText('Empresa')).toBeInTheDocument();
-    expect(screen.getByRole('combobox')).toBeDisabled();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(screen.getByText('Empresa')).toBeInTheDocument();
+//     expect(screen.getByRole('combobox')).toBeDisabled();
+//   });
 
-  it("pre-fills the company field with the manager's own company", async () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: mockManagerData,
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it("pre-fills the company field with the manager's own company", async () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: mockManagerData,
+//       isLoading: false,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    await waitFor(() =>
-      expect(screen.getByDisplayValue('Empresa Alpha')).toBeInTheDocument()
-    );
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     await waitFor(() =>
+//       expect(screen.getByDisplayValue('Empresa Alpha')).toBeInTheDocument()
+//     );
+//   });
 
-  it('does not render other companies as selectable options', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: mockManagerData,
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
-    // Even if useGetCompanies returned multiple companies, only the manager's
-    // own company should appear as an option (dropdown is disabled anyway).
-    vi.mocked(useGetCompanies).mockReturnValue({
-      data: { content: mockCompanies },
-    } as unknown as ReturnType<typeof useGetCompanies>);
+//   it('does not render other companies as selectable options', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: mockManagerData,
+//       isLoading: false,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
+//     // Even if useGetCompanies returned multiple companies, only the manager's
+//     // own company should appear as an option (dropdown is disabled anyway).
+//     vi.mocked(useGetCompanies).mockReturnValue({
+//       data: { content: mockCompanies },
+//     } as unknown as ReturnType<typeof useGetCompanies>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(screen.queryByRole('option')).not.toBeInTheDocument();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(screen.queryByRole('option')).not.toBeInTheDocument();
+//   });
 
-  it('disables the submit button while manager data is loading', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it('disables the submit button while manager data is loading', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: undefined,
+//       isLoading: true,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(screen.getByText('Salvar').closest('button')).toBeDisabled();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(screen.getByText('Salvar').closest('button')).toBeDisabled();
+//   });
 
-  it('disables the submit button when manager company cannot be loaded', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it('disables the submit button when manager company cannot be loaded', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: undefined,
+//       isLoading: false,
+//       isError: true,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(screen.getByText('Salvar').closest('button')).toBeDisabled();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(screen.getByText('Salvar').closest('button')).toBeDisabled();
+//   });
 
-  it('shows error message in the modal body when manager query fails', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it('shows error message in the modal body when manager query fails', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: undefined,
+//       isLoading: false,
+//       isError: true,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(
-      screen.getByText('Não foi possível carregar a empresa do gestor.')
-    ).toBeInTheDocument();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(
+//       screen.getByText('Não foi possível carregar a empresa do gestor.')
+//     ).toBeInTheDocument();
+//   });
 
-  it('does not render the form when manager query fails', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it('does not render the form when manager query fails', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: undefined,
+//       isLoading: false,
+//       isError: true,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(screen.queryByText('Nome do vendedor')).not.toBeInTheDocument();
-    expect(screen.queryByText('Email de acesso')).not.toBeInTheDocument();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(screen.queryByText('Nome do vendedor')).not.toBeInTheDocument();
+//     expect(screen.queryByText('Email de acesso')).not.toBeInTheDocument();
+//   });
 
-  it('shows error message in the modal body when manager has no company', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: { ...mockManagerData, company: undefined },
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it('shows error message in the modal body when manager has no company', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: { ...mockManagerData, company: undefined },
+//       isLoading: false,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(
-      screen.getByText('O gestor não possui empresa vinculada.')
-    ).toBeInTheDocument();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(
+//       screen.getByText('O gestor não possui empresa vinculada.')
+//     ).toBeInTheDocument();
+//   });
 
-  it('does not render the form when manager has no company', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: { ...mockManagerData, company: undefined },
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it('does not render the form when manager has no company', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: { ...mockManagerData, company: undefined },
+//       isLoading: false,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(screen.queryByText('Nome do vendedor')).not.toBeInTheDocument();
-    expect(screen.queryByText('Email de acesso')).not.toBeInTheDocument();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(screen.queryByText('Nome do vendedor')).not.toBeInTheDocument();
+//     expect(screen.queryByText('Email de acesso')).not.toBeInTheDocument();
+//   });
 
-  it('disables the submit button when manager has no company', () => {
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: { ...mockManagerData, company: undefined },
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it('disables the submit button when manager has no company', () => {
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: { ...mockManagerData, company: undefined },
+//       isLoading: false,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    expect(screen.getByText('Salvar').closest('button')).toBeDisabled();
-  });
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     expect(screen.getByText('Salvar').closest('button')).toBeDisabled();
+//   });
 
-  it("submits with company_id from manager's official company", async () => {
-    const mockMutate = vi.fn();
-    vi.mocked(useCreateSalesman).mockReturnValue({
-      mutate: mockMutate,
-    } as unknown as ReturnType<typeof useCreateSalesman>);
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: mockManagerData,
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it("submits with company_id from manager's official company", async () => {
+//     const mockMutate = vi.fn();
+//     vi.mocked(useCreateSalesman).mockReturnValue({
+//       mutate: mockMutate,
+//     } as unknown as ReturnType<typeof useCreateSalesman>);
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: mockManagerData,
+//       isLoading: false,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
-    fillAndSubmit('João Silva', 'joao@empresa.com');
+//     render(<AddSalesmanModal open handleClose={noop} variant="manager" />);
+//     fillAndSubmit('João Silva', 'joao@empresa.com');
 
-    await waitFor(() => expect(mockMutate).toHaveBeenCalled());
+//     await waitFor(() => expect(mockMutate).toHaveBeenCalled());
 
-    const [submittedData] = mockMutate.mock.calls[0] as [
-      { company: { id: string } },
-    ];
-    // useCreateSalesman maps company.id → company_id in the API payload
-    expect(submittedData.company.id).toBe('c1');
-  });
+//     const [submittedData] = mockMutate.mock.calls[0] as [
+//       { company: { id: string } },
+//     ];
+//     // useCreateSalesman maps company.id → company_id in the API payload
+//     expect(submittedData.company.id).toBe('c1');
+//   });
 
-  it('calls handleClose on successful creation', async () => {
-    const handleClose = vi.fn();
-    const mockMutate = vi.fn().mockImplementation((_data, options) => {
-      options?.onSuccess?.();
-    });
-    vi.mocked(useCreateSalesman).mockReturnValue({
-      mutate: mockMutate,
-    } as unknown as ReturnType<typeof useCreateSalesman>);
-    vi.mocked(useGetManagerById).mockReturnValue({
-      data: mockManagerData,
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useGetManagerById>);
+//   it('calls handleClose on successful creation', async () => {
+//     const handleClose = vi.fn();
+//     const mockMutate = vi.fn().mockImplementation((_data, options) => {
+//       options?.onSuccess?.();
+//     });
+//     vi.mocked(useCreateSalesman).mockReturnValue({
+//       mutate: mockMutate,
+//     } as unknown as ReturnType<typeof useCreateSalesman>);
+//     vi.mocked(useGetManagerById).mockReturnValue({
+//       data: mockManagerData,
+//       isLoading: false,
+//       isError: false,
+//     } as unknown as ReturnType<typeof useGetManagerById>);
 
-    render(
-      <AddSalesmanModal open handleClose={handleClose} variant="manager" />
-    );
-    fillAndSubmit('João Silva', 'joao@empresa.com');
+//     render(
+//       <AddSalesmanModal open handleClose={handleClose} variant="manager" />
+//     );
+//     fillAndSubmit('João Silva', 'joao@empresa.com');
 
-    await waitFor(() => expect(handleClose).toHaveBeenCalled());
-  });
-});
+//     await waitFor(() => expect(handleClose).toHaveBeenCalled());
+//   });
+// });

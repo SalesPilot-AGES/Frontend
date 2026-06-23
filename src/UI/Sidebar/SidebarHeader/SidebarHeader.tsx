@@ -9,7 +9,16 @@ export const SidebarHeader = (): JSX.Element => {
   return (
     <Box display={'flex'} gap={'1rem'} alignItems={'center'} padding={'1.5rem'}>
       <IconBox iconName="logo" sx={{ height: '2.8rem', width: '2.8rem' }} />
-      <Header title="Sales Pilot" subtitle={userRole ?? ''} />
+      <Header
+        title="Sales Pilot"
+        subtitle={
+          userRole == 'manager'
+            ? 'Gestor'
+            : userRole == 'salesmen'
+              ? 'Vendedor'
+              : (userRole ?? '')
+        }
+      />
     </Box>
   );
 };

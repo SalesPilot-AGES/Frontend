@@ -151,6 +151,7 @@ export const AdminSalesmenPage = (): JSX.Element => {
       <AddSalesmanModal
         open={isModalOpen}
         handleClose={() => setIsModalOpen(false)}
+        variant="admin"
       />
     </PageContainter>
   );

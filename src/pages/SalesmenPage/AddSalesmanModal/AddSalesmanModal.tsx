@@ -13,7 +13,6 @@ import {
   type TSalesmanCompany,
 } from '@services/models/SalesmanSchema';
 import { useGetCompanies } from '@services/queries/useCompanies';
-import { useGetManagerById } from '@services/queries/useManagers';
 import { useCreateSalesman } from '@services/queries/useSalesman';
 import { selectUser, useAuthStore } from '@store/authStore';
 import { AppModal } from '@UI/AppModal/AppModal';
@@ -33,6 +32,7 @@ export const AddSalesmanModal = ({
   variant = 'admin',
 }: IAddSalesmanModalProps): JSX.Element => {
   const isManagerVariant = variant === 'manager';
+  const user = useAuthStore(selectUser);
 
   const {
     control,
@@ -50,26 +50,21 @@ export const AddSalesmanModal = ({
     },
   });
 
-  // ADMIN ONLY: Fetch all companies via the admin-scoped endpoint.
-  // Condiciona a requisição apenas para admin
+  // ADMIN: fetch all companies via the admin-scoped endpoint.
   const { data: companiesPage } = useGetCompanies(
     0,
     20,
     {},
-    { enabled: open && !isManagerVariant } // ← Ativa só quando modal abre E é admin
+    { enabled: open && !isManagerVariant }
   );
 
-  // MANAGER ONLY: Fetch the authenticated manager's own record.
-  const user = useAuthStore(selectUser);
-  const {
-    data: managerData,
-    isLoading: isManagerLoading,
-    isError: isManagerError,
-  } = useGetManagerById(isManagerVariant ? (user?.id ?? null) : null);
+  // Manager: get company info from user store
+  const managerCompanyId = user?.company_id;
+  const managerCompanyName = user?.company_name || 'Empresa do gestor';
 
   const companyOptions: TSalesmanCompany[] = isManagerVariant
-    ? managerData?.company
-      ? [managerData.company]
+    ? managerCompanyId
+      ? [{ id: managerCompanyId, name: managerCompanyName }]
       : []
     : (companiesPage?.content ?? []).filter((c) => c.active);
 
@@ -79,12 +74,12 @@ export const AddSalesmanModal = ({
     }
   }, [open, reset]);
 
-  // Manager: pre-fill the company field once the manager record loads.
+  // Manager: pre-fill the company field once user data is available
   useEffect(() => {
-    if (isManagerVariant && managerData?.company) {
-      setValue('company', managerData.company);
+    if (isManagerVariant && managerCompanyId) {
+      setValue('company', { id: managerCompanyId, name: managerCompanyName });
     }
-  }, [isManagerVariant, managerData?.company, setValue]);
+  }, [isManagerVariant, managerCompanyId, managerCompanyName, setValue]);
 
   const { mutate: createSalesman, isPending } = useCreateSalesman();
 
@@ -105,16 +100,10 @@ export const AddSalesmanModal = ({
     return undefined;
   };
 
-  // Manager blocking states: failed query or successful load with no company.
-  // In either case the form must not be rendered as usable.
-  const showManagerBlockingError =
-    isManagerVariant &&
-    !isManagerLoading &&
-    (isManagerError || !managerData?.company);
+  // Manager blocking state: no company ID available
+  const showManagerBlockingError = isManagerVariant && !managerCompanyId;
 
-  const managerErrorMessage = isManagerError
-    ? 'Não foi possível carregar a empresa do gestor.'
-    : 'O gestor não possui empresa vinculada.';
+  const managerErrorMessage = 'O gestor não possui empresa vinculada.';
 
   return (
     <AppModal
@@ -123,10 +112,7 @@ export const AddSalesmanModal = ({
       handleClose={handleClose}
       handleSubmit={handleSubmit(onSubmit)}
       isSubmitting={isPending}
-      isSaveButtonDisabled={
-        isManagerVariant &&
-        (isManagerLoading || isManagerError || !managerData?.company)
-      }
+      isSaveButtonDisabled={isManagerVariant && !managerCompanyId}
     >
       {showManagerBlockingError ? (
         <Box
@@ -173,40 +159,42 @@ export const AddSalesmanModal = ({
             />
           </Box>
 
-          <Box>
-            <Typography sx={{ mb: 1 }} variant="body2">
-              Empresa
-            </Typography>
-            <Controller
-              name="company"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete<TSalesmanCompany, false, false, false>
-                  disablePortal
-                  disabled={isManagerVariant}
-                  options={companyOptions}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(a, b) => a.id === b.id}
-                  value={
-                    companyOptions.find((c) => c.id === field.value?.id) ?? null
-                  }
-                  onChange={(_, company) => {
-                    field.onChange(company ?? null);
-                  }}
-                  onBlur={field.onBlur}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      name={field.name}
-                      inputRef={field.ref}
-                      error={!!errors.company}
-                      helperText={getCompanyHelperText()}
-                    />
-                  )}
-                />
-              )}
-            />
-          </Box>
+          {!isManagerVariant && (
+            <Box>
+              <Typography sx={{ mb: 1 }} variant="body2">
+                Empresa
+              </Typography>
+              <Controller
+                name="company"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete<TSalesmanCompany, false, false, false>
+                    disablePortal
+                    options={companyOptions}
+                    getOptionLabel={(option) => option.name}
+                    isOptionEqualToValue={(a, b) => a.id === b.id}
+                    value={
+                      companyOptions.find((c) => c.id === field.value?.id) ??
+                      null
+                    }
+                    onChange={(_, company) => {
+                      field.onChange(company ?? null);
+                    }}
+                    onBlur={field.onBlur}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name={field.name}
+                        inputRef={field.ref}
+                        error={!!errors.company}
+                        helperText={getCompanyHelperText()}
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Box>
+          )}
 
           <Box>
             <Typography sx={{ mb: 1 }} variant="body2">

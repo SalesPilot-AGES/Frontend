@@ -182,7 +182,7 @@ export const dashboardApi = {
   getSalesmenStatus: async (): Promise<TDashboardStatusCount> => {
     try {
       const response = await apiClient.get<unknown>(
-        '/api/dashboard/salesmen-status'
+        '/api/dashboard/sellers-status'
       );
 
       return StatusCountResponseSchema.parse(response.data);

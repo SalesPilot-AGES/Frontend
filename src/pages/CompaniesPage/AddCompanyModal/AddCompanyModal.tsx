@@ -52,9 +52,11 @@ export const AddCompanyModal = ({
     }
   }, [open, reset]);
 
-  const { mutate: createCompany } = useCreateCompany();
+  const { mutate: createCompany, isPending } = useCreateCompany();
 
   const onSubmit = (data: TCompanyCreatePayload): void => {
+    if (isPending) return;
+
     createCompany(data, {
       onSuccess: () => {
         handleClose();
@@ -68,6 +70,7 @@ export const AddCompanyModal = ({
       open={open}
       handleClose={handleClose}
       isSaveButtonDisabled={!isValid}
+      isSubmitting={isPending}
       handleSubmit={handleSubmit(onSubmit)}
     >
       <Box

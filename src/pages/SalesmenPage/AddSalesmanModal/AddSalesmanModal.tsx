@@ -50,11 +50,16 @@ export const AddSalesmanModal = ({
     },
   });
 
-  // ADMIN: fetch all companies via the admin-scoped endpoint.
-  const { data: companiesPage } = useGetCompanies();
+  // ADMIN ONLY: Fetch all companies via the admin-scoped endpoint.
+  // Condiciona a requisição apenas para admin
+  const { data: companiesPage } = useGetCompanies(
+    0,
+    20,
+    {},
+    { enabled: open && !isManagerVariant } // ← Ativa só quando modal abre E é admin
+  );
 
-  // MANAGER: fetch the authenticated manager's own record to get the official company.
-  // useGetManagerById is a no-op when uuid is null (enabled: !!uuid).
+  // MANAGER ONLY: Fetch the authenticated manager's own record.
   const user = useAuthStore(selectUser);
   const {
     data: managerData,

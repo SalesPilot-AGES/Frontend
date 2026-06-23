@@ -70,7 +70,7 @@ export const useGetCompanies = (
   page: number = 0,
   size: number = 20,
   filters?: TCompanyFilters,
-  options?: UseQueryOptions<TCompanyList>
+  options?: Omit<UseQueryOptions<TCompanyList>, 'queryKey' | 'queryFn'> // ← Muda aqui
 ): ReturnType<typeof useQuery<TCompanyList, Error>> => {
   return useQuery<TCompanyList, Error>({
     ...getCompaniesListQueryOptions(page, size, filters),

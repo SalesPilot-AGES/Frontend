@@ -3,8 +3,8 @@ import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import { EPlan } from '@data/enums/EPlan';
-import { EStatus } from '@data/enums/EStatus';
 import type { DataTableProps, TPlan } from '@declarations/ui';
+import { useFilterOptions } from '@hooks/useFilterOptions';
 import AddIcon from '@mui/icons-material/Add';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import EventIcon from '@mui/icons-material/Event';
@@ -21,7 +21,6 @@ import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { PlanBadge } from '@UI/PlanBadge/PlanBadge';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
-import { normalizeText } from '@utils/normalizeText';
 import type { JSX, ReactNode } from 'react';
 import React, { useMemo, useState } from 'react';
 
@@ -33,22 +32,45 @@ const planLabelMap: Record<TCompany['plan'], TPlan> = {
   ENTERPRISE: EPlan.ENTERPRISE,
 };
 
-// TODO: remover quando a API retornar esses campos
 type CompanyWithStats = TCompany & {
   managers: number;
   sellers: number;
   meetings: number;
 };
 
+const filterGroupConfig = [
+  {
+    id: 'status',
+    label: 'Status',
+    accessor: (company: CompanyWithStats): string =>
+      company.active ? 'Ativo' : 'Inativo',
+    formatter: (value: string): string => value,
+  },
+  {
+    id: 'plan',
+    label: 'Plano',
+    accessor: (company: CompanyWithStats): string => company.plan,
+    formatter: (value: string): string => {
+      const map: Record<string, string> = {
+        BASIC: 'Básico',
+        PRO: 'Profissional',
+        ENTERPRISE: 'Enterprise',
+      };
+      return map[value] || value;
+    },
+  },
+];
+
 export const CompaniesPage = (): JSX.Element => {
   const { palette } = useTheme();
   const { data, isLoading } = useGetCompanies();
   const [openAddModal, setOpenAddModal] = React.useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const [filterValue, setFilterValue] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
   const navigate = useNavigate();
 
-  // TODO: remover mock quando a API retornar managers, sellers e meetings
   const companies: CompanyWithStats[] = (data?.content ?? []).map(
     (company, index) => ({
       ...company,
@@ -58,105 +80,138 @@ export const CompaniesPage = (): JSX.Element => {
     })
   );
 
-  const filteredCompanies = useMemo(() => {
-    const query = normalizeText(searchValue.trim());
+  const filterGroups = useFilterOptions({
+    data: companies,
+    groups: filterGroupConfig,
+  });
+
+  const filteredCompanies = useMemo((): CompanyWithStats[] => {
+    const query = searchValue.trim().toLowerCase();
     return companies.filter((company) => {
-      if (filterValue === 'true' && !company.active) return false;
-      if (filterValue === 'false' && company.active) return false;
-      if (query.length === 0) return true;
-      const nameMatch = normalizeText(company.name).includes(query);
-      const taxIdMatch = normalizeText(company.tax_id).includes(query);
-      return nameMatch || taxIdMatch;
+      if (query.length > 0) {
+        const nameMatch = company.name.toLowerCase().includes(query);
+        const taxIdMatch = company.tax_id.toLowerCase().includes(query);
+        if (!nameMatch && !taxIdMatch) return false;
+      }
+      const statusFilters = selectedFilters.status || [];
+      if (statusFilters.length > 0) {
+        const companyStatus = company.active ? 'Ativo' : 'Inativo';
+        if (!statusFilters.includes(companyStatus)) return false;
+      }
+      const planFilters = selectedFilters.plan || [];
+      if (planFilters.length > 0 && !planFilters.includes(company.plan))
+        return false;
+      const managerFilters = selectedFilters.managers || [];
+      if (managerFilters.length > 0) {
+        const managerCount = String(company.managers);
+        if (!managerFilters.includes(managerCount)) return false;
+      }
+      return true;
     });
-  }, [companies, searchValue, filterValue]);
+  }, [companies, searchValue, selectedFilters]);
+
+  const handleFilterChange = (
+    groupId: string,
+    selectedValues: string[]
+  ): void => {
+    setSelectedFilters((prev) => ({ ...prev, [groupId]: selectedValues }));
+  };
+
+  const handleClearFilters = (): void => setSelectedFilters({});
+
+  const handleDetailsClick = (rowId: string | number): void => {
+    void navigate({
+      to: EPageRoutes.COMPANY_DETAIL,
+      params: { companyId: String(rowId) },
+    });
+  };
+
+  const renderCompanyName = (value: ReactNode): JSX.Element => (
+    <Stack direction="row" alignItems="center" spacing="0.5rem">
+      <ApartmentIcon
+        sx={{ color: palette.companies[500], fontSize: '1.5rem' }}
+      />
+      <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+        {value ?? '-'}
+      </Typography>
+    </Stack>
+  );
+
+  const renderManagers = (value: ReactNode): JSX.Element => (
+    <Stack direction="row" alignItems="center" spacing="0.5rem">
+      <ManageAccountsIcon
+        sx={{ color: palette.managers[500], fontSize: '1.5rem' }}
+      />
+      <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+        {value ?? '-'}
+      </Typography>
+    </Stack>
+  );
+
+  const renderSellers = (value: ReactNode): JSX.Element => (
+    <Stack direction="row" alignItems="center" spacing="0.5rem">
+      <PersonIcon sx={{ color: palette.salesmen[500], fontSize: '1.5rem' }} />
+      <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+        {value ?? '-'}
+      </Typography>
+    </Stack>
+  );
+
+  const renderMeetings = (value: ReactNode): JSX.Element => (
+    <Stack direction="row" alignItems="center" spacing="0.5rem">
+      <EventIcon sx={{ color: palette.meetings[500], fontSize: '1.5rem' }} />
+      <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+        {value ?? '-'}
+      </Typography>
+    </Stack>
+  );
 
   const columns: DataTableProps<CompanyWithStats>['columns'] = [
     {
       header: ECardLabel.COMPANY_NAME,
-      accessor: (row: CompanyWithStats) => row.name,
-      render: (value: ReactNode) => (
-        <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <ApartmentIcon
-            sx={{ color: palette.companies[500], fontSize: '1.5rem' }}
-          />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-            {value ?? '-'}
-          </Typography>
-        </Stack>
-      ),
+      accessor: (row: CompanyWithStats): string => row.name,
+      render: renderCompanyName,
     },
     {
       header: ECardLabel.MANAGERS,
-      accessor: (row: CompanyWithStats) => row.managers,
-      render: (value: ReactNode) => (
-        <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <ManageAccountsIcon
-            sx={{ color: palette.managers[500], fontSize: '1.5rem' }}
-          />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-            {value ?? '-'}
-          </Typography>
-        </Stack>
-      ),
+      accessor: (row: CompanyWithStats): number => row.managers,
+      render: renderManagers,
     },
     {
       header: ECardLabel.SALESMAN,
-      accessor: (row: CompanyWithStats) => row.sellers,
-      render: (value: ReactNode) => (
-        <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <PersonIcon
-            sx={{ color: palette.salesmen[500], fontSize: '1.5rem' }}
-          />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-            {value ?? '-'}
-          </Typography>
-        </Stack>
-      ),
+      accessor: (row: CompanyWithStats): number => row.sellers,
+      render: renderSellers,
     },
     {
       header: ECardLabel.TOTAL_MEETINGS,
-      accessor: (row: CompanyWithStats) => row.meetings,
-      render: (value: ReactNode) => (
-        <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <EventIcon
-            sx={{ color: palette.meetings[500], fontSize: '1.5rem' }}
-          />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-            {value ?? '-'}
-          </Typography>
-        </Stack>
-      ),
+      accessor: (row: CompanyWithStats): number => row.meetings,
+      render: renderMeetings,
     },
     {
       header: 'Plano',
-      accessor: (row: CompanyWithStats) => row.plan,
-      render: (_value: ReactNode, row: CompanyWithStats) => (
+      accessor: (row: CompanyWithStats): string => row.plan,
+      render: (_: ReactNode, row: CompanyWithStats): JSX.Element => (
         <PlanBadge plan={planLabelMap[row.plan]} />
       ),
     },
     {
       header: 'Status',
-      accessor: (row: CompanyWithStats) => row.active,
-      render: (_value: ReactNode, row: CompanyWithStats) => (
+      accessor: (row: CompanyWithStats): boolean => row.active,
+      render: (_: ReactNode, row: CompanyWithStats): JSX.Element => (
         <StatusBadge active={row.active} />
       ),
     },
   ];
 
-  const activeCompanies = companies.filter((company) => company.active).length;
-  const inactiveCompanies = companies.filter(
-    (company) => !company.active
-  ).length;
-  const totalMeetings = companies.reduce(
-    (acc, company) => acc + company.meetings,
-    0
-  );
+  const activeCompanies = companies.filter((c) => c.active).length;
+  const inactiveCompanies = companies.filter((c) => !c.active).length;
+  const totalMeetings = companies.reduce((acc, c) => acc + c.meetings, 0);
 
   return (
     <PageContainter>
       <AddCompanyModal
         open={openAddModal}
-        handleClose={() => setOpenAddModal(false)}
+        handleClose={(): void => setOpenAddModal(false)}
       />
       <Stack spacing="2.5rem" sx={{ height: '100%' }}>
         <Box
@@ -168,16 +223,14 @@ export const CompaniesPage = (): JSX.Element => {
             title={EPageTitles.COMPANIES}
             subtitle={EpageDescriptions.COMPANIES}
           />
-
           <Button
             startIcon={<AddIcon />}
             variant="gradient"
-            onClick={() => setOpenAddModal(true)}
+            onClick={(): void => setOpenAddModal(true)}
           >
             Adicionar empresa
           </Button>
         </Box>
-
         <Box display="flex" gap="1.5rem">
           <StatCard
             iconName="company"
@@ -185,14 +238,12 @@ export const CompaniesPage = (): JSX.Element => {
             value={activeCompanies}
             label={ECardLabel.ACTIVE_COMPANIES}
           />
-
           <StatCard
             iconName="company"
             theme="neutrals"
             value={inactiveCompanies}
             label={ECardLabel.INACTIVE_COMPANIES}
           />
-
           <StatCard
             iconName="meeting"
             theme="meetings"
@@ -200,37 +251,29 @@ export const CompaniesPage = (): JSX.Element => {
             label={ECardLabel.TOTAL_MEETINGS}
           />
         </Box>
-
         <DataTable
           data={filteredCompanies}
           columns={columns}
-          getRowId={(row: CompanyWithStats) => row.id}
+          getRowId={(row: CompanyWithStats): string => row.id}
           loading={isLoading}
           sx={{
             border: `1px solid ${palette.neutrals[200]}`,
             flex: 1,
             minHeight: 0,
           }}
-          onDetailsClick={(rowId) => {
-            navigate({
-              to: EPageRoutes.COMPANY_DETAIL,
-              params: { companyId: String(rowId) },
-            });
-          }}
+          onDetailsClick={handleDetailsClick}
+          filterType="advanced"
+          filterGroups={filterGroups}
+          selectedFilters={selectedFilters}
+          onFilterChangeAdvanced={handleFilterChange}
+          onClearFilters={handleClearFilters}
+          filterLabel="Filtros"
+          filterPlaceholderAdvanced="Filtrar empresas"
           onSearchChange={setSearchValue}
-          onFilterChange={setFilterValue}
           searchValue={searchValue}
-          filterValue={filterValue}
-          toolbarTitle="Lista de empresas"
           searchPlaceholder="Buscar empresa..."
           searchAriaLabel="Buscar empresa"
-          filterPlaceholder="Filtrar"
-          filterAriaLabel="Filtrar empresas"
-          filterOptions={[
-            { label: 'Todos', value: '' },
-            { label: EStatus.ACTIVE, value: 'true' },
-            { label: EStatus.INACTIVE, value: 'false' },
-          ]}
+          toolbarTitle="Lista de empresas"
         />
       </Stack>
     </PageContainter>

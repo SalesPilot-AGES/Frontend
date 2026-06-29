@@ -2,23 +2,28 @@ import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import type { DataTableProps } from '@declarations/ui';
+import { useFilterOptions } from '@hooks/useFilterOptions';
 import { getSentimentConfig } from '@hooks/useSentiment';
 import EventIcon from '@mui/icons-material/Event';
 import PersonIcon from '@mui/icons-material/Person';
-import RealEstateAgentIcon from '@mui/icons-material/RealEstateAgent';
+import RealEstateAgentOutlinedIcon from '@mui/icons-material/RealEstateAgentOutlined';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { TMeetingListItem } from '@services/models/MeetingSchema';
 import { useGetMeetings } from '@services/queries/useMeetings';
-import { useGetSalesmen } from '@services/queries/useSalesmen';
 import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatCard } from '@UI/StatCard/StatCard';
+import { normalizeText } from '@utils/normalizeText';
 import type { JSX, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
+
+type MeetingWithDate = TMeetingListItem & {
+  dateRange: string;
+};
 
 const formatMeetingDate = (date: string): string => {
   return new Intl.DateTimeFormat('pt-BR').format(new Date(date));
@@ -28,60 +33,135 @@ const formatDuration = (minutes: number): string => {
   return `${minutes} min`;
 };
 
+const getDateRange = (date: string): string => {
+  const d = new Date(date);
+  const currentDate = new Date();
+  const today = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    currentDate.getDate()
+  );
+  const meetingDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.floor(
+    (today.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  if (diffDays === 0) return 'Hoje';
+  if (diffDays === 1) return 'Ontem';
+  if (diffDays <= 7) return 'Última semana';
+  if (diffDays <= 14) return 'Últimas 2 semanas';
+  if (diffDays <= 30) return 'Último mês';
+  if (diffDays <= 90) return 'Últimos 3 meses';
+  if (diffDays <= 180) return 'Últimos 6 meses';
+  return 'Mais de 6 meses';
+};
+
+const filterGroupConfig = [
+  {
+    id: 'seller',
+    label: 'Vendedor',
+    accessor: (meeting: MeetingWithDate): string => meeting.sellerName,
+    formatter: (value: string): string => value,
+  },
+  {
+    id: 'client',
+    label: 'Cliente',
+    accessor: (meeting: MeetingWithDate): string => meeting.clientName,
+    formatter: (value: string): string => value,
+  },
+  {
+    id: 'dateRange',
+    label: 'Período',
+    accessor: (meeting: MeetingWithDate): string => meeting.dateRange,
+    formatter: (value: string): string => value,
+  },
+];
+
 export const ManagerMeetingsPage = (): JSX.Element => {
   const { palette } = useTheme();
   const navigate = useNavigate();
 
   const [searchValue, setSearchValue] = useState('');
-  const [filterValue, setFilterValue] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
+  const { data, isLoading } = useGetMeetings(0, 100, {});
 
-  const filters = useMemo(
-    () => ({
-      ...(searchValue.trim() && { search: searchValue.trim() }),
-    }),
-    [searchValue]
+  const meetings: MeetingWithDate[] = useMemo(
+    () =>
+      (data?.content ?? []).map((meeting) => ({
+        ...meeting,
+        dateRange: getDateRange(meeting.date),
+      })),
+    [data?.content]
   );
 
-  const { data: salesmenPage } = useGetSalesmen(0, 100, {});
-  // O filtro de vendedor (filterValue) é aplicado client-side abaixo porque
-  // a API só suporta filtro por título/empresa, não por vendedor. Buscamos
-  // um tamanho de página maior para reduzir a chance do filtro esconder
-  // reuniões que estão fora da primeira página.
-  const { data, isLoading } = useGetMeetings(0, 100, filters);
+  const filterGroups = useFilterOptions({
+    data: meetings,
+    groups: filterGroupConfig,
+  });
 
-  const meetings = useMemo(() => data?.content ?? [], [data?.content]);
+  const filteredMeetings = useMemo((): MeetingWithDate[] => {
+    const query = normalizeText(searchValue.trim());
+    return meetings.filter((meeting) => {
+      // Filtro de busca
+      if (query.length > 0) {
+        const titleMatch = normalizeText(meeting.title).includes(query);
+        const sellerMatch = normalizeText(meeting.sellerName).includes(query);
+        const clientMatch = normalizeText(meeting.clientName).includes(query);
+        if (!titleMatch && !sellerMatch && !clientMatch) return false;
+      }
+
+      // Filtro de Vendedor
+      const sellerFilters = selectedFilters.seller || [];
+      if (sellerFilters.length > 0) {
+        if (!sellerFilters.includes(meeting.sellerName)) return false;
+      }
+
+      // Filtro de Cliente
+      const clientFilters = selectedFilters.client || [];
+      if (clientFilters.length > 0) {
+        if (!clientFilters.includes(meeting.clientName)) return false;
+      }
+
+      // Filtro de Data
+      const dateFilters = selectedFilters.dateRange || [];
+      if (dateFilters.length > 0) {
+        const dateRange = getDateRange(meeting.date);
+        if (!dateFilters.includes(dateRange)) return false;
+      }
+
+      return true;
+    });
+  }, [meetings, searchValue, selectedFilters]);
+
+  const handleFilterChange = (
+    groupId: string,
+    selectedValues: string[]
+  ): void => {
+    setSelectedFilters((prev) => ({ ...prev, [groupId]: selectedValues }));
+  };
+
+  const handleClearFilters = (): void => setSelectedFilters({});
+
+  const handleDetailsClick = (rowId: string | number): void => {
+    void navigate({
+      to: EPageRoutes.SALESMAN_MEETINGS_DETAIL,
+      params: { meetingId: String(rowId) },
+    });
+  };
+
   const summary = data?.summary;
-
-  const filteredMeetings = useMemo(() => {
-    if (!filterValue) {
-      return meetings;
-    }
-
-    return meetings.filter((meeting) => meeting.sellerName === filterValue);
-  }, [meetings, filterValue]);
-
-  const salesmanFilterOptions = useMemo(() => {
-    const salesmanNames = Array.from(
-      new Set((salesmenPage?.content ?? []).map((salesman) => salesman.name))
-    )
-      .filter((name) => name.trim().length > 0)
-      .sort((a, b) => a.localeCompare(b, 'pt-BR'));
-
-    return [
-      { label: 'Todos', value: '' },
-      ...salesmanNames.map((name) => ({ label: name, value: name })),
-    ];
-  }, [salesmenPage]);
 
   const successRatePercent =
     summary != null ? Math.round(summary.success_rate * 100) : undefined;
   const sentimentConfig = getSentimentConfig(successRatePercent);
 
-  const columns: DataTableProps<TMeetingListItem>['columns'] = [
+  const columns: DataTableProps<MeetingWithDate>['columns'] = [
     {
       header: 'Reunião',
-      accessor: (row: TMeetingListItem) => row.title,
-      render: (value: ReactNode) => (
+      accessor: (row: MeetingWithDate): string => row.title,
+      render: (value: ReactNode): JSX.Element => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <EventIcon
             sx={{ color: palette.meetings[500], fontSize: '1.5rem' }}
@@ -94,8 +174,8 @@ export const ManagerMeetingsPage = (): JSX.Element => {
     },
     {
       header: 'Vendedor',
-      accessor: (row: TMeetingListItem) => row.sellerName,
-      render: (value: ReactNode) => (
+      accessor: (row: MeetingWithDate): string => row.sellerName,
+      render: (value: ReactNode): JSX.Element => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <PersonIcon
             sx={{ color: palette.salesmen[500], fontSize: '1.5rem' }}
@@ -108,22 +188,27 @@ export const ManagerMeetingsPage = (): JSX.Element => {
     },
     {
       header: 'Cliente',
-      accessor: (row: TMeetingListItem) => row.clientName,
-      render: (value: ReactNode) => (
-        <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <RealEstateAgentIcon
-            sx={{ color: palette.primary[200], fontSize: '1.5rem' }}
+      accessor: (row: MeetingWithDate): string => row.clientName,
+      render: (value: ReactNode, row): JSX.Element => (
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <RealEstateAgentOutlinedIcon
+            sx={{ color: palette.primary[300], fontSize: '1.25rem' }}
           />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-            {value ?? '-'}
-          </Typography>
+          <Stack spacing={0}>
+            <Typography variant="body2" fontWeight={500}>
+              {value ?? '-'}
+            </Typography>
+            <Typography variant="caption" color={palette.neutrals[500]}>
+              {row.companyName}
+            </Typography>
+          </Stack>
         </Stack>
       ),
     },
     {
       header: 'Data',
-      accessor: (row: TMeetingListItem) => row.date,
-      render: (value: ReactNode) => (
+      accessor: (row: MeetingWithDate): string => row.date,
+      render: (value: ReactNode): JSX.Element => (
         <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
           {typeof value === 'string' ? formatMeetingDate(value) : '-'}
         </Typography>
@@ -131,8 +216,8 @@ export const ManagerMeetingsPage = (): JSX.Element => {
     },
     {
       header: 'Duração',
-      accessor: (row: TMeetingListItem) => row.durationMinutes,
-      render: (value: ReactNode) => (
+      accessor: (row: MeetingWithDate): number => row.durationMinutes,
+      render: (value: ReactNode): JSX.Element => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
           <ScheduleIcon
             sx={{ color: palette.primary[500], fontSize: '1.5rem' }}
@@ -160,7 +245,6 @@ export const ManagerMeetingsPage = (): JSX.Element => {
             value={summary?.total_meetings ?? 0}
             label="Total de reuniões"
           />
-
           <StatCard
             iconName="duration"
             theme="neutrals"
@@ -171,7 +255,6 @@ export const ManagerMeetingsPage = (): JSX.Element => {
             }
             label="Duração média"
           />
-
           <StatCard
             iconName={sentimentConfig.iconName}
             theme={sentimentConfig.theme}
@@ -183,29 +266,26 @@ export const ManagerMeetingsPage = (): JSX.Element => {
         <DataTable
           data={filteredMeetings}
           columns={columns}
-          getRowId={(row: TMeetingListItem) => row.id}
+          getRowId={(row: MeetingWithDate): string => row.id}
           loading={isLoading}
           sx={{
             border: `1px solid ${palette.neutrals[200]}`,
             flex: 1,
             minHeight: 0,
           }}
-          onDetailsClick={(rowId) => {
-            navigate({
-              to: EPageRoutes.SALESMAN_MEETINGS_DETAIL,
-              params: { meetingId: String(rowId) },
-            });
-          }}
+          onDetailsClick={handleDetailsClick}
+          filterType="advanced"
+          filterGroups={filterGroups}
+          selectedFilters={selectedFilters}
+          onFilterChangeAdvanced={handleFilterChange}
+          onClearFilters={handleClearFilters}
+          filterLabel="Filtros"
+          filterPlaceholderAdvanced="Filtrar reuniões"
           onSearchChange={setSearchValue}
-          onFilterChange={setFilterValue}
           searchValue={searchValue}
-          filterValue={filterValue}
-          toolbarTitle="Lista de reuniões"
           searchPlaceholder="Buscar reunião..."
           searchAriaLabel="Buscar reunião"
-          filterPlaceholder="Filtrar"
-          filterAriaLabel="Filtrar reuniões por vendedor"
-          filterOptions={salesmanFilterOptions}
+          toolbarTitle="Lista de reuniões"
         />
       </Stack>
     </PageContainter>

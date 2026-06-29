@@ -10,20 +10,17 @@ import RealEstateAgentOutlinedIcon from '@mui/icons-material/RealEstateAgentOutl
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import type { TMeetingListItem } from '@services/models/MeetingSchema';
+import type { MeetingWithDate } from '@services/api/meeting';
 import { useGetMeetings } from '@services/queries/useMeetings';
 import { useNavigate } from '@tanstack/react-router';
 import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatCard } from '@UI/StatCard/StatCard';
+import { getFilterDateRange } from '@utils/getFilterDateRange';
 import { normalizeText } from '@utils/normalizeText';
 import type { JSX, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-
-type MeetingWithDate = TMeetingListItem & {
-  dateRange: string;
-};
 
 const formatMeetingDate = (date: string): string => {
   return new Intl.DateTimeFormat('pt-BR').format(new Date(date));
@@ -31,29 +28,6 @@ const formatMeetingDate = (date: string): string => {
 
 const formatDuration = (minutes: number): string => {
   return `${minutes} min`;
-};
-
-const getDateRange = (date: string): string => {
-  const d = new Date(date);
-  const currentDate = new Date();
-  const today = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    currentDate.getDate()
-  );
-  const meetingDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const diffDays = Math.floor(
-    (today.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
-
-  if (diffDays === 0) return 'Hoje';
-  if (diffDays === 1) return 'Ontem';
-  if (diffDays <= 7) return 'Última semana';
-  if (diffDays <= 14) return 'Últimas 2 semanas';
-  if (diffDays <= 30) return 'Último mês';
-  if (diffDays <= 90) return 'Últimos 3 meses';
-  if (diffDays <= 180) return 'Últimos 6 meses';
-  return 'Mais de 6 meses';
 };
 
 const filterGroupConfig = [
@@ -91,7 +65,7 @@ export const ManagerMeetingsPage = (): JSX.Element => {
     () =>
       (data?.content ?? []).map((meeting) => ({
         ...meeting,
-        dateRange: getDateRange(meeting.date),
+        dateRange: getFilterDateRange(meeting.date),
       })),
     [data?.content]
   );
@@ -127,7 +101,7 @@ export const ManagerMeetingsPage = (): JSX.Element => {
       // Filtro de Data
       const dateFilters = selectedFilters.dateRange || [];
       if (dateFilters.length > 0) {
-        const dateRange = getDateRange(meeting.date);
+        const dateRange = getFilterDateRange(meeting.date);
         if (!dateFilters.includes(dateRange)) return false;
       }
 

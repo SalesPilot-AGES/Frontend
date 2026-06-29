@@ -1,7 +1,12 @@
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import type { DataTableProps } from '@declarations/ui';
-import { getSentimentConfig } from '@hooks/useSentiment';
+import { useFilterOptions } from '@hooks/useFilterOptions';
+import {
+  getSentimentConfig,
+  getSentimentPercent,
+  getSentimentRange,
+} from '@hooks/useSentimental';
 import EventIcon from '@mui/icons-material/Event';
 import RealEstateAgentOutlinedIcon from '@mui/icons-material/RealEstateAgentOutlined';
 import { Box, Stack, Typography } from '@mui/material';
@@ -14,64 +19,148 @@ import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatCard } from '@UI/StatCard/StatCard';
+import { getFilterDateRange } from '@utils/getFilterDateRange';
 import {
   formatMeetingDate,
   formatMeetingStatus,
-  getClientSentimentPercent,
 } from '@utils/meetingFormatters';
+import { normalizeText } from '@utils/normalizeText';
 import type { JSX, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
+
+type MeetingWithDate = TMeetingListItem & {
+  dateRange: string;
+  sentimentRange: string;
+  clientName: string;
+  companyName: string;
+  sentimentValue: number | null;
+};
+
+const filterGroupConfig = [
+  {
+    id: 'client',
+    label: 'Cliente',
+    accessor: (m: MeetingWithDate): string => m.clientName,
+    formatter: (v: string): string => v,
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    accessor: (m: MeetingWithDate): string => formatMeetingStatus(m.status),
+    formatter: (v: string): string => v,
+  },
+  {
+    id: 'dateRange',
+    label: 'Período',
+    accessor: (m: MeetingWithDate): string => m.dateRange,
+    formatter: (v: string): string => v,
+  },
+  {
+    id: 'sentiment',
+    label: 'Sentimento Médio',
+    accessor: (m: MeetingWithDate): string => m.sentimentRange,
+    formatter: (v: string): string => v,
+  },
+];
 
 export const SalesmanMeetingsPage = (): JSX.Element => {
   const { palette } = useTheme();
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
-  const [clientFilterValue, setClientFilterValue] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
 
-  const filters = useMemo(
-    () => ({
-      ...(searchValue.trim() && { search: searchValue.trim() }),
-    }),
-    [searchValue]
-  );
-
-  // O filtro de cliente (clientFilterValue) é aplicado client-side abaixo porque
-  // a API só suporta filtro por clientCompanyName, não por clientId individual.
-  // Buscamos um tamanho de página maior para reduzir a chance do filtro
-  // esconder reuniões que estão fora da primeira página.
-  const { data, isLoading } = useGetMeetings(0, 100, filters);
+  const { data, isLoading } = useGetMeetings(0, 100, {});
   const meetings = useMemo(() => data?.content ?? [], [data?.content]);
   const summary = data?.summary;
-  const filteredMeetings = useMemo(
+
+  const meetingsWithDate: MeetingWithDate[] = useMemo(
     () =>
-      clientFilterValue
-        ? meetings.filter((meeting) => meeting.clientId === clientFilterValue)
-        : meetings,
-    [clientFilterValue, meetings]
+      meetings.map((m) => ({
+        ...m,
+        clientName: m.clientName || '-',
+        companyName: m.companyName || '-',
+        sentimentValue: m.sentiment ?? null,
+        dateRange: getFilterDateRange(m.date),
+        sentimentRange: getSentimentRange(m.sentiment),
+      })),
+    [meetings]
   );
-  const clientFilterOptions = useMemo(() => {
-    const clients = Array.from(
-      new Map(
-        meetings.map((meeting) => [meeting.clientId, meeting.clientName])
-      ).entries()
-    ).sort(([, firstName], [, secondName]) =>
-      firstName.localeCompare(secondName, 'pt-BR')
-    );
 
-    return [
-      { label: 'Todos', value: '' },
-      ...clients.map(([id, name]) => ({ label: name, value: id })),
-    ];
-  }, [meetings]);
-  const successRatePercent =
+  const filterGroups = useFilterOptions({
+    data: meetingsWithDate,
+    groups: filterGroupConfig,
+  });
+
+  const filteredMeetings = useMemo((): MeetingWithDate[] => {
+    const query = normalizeText(searchValue.trim());
+    return meetingsWithDate.filter((m) => {
+      // Filtro de busca
+      if (query.length > 0) {
+        const title = normalizeText(m.title).includes(query);
+        const client = normalizeText(m.clientName).includes(query);
+        const company = normalizeText(m.companyName).includes(query);
+        if (!title && !client && !company) return false;
+      }
+
+      // Filtro de Cliente
+      const clientFilters = selectedFilters.client || [];
+      if (clientFilters.length > 0 && !clientFilters.includes(m.clientName))
+        return false;
+
+      // Filtro de Status
+      const statusFilters = selectedFilters.status || [];
+      if (statusFilters.length > 0) {
+        const status = formatMeetingStatus(m.status);
+        if (!statusFilters.includes(status)) return false;
+      }
+
+      // Filtro de Data
+      const dateFilters = selectedFilters.dateRange || [];
+      if (dateFilters.length > 0) {
+        const dateRange = getFilterDateRange(m.date);
+        if (!dateFilters.includes(dateRange)) return false;
+      }
+
+      // Filtro de Sentimento
+      const sentimentFilters = selectedFilters.sentiment || [];
+      if (sentimentFilters.length > 0) {
+        const sentimentRange = getSentimentRange(m.sentimentValue);
+        if (!sentimentFilters.includes(sentimentRange)) return false;
+      }
+
+      return true;
+    });
+  }, [meetingsWithDate, searchValue, selectedFilters]);
+
+  const handleFilterChange = (groupId: string, values: string[]): void => {
+    setSelectedFilters((prev) => ({ ...prev, [groupId]: values }));
+  };
+
+  const handleClearFilters = (): void => setSelectedFilters({});
+
+  const handleDetailsClick = (id: string | number): void => {
+    void navigate({
+      to: EPageRoutes.SALESMAN_MEETINGS_DETAIL,
+      params: { meetingId: String(id) },
+    });
+  };
+
+  const successRate =
     summary != null ? Math.round(summary.success_rate * 100) : undefined;
-  const sentimentConfig = getSentimentConfig(successRatePercent);
+  const sentimentConfig = getSentimentConfig(successRate);
 
-  const columns: DataTableProps<TMeetingListItem>['columns'] = [
+  const getSentimentForRow = (row: MeetingWithDate): number | undefined => {
+    if (row.status !== 'COMPLETED') return undefined;
+    return getSentimentPercent(row.sentimentValue);
+  };
+
+  const columns: DataTableProps<MeetingWithDate>['columns'] = [
     {
       header: 'Reunião',
-      accessor: (row) => row.title,
-      render: (value: ReactNode) => (
+      accessor: (row: MeetingWithDate): string => row.title,
+      render: (value: ReactNode): JSX.Element => (
         <Stack direction="row" alignItems="center" spacing={1}>
           <EventIcon
             sx={{ color: palette.meetings[500], fontSize: '1.25rem' }}
@@ -84,8 +173,8 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
     },
     {
       header: 'Cliente',
-      accessor: (row) => row.clientName,
-      render: (value: ReactNode, row) => (
+      accessor: (row: MeetingWithDate): string => row.clientName,
+      render: (value: ReactNode, row: MeetingWithDate): JSX.Element => (
         <Stack direction="row" alignItems="center" spacing={1}>
           <RealEstateAgentOutlinedIcon
             sx={{ color: palette.primary[300], fontSize: '1.25rem' }}
@@ -103,25 +192,21 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
     },
     {
       header: 'Status',
-      accessor: (row) => formatMeetingStatus(row.status),
+      accessor: (row: MeetingWithDate): string =>
+        formatMeetingStatus(row.status),
     },
     {
       header: 'Data',
-      accessor: (row) => formatMeetingDate(row.date),
+      accessor: (row: MeetingWithDate): string => formatMeetingDate(row.date),
     },
     {
       header: 'Sentimento',
-      accessor: (row) =>
-        row.status === 'COMPLETED'
-          ? getClientSentimentPercent(row.sentiment)
-          : undefined,
+      accessor: getSentimentForRow,
       render: (value: ReactNode): ReactNode => {
         const percent = typeof value === 'number' ? value : undefined;
         const config = getSentimentConfig(percent);
-
-        return percent == null ? (
-          <Typography variant="body2">-</Typography>
-        ) : (
+        if (percent == null) return <Typography variant="body2">-</Typography>;
+        return (
           <Stack direction="row" alignItems="center" spacing={0.75}>
             <Box
               sx={{
@@ -152,7 +237,6 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
           title={EPageTitles.MEETINGS}
           subtitle="Gerencie todas reuniões da plataforma"
         />
-
         <Stack direction={{ xs: 'column', md: 'row' }} spacing="1.5rem">
           <StatCard
             iconName="meeting"
@@ -173,32 +257,28 @@ export const SalesmanMeetingsPage = (): JSX.Element => {
           <StatCard
             iconName={sentimentConfig.iconName}
             theme={sentimentConfig.theme}
-            value={successRatePercent != null ? `${successRatePercent}%` : '0%'}
+            value={successRate != null ? `${successRate}%` : '0%'}
             label="Sentimento médio"
           />
         </Stack>
-
         <DataTable
           data={filteredMeetings}
           columns={columns}
-          getRowId={(row) => row.id}
+          getRowId={(row: MeetingWithDate): string => row.id}
           loading={isLoading}
-          onDetailsClick={(rowId) => {
-            navigate({
-              to: EPageRoutes.SALESMAN_MEETINGS_DETAIL,
-              params: { meetingId: String(rowId) },
-            });
-          }}
+          onDetailsClick={handleDetailsClick}
+          filterType="advanced"
+          filterGroups={filterGroups}
+          selectedFilters={selectedFilters}
+          onFilterChangeAdvanced={handleFilterChange}
+          onClearFilters={handleClearFilters}
+          filterLabel="Filtros"
+          filterPlaceholderAdvanced="Filtrar reuniões"
           onSearchChange={setSearchValue}
-          onFilterChange={setClientFilterValue}
           searchValue={searchValue}
-          filterValue={clientFilterValue}
-          toolbarTitle="Lista de reuniões"
           searchPlaceholder="Buscar reunião..."
           searchAriaLabel="Buscar reunião"
-          filterPlaceholder="Selecionar cliente"
-          filterAriaLabel="Filtrar reuniões por cliente"
-          filterOptions={clientFilterOptions}
+          toolbarTitle="Lista de reuniões"
           sx={{
             border: `1px solid ${palette.neutrals[200]}`,
             flex: 1,

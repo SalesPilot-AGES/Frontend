@@ -14,6 +14,14 @@ import axios from 'axios';
 
 import apiClient, { unwrapContent } from './apiClient';
 
+export type MeetingWithDate = TMeetingListItem & {
+  dateRange: string;
+  sentimentRange?: string;
+  clientName?: string;
+  companyName?: string;
+  sentimentValue?: number | null;
+};
+
 export type TMeetingFilters = {
   search?: string;
   companies?: string;

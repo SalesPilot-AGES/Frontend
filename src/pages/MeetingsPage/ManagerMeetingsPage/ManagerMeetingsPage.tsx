@@ -3,9 +3,9 @@ import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
 import type { DataTableProps } from '@declarations/ui';
 import { getSentimentConfig } from '@hooks/useSentiment';
-import ApartmentIcon from '@mui/icons-material/Apartment';
 import EventIcon from '@mui/icons-material/Event';
 import PersonIcon from '@mui/icons-material/Person';
+import RealEstateAgentIcon from '@mui/icons-material/RealEstateAgent';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -107,12 +107,12 @@ export const ManagerMeetingsPage = (): JSX.Element => {
       ),
     },
     {
-      header: 'Empresa',
-      accessor: (row: TMeetingListItem) => row.companyName,
+      header: 'Cliente',
+      accessor: (row: TMeetingListItem) => row.clientName,
       render: (value: ReactNode) => (
         <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <ApartmentIcon
-            sx={{ color: palette.companies[500], fontSize: '1.5rem' }}
+          <RealEstateAgentIcon
+            sx={{ color: palette.primary[200], fontSize: '1.5rem' }}
           />
           <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
             {value ?? '-'}

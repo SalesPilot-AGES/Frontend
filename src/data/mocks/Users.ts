@@ -6,20 +6,20 @@ export const mockUsers: User[] = [
     name: 'Admin User',
     email: 'admin@example.com',
     role: 'admin',
-    company: 'SalesPilot',
+    company_name: 'SalesPilot',
   },
   {
     id: '2',
     name: 'Manager User',
     email: 'manager@example.com',
     role: 'manager',
-    company: 'Tech Corp',
+    company_name: 'Tech Corp',
   },
   {
     id: '3',
     name: 'Salesmen User',
     email: 'salesmen@example.com',
     role: 'salesmen',
-    company: 'Tech Corp',
+    company_name: 'Tech Corp',
   },
 ];

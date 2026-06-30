@@ -85,6 +85,26 @@ describe('dashboardApi', () => {
     });
   });
 
+  it('parses seller dashboard metrics', async () => {
+    mockedGet.mockResolvedValue({
+      data: {
+        total_meetings: { value: 15, variation_percent: 20, trend: 'up' },
+        average_duration: {
+          value: 2400,
+          variation_percent: -5,
+          trend: 'down',
+        },
+      },
+    });
+
+    const metrics = await dashboardApi.getMetrics({ period: '30d' });
+
+    expect(metrics.total_meetings?.value).toBe(15);
+    expect(metrics.total_meetings?.variationPercentage).toBe(20);
+    expect(metrics.average_duration?.value).toBe(2400);
+    expect(metrics.average_duration?.trend).toBe('down');
+  });
+
   it('sends custom range params when fetching avg duration', async () => {
     mockedGet.mockResolvedValue({
       data: {

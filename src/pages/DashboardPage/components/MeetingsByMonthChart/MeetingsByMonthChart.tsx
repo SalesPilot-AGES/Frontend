@@ -8,6 +8,7 @@ import { useMemo } from 'react';
 
 import { useDashboardFilterContext } from '../../context/DashboardFilterContext';
 import { formatMonthLabel } from '../AvgDurationLineChart/AvgDurationLineChart.utils';
+import { CHART_TOOLTIP_SLOT_PROPS } from '../chartTooltipSlotProps';
 
 const EMPTY_STATE_TITLE = 'Nenhuma reunião encontrada';
 const EMPTY_STATE_DESCRIPTION =
@@ -52,7 +53,16 @@ export const MeetingsByMonthChart = (): JSX.Element => {
         Total de reuniões
       </Typography>
 
-      <Box sx={{ width: '100%', height: '15rem', overflow: 'hidden' }}>
+      <Box
+        sx={{
+          width: '100%',
+          flex: 1,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
         {isLoading ? (
           <Box
             sx={{
@@ -108,15 +118,7 @@ export const MeetingsByMonthChart = (): JSX.Element => {
                 valueFormatter: (value): string => `${value ?? 0} reuniões`,
               },
             ]}
-            slotProps={{
-              tooltip: {
-                sx: {
-                  '& .MuiChartsTooltip-table caption': {
-                    textAlign: 'right',
-                  },
-                },
-              },
-            }}
+            slotProps={CHART_TOOLTIP_SLOT_PROPS}
             slots={{ legend: () => null }}
           />
         )}

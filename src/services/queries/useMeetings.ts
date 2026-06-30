@@ -37,7 +37,7 @@ export const useGetMeetings = (
   return useQuery<TMeetingsListResult, Error>({
     queryKey: meetingsQueryKeys.list(page, size, filters),
     queryFn: () => meetingApi.getMeetings(page, size, filters),
-    staleTime: 0,
+    staleTime: 1000 * 60 * 5,
     ...options,
   });
 };

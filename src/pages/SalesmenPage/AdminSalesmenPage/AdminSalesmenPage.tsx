@@ -2,7 +2,7 @@ import { ECardLabel } from '@data/enums/ECardLabel';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import { EStatus } from '@data/enums/EStatus';
+import { useFilterOptions } from '@hooks/useFilterOptions';
 import { getSentimentConfig } from '@hooks/useSentiment';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Button, Stack } from '@mui/material';
@@ -14,6 +14,7 @@ import { DataTable } from '@UI/DataTable/DataTable';
 import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatCard } from '@UI/StatCard/StatCard';
+import { normalizeText } from '@utils/normalizeText';
 import type { JSX } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -23,30 +24,119 @@ import {
   formatAverageSentiment,
 } from './salesmenColumns';
 
+type SalesmanWithCompany = TSalesmanWithCompany & {
+  companyName: string;
+  sentimentRange: string;
+};
+
+const getSentimentRange = (sentiment: number | null | undefined): string => {
+  if (sentiment === null || sentiment === undefined) return 'Sem dados';
+  const percent = sentiment * 100;
+  if (percent <= 40) return '0% a 40%';
+  if (percent <= 60) return '41% a 60%';
+  return '61% a 100%';
+};
+
+const filterGroupConfig = [
+  {
+    id: 'status',
+    label: 'Status',
+    accessor: (salesman: SalesmanWithCompany): string =>
+      salesman.active ? 'Ativo' : 'Inativo',
+    formatter: (value: string): string => value,
+  },
+  {
+    id: 'company',
+    label: 'Empresa',
+    accessor: (salesman: SalesmanWithCompany): string => salesman.companyName,
+    formatter: (value: string): string => value,
+  },
+  {
+    id: 'sentiment',
+    label: 'Sentimento Médio',
+    accessor: (salesman: SalesmanWithCompany): string =>
+      getSentimentRange(salesman.average_sentiment),
+    formatter: (value: string): string => value,
+  },
+];
+
 export const AdminSalesmenPage = (): JSX.Element => {
   const { palette } = useTheme();
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
-  const [filterValue, setFilterValue] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: salesmenData, isLoading } = useGetSalesmen(0, 20, {});
-  const salesmen = useMemo(
-    () => salesmenData?.content ?? [],
+
+  const salesmen: SalesmanWithCompany[] = useMemo(
+    () =>
+      (salesmenData?.content ?? []).map((salesman) => ({
+        ...salesman,
+        companyName: salesman.company.name,
+        sentimentRange: getSentimentRange(salesman.average_sentiment),
+      })),
     [salesmenData?.content]
   );
 
-  const filteredSalesmen = useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
+  const filterGroups = useFilterOptions({
+    data: salesmen,
+    groups: filterGroupConfig,
+  });
+
+  const filteredSalesmen = useMemo((): SalesmanWithCompany[] => {
+    const query = normalizeText(searchValue.trim());
     return salesmen.filter((salesman) => {
-      if (filterValue === 'true' && !salesman.active) return false;
-      if (filterValue === 'false' && salesman.active) return false;
-      if (query.length === 0) return true;
-      const nameMatch = salesman.name.toLowerCase().includes(query);
-      const emailMatch = salesman.email.toLowerCase().includes(query);
-      const companyMatch = salesman.company.name.toLowerCase().includes(query);
-      return nameMatch || emailMatch || companyMatch;
+      // Filtro de busca
+      if (query.length > 0) {
+        const nameMatch = normalizeText(salesman.name).includes(query);
+        const emailMatch = normalizeText(salesman.email).includes(query);
+        const companyMatch = normalizeText(salesman.companyName).includes(
+          query
+        );
+        if (!nameMatch && !emailMatch && !companyMatch) return false;
+      }
+
+      // Filtro de Status
+      const statusFilters = selectedFilters.status || [];
+      if (statusFilters.length > 0) {
+        const salesmanStatus = salesman.active ? 'Ativo' : 'Inativo';
+        if (!statusFilters.includes(salesmanStatus)) return false;
+      }
+
+      // Filtro de Empresa
+      const companyFilters = selectedFilters.company || [];
+      if (companyFilters.length > 0) {
+        if (!companyFilters.includes(salesman.companyName)) return false;
+      }
+
+      // Filtro de Sentimento
+      const sentimentFilters = selectedFilters.sentiment || [];
+      if (sentimentFilters.length > 0) {
+        const sentimentRange = getSentimentRange(salesman.average_sentiment);
+        if (!sentimentFilters.includes(sentimentRange)) return false;
+      }
+
+      return true;
     });
-  }, [salesmen, searchValue, filterValue]);
+  }, [salesmen, searchValue, selectedFilters]);
+
+  const handleFilterChange = (
+    groupId: string,
+    selectedValues: string[]
+  ): void => {
+    setSelectedFilters((prev) => ({ ...prev, [groupId]: selectedValues }));
+  };
+
+  const handleClearFilters = (): void => setSelectedFilters({});
+
+  const handleDetailsClick = (rowId: string | number): void => {
+    void navigate({
+      to: EPageRoutes.SALESMAN_DETAIL,
+      params: { id: String(rowId) },
+    });
+  };
 
   const columns = useMemo(() => buildSalesmenColumns(palette), [palette]);
 
@@ -81,11 +171,10 @@ export const AdminSalesmenPage = (): JSX.Element => {
             title={EPageTitles.SALESMEN}
             subtitle={EpageDescriptions.SALESMEN}
           />
-
           <Button
             startIcon={<AddIcon />}
             variant="gradient"
-            onClick={() => setIsModalOpen(true)}
+            onClick={(): void => setIsModalOpen(true)}
           >
             Adicionar vendedor
           </Button>
@@ -98,14 +187,12 @@ export const AdminSalesmenPage = (): JSX.Element => {
             value={activeSalesmen}
             label={ECardLabel.ACTIVE_SALESMAN}
           />
-
           <StatCard
             iconName="salesman"
             theme="neutrals"
             value={inactiveSalesmen}
             label={ECardLabel.INACTIVE_SALESMAN}
           />
-
           <StatCard
             iconName={averageSentimentConfig.iconName}
             theme={averageSentimentConfig.theme}
@@ -118,38 +205,32 @@ export const AdminSalesmenPage = (): JSX.Element => {
         <DataTable
           data={filteredSalesmen}
           columns={columns}
-          getRowId={(row: TSalesmanWithCompany) => row.id}
+          getRowId={(row: SalesmanWithCompany): string => row.id}
           loading={isLoading}
           sx={{
             border: `1px solid ${palette.neutrals[200]}`,
             flex: 1,
             minHeight: 0,
           }}
-          onDetailsClick={(rowId) => {
-            navigate({
-              to: EPageRoutes.SALESMAN_DETAIL,
-              params: { id: String(rowId) },
-            });
-          }}
+          onDetailsClick={handleDetailsClick}
+          filterType="advanced"
+          filterGroups={filterGroups}
+          selectedFilters={selectedFilters}
+          onFilterChangeAdvanced={handleFilterChange}
+          onClearFilters={handleClearFilters}
+          filterLabel="Filtros"
+          filterPlaceholderAdvanced="Filtrar vendedores"
           onSearchChange={setSearchValue}
-          onFilterChange={setFilterValue}
           searchValue={searchValue}
-          filterValue={filterValue}
-          toolbarTitle="Lista de vendedores"
           searchPlaceholder="Buscar vendedor..."
           searchAriaLabel="Buscar vendedor"
-          filterPlaceholder="Filtrar"
-          filterAriaLabel="Filtrar vendedores"
-          filterOptions={[
-            { label: 'Todos', value: '' },
-            { label: EStatus.ACTIVE, value: 'true' },
-            { label: EStatus.INACTIVE, value: 'false' },
-          ]}
+          toolbarTitle="Lista de vendedores"
         />
       </Stack>
       <AddSalesmanModal
         open={isModalOpen}
-        handleClose={() => setIsModalOpen(false)}
+        handleClose={(): void => setIsModalOpen(false)}
+        variant="admin"
       />
     </PageContainter>
   );

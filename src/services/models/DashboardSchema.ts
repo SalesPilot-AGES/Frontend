@@ -20,6 +20,8 @@ export const DashboardMetricTrendSchema = z.enum(['up', 'down', 'neutral']);
 export const DashboardMetricKeySchema = z.enum([
   'active_companies',
   'inactive_companies',
+  'average_duration',
+  'average_sentiment',
   'total_meetings',
   'salesmen',
 ]);
@@ -63,29 +65,47 @@ const DashboardMetricApiSchema = z
     };
   });
 
+export type TDashboardMetric = z.infer<typeof DashboardMetricApiSchema>;
+export type TDashboardMetrics = Partial<
+  Record<TDashboardMetricKey, TDashboardMetric>
+>;
+
+const assignMetric = (
+  metrics: TDashboardMetrics,
+  key: TDashboardMetricKey,
+  metric?: TDashboardMetric
+): void => {
+  if (metric) {
+    metrics[key] = metric;
+  }
+};
+
 export const DashboardMetricsResponseSchema = z
   .object({
-    active_companies: DashboardMetricApiSchema,
-    inactive_companies: DashboardMetricApiSchema,
-    total_meetings: DashboardMetricApiSchema,
-    active_sellers: DashboardMetricApiSchema,
+    active_companies: DashboardMetricApiSchema.optional(),
+    inactive_companies: DashboardMetricApiSchema.optional(),
+    average_duration: DashboardMetricApiSchema.optional(),
+    average_sentiment: DashboardMetricApiSchema.optional(),
+    total_meetings: DashboardMetricApiSchema.optional(),
+    active_sellers: DashboardMetricApiSchema.optional(),
+    salesmen: DashboardMetricApiSchema.optional(),
   })
-  .transform((r) => ({
-    active_companies: r.active_companies,
-    inactive_companies: r.inactive_companies,
-    total_meetings: r.total_meetings,
-    salesmen: r.active_sellers,
-  }));
+  .transform((response) => {
+    const metrics: TDashboardMetrics = {};
 
-export const DashboardMetricsSchema = z.object({
-  active_companies: DashboardMetricApiSchema,
-  inactive_companies: DashboardMetricApiSchema,
-  total_meetings: DashboardMetricApiSchema,
-  salesmen: DashboardMetricApiSchema,
-});
+    assignMetric(metrics, 'active_companies', response.active_companies);
+    assignMetric(metrics, 'inactive_companies', response.inactive_companies);
+    assignMetric(metrics, 'average_duration', response.average_duration);
+    assignMetric(metrics, 'average_sentiment', response.average_sentiment);
+    assignMetric(metrics, 'total_meetings', response.total_meetings);
+    assignMetric(
+      metrics,
+      'salesmen',
+      response.active_sellers ?? response.salesmen
+    );
 
-export type TDashboardMetric = z.infer<typeof DashboardMetricApiSchema>;
-export type TDashboardMetrics = z.infer<typeof DashboardMetricsSchema>;
+    return metrics;
+  });
 
 const MeetingsByCompanyItemApiSchema = z.object({
   company_name: z.string().trim().min(1),
@@ -141,28 +161,19 @@ export const MeetingsByMonthSchema = z.array(MeetingsByMonthApiItemSchema);
 export type TMeetingsByMonth = z.infer<typeof MeetingsByMonthSchema>;
 
 const MeetingsBySalesmanItemApiSchema = z.object({
-  salesman_name: z.string().trim().min(1),
+  seller_name: z.string().trim().min(1),
   total_meetings: z.number().int().nonnegative().optional(),
   meetings_total: z.number().int().nonnegative().optional(),
   meetings_count: z.number().int().nonnegative().optional(),
   total: z.number().int().nonnegative().optional(),
 });
 
-const getTotalMeetingsSalesman = (
-  row: z.infer<typeof MeetingsBySalesmanItemApiSchema>
-): number =>
-  row.total_meetings ??
-  row.meetings_total ??
-  row.meetings_count ??
-  row.total ??
-  0;
-
 export const MeetingsBySalesmanSchema = z
   .array(MeetingsBySalesmanItemApiSchema)
   .transform((rows) =>
     rows.map((row) => ({
-      salesman_name: row.salesman_name,
-      total_meetings: getTotalMeetingsSalesman(row),
+      salesman_name: row.seller_name,
+      total_meetings: row.total,
     }))
   );
 

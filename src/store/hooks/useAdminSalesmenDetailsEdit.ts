@@ -25,7 +25,8 @@ const createEditForm = (salesman: TSalesman): TSalesmanEditForm => ({
 export const useAdminSalesmenDetailsEdit = (
   salesman: TSalesman | null,
   isEditing: boolean,
-  onSaveSuccess?: () => void
+  onSaveSuccess?: () => void,
+  canEdit: boolean = true
 ): {
   editForm: TSalesmanEditForm | null;
   isEditFormValid: boolean;
@@ -37,7 +38,9 @@ export const useAdminSalesmenDetailsEdit = (
   ) => void;
   handleStatusChange: (checked: boolean) => void;
 } => {
-  const { data: companiesResponse } = useGetCompanies(0, 200);
+  const { data: companiesResponse } = useGetCompanies(0, 200, undefined, {
+    enabled: canEdit,
+  } as Parameters<typeof useGetCompanies>[3]);
   const updateSalesmanMutation = useUpdateSalesman();
   const [draftEditForm, setDraftEditForm] = useState<TSalesmanEditForm | null>(
     null

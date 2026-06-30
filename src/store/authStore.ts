@@ -24,11 +24,17 @@ const decodeJwtPayload = (token: string): Record<string, unknown> => {
 const userFromAccessToken = (accessToken: string): User => {
   const claims = decodeJwtPayload(accessToken);
   const email = claims.email as string;
+
+  // Extrai company_id do token
+  const companyId = claims.company_id as string | undefined;
+
   return {
     id: claims.sub as string,
     name: email.split('@')[0],
     email,
     role: ROLE_MAP[claims.role as string] ?? 'salesmen',
+    company_id: companyId, // Adiciona company_id ao objeto User
+    company_name: '', // Inicializa vazio, será preenchido posteriormente se necessário
   };
 };
 

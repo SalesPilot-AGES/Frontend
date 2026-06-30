@@ -2,8 +2,8 @@ import { ECardLabel } from '@data/enums/ECardLabel';
 import { EpageDescriptions } from '@data/enums/EpageDescriptions';
 import { EPageRoutes } from '@data/enums/EPageRoutes';
 import { EPageTitles } from '@data/enums/EPageTitles';
-import { EStatus } from '@data/enums/EStatus';
 import type { DataTableProps } from '@declarations/ui';
+import { useFilterOptions } from '@hooks/useFilterOptions';
 import AddIcon from '@mui/icons-material/Add';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import MailIcon from '@mui/icons-material/Mail';
@@ -18,89 +18,159 @@ import { PageContainter } from '@UI/PageContainer/PageContainer';
 import { PageHeader } from '@UI/PageHeader/PageHeader';
 import { StatCard } from '@UI/StatCard/StatCard';
 import { StatusBadge } from '@UI/StatusBadge/StatusBadge';
+import { normalizeText } from '@utils/normalizeText';
 import type { JSX, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 
 import { AddManagerModal } from './AddManagerModal/AddManagerModal';
+
+type ManagerWithCompany = TManager & {
+  companyName: string;
+};
+
+const filterGroupConfig = [
+  {
+    id: 'status',
+    label: 'Status',
+    accessor: (manager: ManagerWithCompany): string =>
+      manager.active ? 'Ativo' : 'Inativo',
+    formatter: (value: string): string => value,
+  },
+  {
+    id: 'company',
+    label: 'Empresa',
+    accessor: (manager: ManagerWithCompany): string => manager.companyName,
+    formatter: (value: string): string => value,
+  },
+];
 
 export const ManagersPage = (): JSX.Element => {
   const { palette } = useTheme();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const [filterValue, setFilterValue] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
 
   const { data: managersData, isLoading } = useGetManagers(0, 20, {});
-  const managers = useMemo(
-    () => managersData?.content ?? [],
+
+  const managers: ManagerWithCompany[] = useMemo(
+    () =>
+      (managersData?.content ?? []).map((manager) => ({
+        ...manager,
+        companyName: manager.company.name,
+      })),
     [managersData?.content]
   );
 
-  const filteredManagers = useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
-    return managers.filter((manager) => {
-      if (filterValue === 'true' && !manager.active) return false;
-      if (filterValue === 'false' && manager.active) return false;
-      if (query.length === 0) return true;
-      const nameMatch = manager.name.toLowerCase().includes(query);
-      const emailMatch = manager.email.toLowerCase().includes(query);
-      const companyMatch = manager.company.name.toLowerCase().includes(query);
-      return nameMatch || emailMatch || companyMatch;
-    });
-  }, [managers, searchValue, filterValue]);
+  const filterGroups = useFilterOptions({
+    data: managers,
+    groups: filterGroupConfig,
+  });
 
-  const columns: DataTableProps<TManager>['columns'] = [
+  const filteredManagers = useMemo((): ManagerWithCompany[] => {
+    const query = normalizeText(searchValue.trim());
+    return managers.filter((manager) => {
+      // Filtro de busca
+      if (query.length > 0) {
+        const nameMatch = normalizeText(manager.name).includes(query);
+        const emailMatch = normalizeText(manager.email).includes(query);
+        const companyMatch = normalizeText(manager.companyName).includes(query);
+        if (!nameMatch && !emailMatch && !companyMatch) return false;
+      }
+
+      // Filtro de Status
+      const statusFilters = selectedFilters.status || [];
+      if (statusFilters.length > 0) {
+        const managerStatus = manager.active ? 'Ativo' : 'Inativo';
+        if (!statusFilters.includes(managerStatus)) return false;
+      }
+
+      // Filtro de Empresa
+      const companyFilters = selectedFilters.company || [];
+      if (companyFilters.length > 0) {
+        if (!companyFilters.includes(manager.companyName)) return false;
+      }
+
+      return true;
+    });
+  }, [managers, searchValue, selectedFilters]);
+
+  const handleFilterChange = (
+    groupId: string,
+    selectedValues: string[]
+  ): void => {
+    setSelectedFilters((prev) => ({ ...prev, [groupId]: selectedValues }));
+  };
+
+  const handleClearFilters = (): void => setSelectedFilters({});
+
+  const handleDetailsClick = (rowId: string | number): void => {
+    void navigate({
+      to: EPageRoutes.MANAGER_DETAIL,
+      params: { id: String(rowId) },
+    });
+  };
+
+  const renderManagerName = (value: ReactNode): JSX.Element => (
+    <Stack direction="row" alignItems="center" spacing="0.5rem">
+      <ManageAccountsIcon
+        sx={{ color: palette.managers[500], fontSize: '1.5rem' }}
+      />
+      <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+        {value ?? '-'}
+      </Typography>
+    </Stack>
+  );
+
+  const renderEmail = (value: ReactNode): JSX.Element => (
+    <Stack direction="row" alignItems="center" spacing="0.5rem">
+      <MailIcon sx={{ color: palette.neutrals[300], fontSize: '1.5rem' }} />
+      <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+        {value ?? '-'}
+      </Typography>
+    </Stack>
+  );
+
+  const renderCompany = (value: ReactNode): JSX.Element => (
+    <Stack direction="row" alignItems="center" spacing="0.5rem">
+      <ApartmentIcon
+        sx={{ color: palette.companies[500], fontSize: '1.5rem' }}
+      />
+      <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
+        {value ?? '-'}
+      </Typography>
+    </Stack>
+  );
+
+  const columns: DataTableProps<ManagerWithCompany>['columns'] = [
     {
       header: 'Nome do gestor',
-      accessor: (row: TManager) => row.name,
-      render: (value: ReactNode) => (
-        <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <ManageAccountsIcon
-            sx={{ color: palette.managers[500], fontSize: '1.5rem' }}
-          />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-            {value ?? '-'}
-          </Typography>
-        </Stack>
-      ),
+      accessor: (row: ManagerWithCompany): string => row.name,
+      render: renderManagerName,
     },
     {
       header: 'E-mail',
-      accessor: (row: TManager) => row.email,
-      render: (value: ReactNode) => (
-        <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <MailIcon sx={{ color: palette.neutrals[300], fontSize: '1.5rem' }} />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-            {value ?? '-'}
-          </Typography>
-        </Stack>
-      ),
+      accessor: (row: ManagerWithCompany): string => row.email,
+      render: renderEmail,
     },
     {
       header: ECardLabel.COMPANY_NAME,
-      accessor: (row: TManager) => row.company.name,
-      render: (value: ReactNode) => (
-        <Stack direction="row" alignItems="center" spacing="0.5rem">
-          <ApartmentIcon
-            sx={{ color: palette.companies[500], fontSize: '1.5rem' }}
-          />
-          <Typography fontWeight={500} fontSize="1rem" lineHeight="1.375rem">
-            {value ?? '-'}
-          </Typography>
-        </Stack>
-      ),
+      accessor: (row: ManagerWithCompany): string => row.companyName,
+      render: renderCompany,
     },
     {
       header: 'Status',
-      accessor: (row: TManager) => row.active,
-      render: (_value: ReactNode, row: TManager) => (
+      accessor: (row: ManagerWithCompany): boolean => row.active,
+      render: (_: ReactNode, row: ManagerWithCompany): JSX.Element => (
         <StatusBadge active={row.active} />
       ),
     },
   ];
 
-  const activeManagers = managers.filter((manager) => manager.active).length;
-  const inactiveManagers = managers.filter((manager) => !manager.active).length;
+  const activeManagers = managers.filter((m) => m.active).length;
+  const inactiveManagers = managers.filter((m) => !m.active).length;
 
   return (
     <PageContainter>
@@ -114,11 +184,10 @@ export const ManagersPage = (): JSX.Element => {
             title={EPageTitles.MANAGERS}
             subtitle={EpageDescriptions.MANAGERS}
           />
-
           <Button
             startIcon={<AddIcon />}
             variant="gradient"
-            onClick={() => setIsModalOpen(true)}
+            onClick={(): void => setIsModalOpen(true)}
           >
             Adicionar gestor
           </Button>
@@ -131,7 +200,6 @@ export const ManagersPage = (): JSX.Element => {
             value={activeManagers}
             label={ECardLabel.ACTIVE_MANAGERS}
           />
-
           <StatCard
             iconName="manager"
             theme="neutrals"
@@ -143,39 +211,32 @@ export const ManagersPage = (): JSX.Element => {
         <DataTable
           data={filteredManagers}
           columns={columns}
-          getRowId={(row: TManager) => row.id}
+          getRowId={(row: ManagerWithCompany): string => row.id}
           loading={isLoading}
           sx={{
             border: `1px solid ${palette.neutrals[200]}`,
             flex: 1,
             minHeight: 0,
           }}
-          onDetailsClick={(rowId) => {
-            navigate({
-              to: EPageRoutes.MANAGER_DETAIL,
-              params: { id: String(rowId) },
-            });
-          }}
+          onDetailsClick={handleDetailsClick}
+          filterType="advanced"
+          filterGroups={filterGroups}
+          selectedFilters={selectedFilters}
+          onFilterChangeAdvanced={handleFilterChange}
+          onClearFilters={handleClearFilters}
+          filterLabel="Filtros"
+          filterPlaceholderAdvanced="Filtrar gestores"
           onSearchChange={setSearchValue}
-          onFilterChange={setFilterValue}
           searchValue={searchValue}
-          filterValue={filterValue}
-          toolbarTitle="Lista de gestores"
           searchPlaceholder="Buscar gestor..."
           searchAriaLabel="Buscar gestor"
-          filterPlaceholder="Filtrar"
-          filterAriaLabel="Filtrar gestores"
-          filterOptions={[
-            { label: 'Todos', value: '' },
-            { label: EStatus.ACTIVE, value: 'true' },
-            { label: EStatus.INACTIVE, value: 'false' },
-          ]}
+          toolbarTitle="Lista de gestores"
         />
       </Stack>
 
       <AddManagerModal
         open={isModalOpen}
-        handleClose={() => setIsModalOpen(false)}
+        handleClose={(): void => setIsModalOpen(false)}
       />
     </PageContainter>
   );

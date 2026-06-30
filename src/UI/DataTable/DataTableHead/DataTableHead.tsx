@@ -20,12 +20,14 @@ export interface IDataTableHeadProps<T> {
   columns: DataTableColumn<T>[];
   surface: DataTableSurfaceColors;
   palette: Palette;
+  showDetailsColumn?: boolean;
 }
 
 export const DataTableHead = <T,>({
   columns,
   surface,
   palette,
+  showDetailsColumn = true,
 }: IDataTableHeadProps<T>): JSX.Element => {
   const headerCellSx = {
     backgroundColor: surface.headerBg,
@@ -59,7 +61,7 @@ export const DataTableHead = <T,>({
                     display: 'inline-flex',
                     color: column.iconColor
                       ? iconTupleToCss(column.iconColor)
-                      : palette.neutrals[500],
+                      : palette.neutrals?.[500],
                   }}
                 >
                   {column.icon}
@@ -80,25 +82,27 @@ export const DataTableHead = <T,>({
             </Stack>
           </TableCell>
         ))}
-        <TableCell
-          align="center"
-          sx={{
-            ...headerCellSx,
-            position: 'sticky',
-            right: 0,
-            zIndex: 3,
-            width: 120,
-          }}
-        >
-          <Typography
-            component="span"
-            variant="caption"
-            fontWeight={700}
-            sx={{ color: 'inherit' }}
+        {showDetailsColumn && (
+          <TableCell
+            align="center"
+            sx={{
+              ...headerCellSx,
+              position: 'sticky',
+              right: 0,
+              zIndex: 3,
+              width: 120,
+            }}
           >
-            Detalhes
-          </Typography>
-        </TableCell>
+            <Typography
+              component="span"
+              variant="caption"
+              fontWeight={700}
+              sx={{ color: 'inherit' }}
+            >
+              Detalhes
+            </Typography>
+          </TableCell>
+        )}
       </TableRow>
     </TableHead>
   );

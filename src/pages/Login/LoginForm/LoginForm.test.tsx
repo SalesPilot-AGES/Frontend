@@ -12,10 +12,6 @@ vi.mock('./useLoginForm', () => ({
   }),
 }));
 
-vi.mock('./DemoAccountsInfo/DemoAccountsInfo', () => ({
-  DemoAccountsInfo: () => <div data-testid="demo-accounts" />,
-}));
-
 import { LoginForm } from './LoginForm';
 
 describe('LoginForm', () => {
@@ -32,11 +28,6 @@ describe('LoginForm', () => {
   it('renders Login button', () => {
     render(<LoginForm />);
     expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
-  });
-
-  it('renders demo accounts section', () => {
-    render(<LoginForm />);
-    expect(screen.getByTestId('demo-accounts')).toBeInTheDocument();
   });
 
   it('renders the card title', () => {

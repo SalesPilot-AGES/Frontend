@@ -147,7 +147,7 @@ export const dashboardApi = {
   ): Promise<TMeetingsBySalesman> => {
     try {
       const response = await apiClient.get<unknown>(
-        '/api/painel/reunioes-por-vendedor',
+        '/api/dashboard/meetings-by-seller',
         {
           params: getDashboardPeriodParams(filters),
         }

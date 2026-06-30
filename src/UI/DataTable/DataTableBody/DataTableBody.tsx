@@ -26,7 +26,7 @@ export interface DataTableBodyProps<T> {
   loading: boolean;
   data: T[];
   getRowId: (row: T) => string | number;
-  onDetailsClick: (id: string | number) => void;
+  onDetailsClick?: (id: string | number) => void;
   emptyTitle: string;
   emptyDescription: string;
   surface: DataTableSurfaceColors;
@@ -90,6 +90,9 @@ export const DataTableBody = <T,>({
     verticalAlign: 'middle' as const,
   };
 
+  const showDetailsColumn = Boolean(onDetailsClick);
+  const detailsColSpan = showDetailsColumn ? 1 : 0;
+
   return (
     <TableBody ref={tableBodyRef}>
       {loading ? (
@@ -111,24 +114,26 @@ export const DataTableBody = <T,>({
                 />
               </TableCell>
             ))}
-            <TableCell
-              align="center"
-              sx={{
-                ...bodyCellSx,
-                position: 'sticky',
-                right: 0,
-                zIndex: 2,
-                minWidth: 120,
-                width: 120,
-              }}
-            >
-              <Skeleton
-                variant="circular"
-                width={32}
-                height={32}
-                sx={{ display: 'inline-flex' }}
-              />
-            </TableCell>
+            {showDetailsColumn && (
+              <TableCell
+                align="center"
+                sx={{
+                  ...bodyCellSx,
+                  position: 'sticky',
+                  right: 0,
+                  zIndex: 2,
+                  minWidth: 120,
+                  width: 120,
+                }}
+              >
+                <Skeleton
+                  variant="circular"
+                  width={32}
+                  height={32}
+                  sx={{ display: 'inline-flex' }}
+                />
+              </TableCell>
+            )}
           </TableRow>
         ))
       ) : data.length > 0 ? (
@@ -160,38 +165,40 @@ export const DataTableBody = <T,>({
                     />
                   </TableCell>
                 ))}
-                <TableCell
-                  align="center"
-                  sx={{
-                    ...bodyCellSx,
-                    position: 'sticky',
-                    right: 0,
-                    zIndex: 1,
-                    minWidth: 120,
-                    width: 120,
-                  }}
-                >
-                  <IconButton
-                    aria-label={`Ver detalhes de ${String(rowId)}`}
-                    onClick={() => onDetailsClick(rowId)}
-                    size="small"
+                {showDetailsColumn && (
+                  <TableCell
+                    align="center"
                     sx={{
-                      color: surface.detailsAction,
-                      p: 0.5,
-                      '&:hover': { backgroundColor: 'transparent' },
-                      '& .MuiSvgIcon-root': { fontSize: 20 },
+                      ...bodyCellSx,
+                      position: 'sticky',
+                      right: 0,
+                      zIndex: 1,
+                      minWidth: 120,
+                      width: 120,
                     }}
                   >
-                    <EastRoundedIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
+                    <IconButton
+                      aria-label={`Ver detalhes de ${String(rowId)}`}
+                      onClick={() => onDetailsClick?.(rowId)}
+                      size="small"
+                      sx={{
+                        color: surface.detailsAction,
+                        p: 0.5,
+                        '&:hover': { backgroundColor: 'transparent' },
+                        '& .MuiSvgIcon-root': { fontSize: 20 },
+                      }}
+                    >
+                      <EastRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                )}
               </TableRow>
             );
           })}
           {infiniteScroll && hasNextPage && (
             <TableRow>
               <TableCell
-                colSpan={columns.length + 1}
+                colSpan={columns.length + detailsColSpan}
                 style={{ textAlign: 'center', padding: '1rem' }}
               >
                 {isFetchingNextPage ? (
@@ -207,7 +214,7 @@ export const DataTableBody = <T,>({
         </>
       ) : (
         <DataTableEmptyState
-          colSpan={columns.length + 1}
+          colSpan={columns.length + detailsColSpan}
           emptyTitle={emptyTitle}
           emptyDescription={emptyDescription}
           emptyStateIconBg={surface.emptyStateIconBg}

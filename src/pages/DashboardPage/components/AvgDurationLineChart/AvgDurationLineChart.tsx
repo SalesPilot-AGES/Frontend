@@ -14,6 +14,7 @@ import type { JSX } from 'react';
 import { useMemo } from 'react';
 
 import { useDashboardFilterContext } from '../../context/DashboardFilterContext';
+import { CHART_TOOLTIP_SLOT_PROPS } from '../chartTooltipSlotProps';
 import { StyledLineChart } from './AvgDurationLineChart.style';
 import { formatDuration, formatMonthLabel } from './AvgDurationLineChart.utils';
 import {
@@ -126,15 +127,7 @@ export const AvgDurationLineChart = (): JSX.Element => {
             height={240}
             margin={{ top: 24, right: 24, bottom: 24, left: 50 }}
             grid={{ horizontal: true }}
-            slotProps={{
-              tooltip: {
-                sx: {
-                  '& .MuiChartsTooltip-table caption': {
-                    textAlign: 'right',
-                  },
-                },
-              },
-            }}
+            slotProps={CHART_TOOLTIP_SLOT_PROPS}
             xAxis={[
               {
                 id: 'months',

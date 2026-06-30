@@ -4,7 +4,11 @@ import { render, screen } from '@tests/testUtils';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AvgDurationLineChart } from './AvgDurationLineChart';
-import { formatDuration, formatMonthLabel } from './AvgDurationLineChart.utils';
+import {
+  formatDuration,
+  formatDurationSecondsAsMinutes,
+  formatMonthLabel,
+} from './AvgDurationLineChart.utils';
 
 const mockUseDashboardAvgDuration = vi.fn();
 
@@ -39,6 +43,12 @@ describe('AvgDurationLineChart', () => {
     expect(formatDuration(158)).toBe('2 horas e 38 minutos');
     expect(formatDuration(38.4)).toBe('38 minutos');
     expect(formatDuration(38.6)).toBe('39 minutos');
+  });
+
+  it('formats duration seconds as short minutes', () => {
+    expect(formatDurationSecondsAsMinutes(0)).toBe('0 min');
+    expect(formatDurationSecondsAsMinutes(90)).toBe('2 min');
+    expect(formatDurationSecondsAsMinutes(2400)).toBe('40 min');
   });
 
   it('renders loading state', () => {

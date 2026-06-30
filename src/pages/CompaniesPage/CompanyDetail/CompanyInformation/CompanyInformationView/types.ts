@@ -6,6 +6,8 @@ export interface CompanyInformationValues {
   tax_id: string;
   plan: TPlan;
   active: boolean;
+  phone?: string | null;
+  address?: string | null;
 }
 
 export interface CompanyInformationProps extends CompanyInformationValues {

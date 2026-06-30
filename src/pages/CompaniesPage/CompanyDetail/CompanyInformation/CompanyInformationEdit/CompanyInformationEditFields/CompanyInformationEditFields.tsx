@@ -66,10 +66,11 @@ export const CompanyInformationEditFields = ({
           </Typography>
           <TextField
             fullWidth
-            value={'Rua Exemplo, 123'}
+            value={draft.address ?? ''}
             onChange={(e) =>
               setDraft((d) => ({ ...d, address: e.target.value }))
             }
+            helperText="Atualização de endereço ainda não é salva pela API."
             slotProps={{
               input: {
                 startAdornment: (
@@ -95,8 +96,9 @@ export const CompanyInformationEditFields = ({
           </Typography>
           <TextField
             fullWidth
-            value={'99999-9999'}
+            value={draft.phone ?? ''}
             onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
+            helperText="Atualização de telefone ainda não é salva pela API."
             slotProps={{
               input: {
                 startAdornment: (

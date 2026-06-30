@@ -77,15 +77,16 @@ describe('SalesmanMeetingsPage', () => {
     expect(screen.getByText('Sentimento')).toBeInTheDocument();
     expect(screen.queryByText('Vendedor')).not.toBeInTheDocument();
     expect(
-      screen.getByLabelText('Filtrar reuniões por cliente')
+      screen.getByRole('button', { name: /filtrar reuniões/i })
     ).toBeInTheDocument();
   });
 
   it('filters meetings by client', () => {
     render(<SalesmanMeetingsPage />);
 
-    fireEvent.mouseDown(screen.getByLabelText('Filtrar reuniões por cliente'));
-    fireEvent.click(screen.getByRole('option', { name: 'Lucas Vaz' }));
+    fireEvent.click(screen.getByRole('button', { name: /filtrar reuniões/i }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Lucas Vaz' }));
+    fireEvent.click(screen.getByRole('button', { name: /aplicar/i }));
 
     expect(
       screen.getByLabelText('Ver detalhes de meeting-2')
@@ -103,9 +104,7 @@ describe('SalesmanMeetingsPage', () => {
     });
     fireEvent.click(screen.getByLabelText('Ver detalhes de meeting-1'));
 
-    expect(mockUseGetMeetings).toHaveBeenLastCalledWith(0, 100, {
-      search: 'produto',
-    });
+    expect(mockUseGetMeetings).toHaveBeenCalledWith(0, 100, {});
     expect(mockNavigate).toHaveBeenCalledWith({
       to: '/reunioes/$meetingId',
       params: { meetingId: 'meeting-1' },

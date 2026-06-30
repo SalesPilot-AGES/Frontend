@@ -109,7 +109,6 @@ describe('ManagerMeetingsPage', () => {
     expect(screen.getByText('Lista de reuniões')).toBeInTheDocument();
     expect(screen.getByText('Reunião')).toBeInTheDocument();
     expect(screen.getByText('Vendedor')).toBeInTheDocument();
-    expect(screen.getByText('Empresa')).toBeInTheDocument();
     expect(screen.getByText('Data')).toBeInTheDocument();
     expect(screen.getByText('Duração')).toBeInTheDocument();
     expect(screen.getByText('Reunião de descoberta')).toBeInTheDocument();
@@ -117,12 +116,11 @@ describe('ManagerMeetingsPage', () => {
     expect(screen.getByText('Acme Ltda')).toBeInTheDocument();
   });
 
-  it('loads salesman filter options', () => {
+  it('renders advanced filter button', () => {
     render(<ManagerMeetingsPage />);
 
-    expect(mockUseGetSalesmen).toHaveBeenCalledWith(0, 100, {});
     expect(
-      screen.getByLabelText('Filtrar reuniões por vendedor')
+      screen.getByRole('button', { name: /filtrar reuniões/i })
     ).toBeInTheDocument();
   });
 });

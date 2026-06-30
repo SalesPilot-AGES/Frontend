@@ -1,14 +1,11 @@
 import FilterListRoundedIcon from '@mui/icons-material/FilterListRounded';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import {
   Box,
   Button,
   IconButton,
-  InputAdornment,
   type Palette,
   Paper,
   Popper,
-  TextField,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -42,7 +39,6 @@ export const AdvancedFilterPopper = ({
   label,
   shouldShowSearch,
   searchTerm,
-  onSearchChange,
   filteredGroups,
   tempSelected,
   onCheckboxChange,
@@ -107,39 +103,6 @@ export const AdvancedFilterPopper = ({
             />
           </IconButton>
         </Box>
-
-        {/* Search dentro do filtro - só aparece com 3+ grupos */}
-        {shouldShowSearch && (
-          <Box sx={{ p: 2, pb: 1 }}>
-            <TextField
-              size="small"
-              placeholder="Buscar filtros..."
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              fullWidth
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchRoundedIcon
-                      sx={{ color: surface.filterMuted, fontSize: 18 }}
-                    />
-                  </InputAdornment>
-                ),
-                sx: {
-                  borderRadius: '8px',
-                  backgroundColor:
-                    (palette.neutrals?.baseWhite as string) || '#f5f5f5',
-                  '& fieldset': {
-                    borderColor: surface.divider,
-                  },
-                  '&:hover fieldset': {
-                    borderColor: palette.neutrals?.[300] || '#e0e0e0',
-                  },
-                },
-              }}
-            />
-          </Box>
-        )}
 
         {/* Conteúdo dos filtros */}
         <AdvancedFilterPopperContent

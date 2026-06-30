@@ -8,17 +8,23 @@ import {
 import { GetAppIcon } from '@UI/AppIcon/AppIcon';
 import type { JSX } from 'react';
 
-import { DemoAccountsInfo } from './DemoAccountsInfo/DemoAccountsInfo';
+// import { DemoAccountsInfo } from './DemoAccountsInfo/DemoAccountsInfo';
 import { useLoginForm } from './useLoginForm';
 
 export const LoginForm = (): JSX.Element => {
-  const { register, handleSubmit, errors, onSubmit, setValue, watch } =
-    useLoginForm();
+  const {
+    register,
+    handleSubmit,
+    errors,
+    onSubmit,
+    // setValue,
+    watch,
+  } = useLoginForm();
 
   const emailValue = watch('email');
   const passwordValue = watch('password');
 
-  const handleFormSubmit = handleSubmit(onSubmit);
+  // const handleFormSubmit = handleSubmit(onSubmit);
 
   return (
     <Card sx={{ boxShadow: 3, width: '28rem' }}>
@@ -65,7 +71,7 @@ export const LoginForm = (): JSX.Element => {
             Login
           </Button>
         </form>
-        <DemoAccountsInfo setValue={setValue} onSubmit={handleFormSubmit} />
+        {/* <DemoAccountsInfo setValue={setValue} onSubmit={handleFormSubmit} /> */}
       </CardContent>
     </Card>
   );

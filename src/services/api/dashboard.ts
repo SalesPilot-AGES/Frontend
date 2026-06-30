@@ -147,7 +147,7 @@ export const dashboardApi = {
   ): Promise<TMeetingsBySalesman> => {
     try {
       const response = await apiClient.get<unknown>(
-        '/api/painel/reunioes-por-vendedor',
+        '/api/dashboard/meetings-by-seller',
         {
           params: getDashboardPeriodParams(filters),
         }
@@ -182,7 +182,7 @@ export const dashboardApi = {
   getSalesmenStatus: async (): Promise<TDashboardStatusCount> => {
     try {
       const response = await apiClient.get<unknown>(
-        '/api/dashboard/sellers-status'
+        '/api/dashboard/salesmen-status'
       );
 
       return StatusCountResponseSchema.parse(response.data);

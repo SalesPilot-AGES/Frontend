@@ -30,7 +30,7 @@ export const ManagerDashboard = (): JSX.Element => {
     () =>
       data.map((item) => ({
         label: item.salesman_name,
-        value: item.total_meetings,
+        value: item.total_meetings ?? 0,
       })),
     [data]
   );

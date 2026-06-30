@@ -161,28 +161,19 @@ export const MeetingsByMonthSchema = z.array(MeetingsByMonthApiItemSchema);
 export type TMeetingsByMonth = z.infer<typeof MeetingsByMonthSchema>;
 
 const MeetingsBySalesmanItemApiSchema = z.object({
-  salesman_name: z.string().trim().min(1),
+  seller_name: z.string().trim().min(1),
   total_meetings: z.number().int().nonnegative().optional(),
   meetings_total: z.number().int().nonnegative().optional(),
   meetings_count: z.number().int().nonnegative().optional(),
   total: z.number().int().nonnegative().optional(),
 });
 
-const getTotalMeetingsSalesman = (
-  row: z.infer<typeof MeetingsBySalesmanItemApiSchema>
-): number =>
-  row.total_meetings ??
-  row.meetings_total ??
-  row.meetings_count ??
-  row.total ??
-  0;
-
 export const MeetingsBySalesmanSchema = z
   .array(MeetingsBySalesmanItemApiSchema)
   .transform((rows) =>
     rows.map((row) => ({
-      salesman_name: row.salesman_name,
-      total_meetings: getTotalMeetingsSalesman(row),
+      salesman_name: row.seller_name,
+      total_meetings: row.total,
     }))
   );
 
